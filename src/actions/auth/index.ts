@@ -1,57 +1,23 @@
 "use server";
-import { client } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { onGetAllAccountDomains } from "../settings";
+import { client } from "@/lib/prisma";
+import { ensureUser } from "@/server/users";
 
-export const onCompleteUserRegistration = async (fullname: string, clerkId: string, type: string) => {
-  try {
-    const registered = await client.user.create({
-      data: {
-        fullname,
-        clerkId,
-        type,
-        subscription: {
-          create: {},
-        },
-      },
-      select: {
-        fullname: true,
-        id: true,
-        type: true,
-      },
-    });
+/**
+ * Loads the signed-in account for the dashboard. The database user is created on the
+ * first visit (or repaired if an earlier sign-up left it incomplete).
+ */
+export const onLoadAccount = async () => {
+  const clerkUser = await currentUser();
+  if (!clerkUser) redirect("/auth/sign-in");
 
-    if (registered) {
-      return { status: 200, user: registered };
-    }
-  } catch (error) {
-    return { status: 400 };
-  }
-};
-
-export const onLoginUser = async () => {
-  const user = await currentUser();
-  if (!user) redirect("/auth/sign-in");
-  else {
-    try {
-      const authenticated = await client.user.findUnique({
-        where: {
-          clerkId: user.id,
-        },
-        select: {
-          id: true,
-          fullname: true,
-          type: true,
-        },
-      });
-      if (authenticated) {
-        const domains = await onGetAllAccountDomains();
-
-        return { status: 200, user: authenticated, domain: domains?.domains };
-      }
-    } catch (error) {
-        return { status: 400 };
-    }
-  }
+  const fullname =
+    clerkUser.fullName?.trim() || clerkUser.primaryEmailAddress?.emailAddress.split("@")[0] || "Usuario";
+  const user = await ensureUser(client, { clerkId: clerkUser.id, fullname });
+  const domains = await client.domain.findMany({
+    where: { userId: user.id },
+    select: { id: true, name: true, icon: true },
+  });
+  return { user, domains };
 };

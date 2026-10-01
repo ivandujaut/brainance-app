@@ -13,6 +13,7 @@ BrAInance: SaaS multi-tenant de chatbots con IA para sitios web (Next.js 16, Rea
 
 ```bash
 npm run lint && npm run typecheck && npm test   # correr antes de cada commit
+TEST_DATABASE_URL=<postgres migrado> npm test   # incluye los tests de integración (*.int.test.ts)
 npm run build
 npm run test:e2e                               # requiere claves de Clerk
 npx prisma migrate dev --name <cambio>         # al cambiar prisma/schema.prisma

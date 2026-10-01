@@ -17,7 +17,8 @@ model User {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   fullname  String
   clerkId   String   @unique
-  type      String
+  // Unused since spec 002; drop in a later migration.
+  type      String   @default("owner")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -54,6 +55,8 @@ model ChatBot {
   background     String?
   textColor      String?
   helpdesk       Boolean @default(false)
+  // Set when the owner confirms the snippet is on their site (later: first widget load).
+  installedAt    DateTime?
   Domain         Domain? @relation(fields: [domainId], references: [id], onDelete: Cascade)
   domainId       String? @unique @db.Uuid
 }

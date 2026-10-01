@@ -1,6 +1,6 @@
 # 002 — Registro y onboarding
 
-- **Estado:** Borrador
+- **Estado:** Aprobada (2026-10-01)
 - **ADRs relacionados:** —
 
 ## Problema

@@ -1,4 +1,4 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import React from "react";
 import Image from "next/image";
@@ -9,9 +9,9 @@ type Props = {
 };
 
 const Layout = async ({ children }: Props) => {
-  const user = await currentUser();
+  const { userId } = await auth();
 
-  if (user) redirect("/");
+  if (userId) redirect("/dashboard");
   return (
     <div className="h-screen flex w-full justify-center">
       <div className="w-[600px] ld:w-full flex flex-col items-start p-6">
@@ -23,10 +23,10 @@ const Layout = async ({ children }: Props) => {
         {children}
       </div>
       <div className="hidden lg:flex flex-1 w-full max-h-full max-w-4000px overflow-hidden relative bg-cream  flex-col pt-10 pl-24 gap-3">
-        <h2 className="text-gravel md:text-4xl font-bold">Hi, I’m your AI powered taxes assistant, BrAInance!</h2>
+        <h2 className="text-gravel md:text-4xl font-bold">Tu asistente con IA que atiende y capta clientes en tu web</h2>
         <p className="text-iridium md:text-sm mb-10">
-          BrAInance is capable of capturing lead information without a form... <br />
-          something never done before 😉
+          BrAInance responde las consultas de tus visitantes con la información de tu negocio <br />
+          y te deja sus datos de contacto, sin formularios.
         </p>
         <Image
           src="/images/app-ui.png"
