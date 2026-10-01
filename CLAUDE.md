@@ -33,6 +33,7 @@ En sandboxes con Chromium preinstalado: `PW_CHROMIUM_PATH=/opt/pw-browsers/chrom
 
 - TDD: escribir el test, verlo fallar e implementar.
 - Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`, `docs:`).
+- Commits y PRs sin `Co-Authored-By` de Claude ni firma de Claude en la descripción del PR.
 - Toda consulta de datos de tenant filtra por el usuario o dominio dueño.
 - Secretos solo en variables de entorno; documentar las variables nuevas en `.env.example`. Nunca poner secretos en `NEXT_PUBLIC_*`.
 - Cambios de prompt o de modelo de IA: correr el eval set (ADR 0001).
