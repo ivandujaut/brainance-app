@@ -34,7 +34,7 @@ En sandboxes con Chromium preinstalado: `PW_CHROMIUM_PATH=/opt/pw-browsers/chrom
 
 - TDD: escribir el test, verlo fallar e implementar.
 - Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`, `docs:`).
-- Commits y PRs sin atribución a Claude: ni `Co-Authored-By`, ni líneas `Claude-Session`, ni firma en la descripción del PR.
+- Commits y PRs sin atribución a Claude: ni `Co-Authored-By`, ni líneas `Claude-Session`, ni firma en la descripción del PR. Autor y committer: `Ivan Dujaut <dujautivan@gmail.com>` (verificar `git config user.name` y `user.email` antes de commitear).
 - Toda consulta de datos de tenant filtra por el usuario o dominio dueño.
 - Secretos solo en variables de entorno; documentar las variables nuevas en `.env.example`. Nunca poner secretos en `NEXT_PUBLIC_*`.
 - Cambios de prompt o de modelo de IA: correr el eval set (ADR 0001).
