@@ -1,6 +1,6 @@
 import { useToast } from "@/components/ui/use-toast";
 import { UserLoginProps, UserLoginSchema } from "@/schemas/auth.schema";
-import { useSignIn } from "@clerk/nextjs";
+import { useSignIn } from "@clerk/nextjs/legacy";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

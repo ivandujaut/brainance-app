@@ -29,6 +29,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+!.env.example
 
 # vercel
 .vercel
@@ -36,3 +37,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/src/generated/
+
+# testing
+/test-results/
+/playwright-report/
+/blob-report/
+
+# eval outputs (keep _state.json and results.jsonl, drop bulk and derived files)
+/evals/**/results/*/traces/
+/evals/**/results/*/progress.txt
+/evals/**/results/*/ref/
+/evals/**/results/report.html
+/evals/**/results/state.json
+/evals/**/results/trajectory/
+/evals/**/sanity/
+/evals/**/pilot/

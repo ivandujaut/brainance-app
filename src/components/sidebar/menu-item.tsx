@@ -4,7 +4,7 @@ import React from "react";
 
 type Props = {
   size: "max" | "min";
-  icon: JSX.Element;
+  icon: React.JSX.Element;
   label: string;
   path?: string;
   current?: string;

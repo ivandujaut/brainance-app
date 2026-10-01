@@ -1,0 +1,22 @@
+{
+  "id": "clinica-dental",
+  "name": "Sonrisa Plena",
+  "description": "clínica odontológica en Nueva Córdoba, Córdoba",
+  "addressing": "usted",
+  "contact": "el teléfono (0351) 555-0202 o WhatsApp +54 9 351 555-0202, de lunes a viernes de 8 a 20 y sábados de 9 a 13",
+  "faqs": [
+    { "question": "¿Qué obras sociales y prepagas atienden?", "answer": "OSDE (plan 210 en adelante), Swiss Medical, Galeno y Sancor Salud. No atendemos PAMI ni APROSS." },
+    { "question": "¿Cuánto cuesta la consulta particular?", "answer": "La consulta particular cuesta $35.000 e incluye el diagnóstico y el plan de tratamiento." },
+    { "question": "¿Cuánto cuesta una limpieza?", "answer": "La limpieza dental con ultrasonido cuesta $45.000 en forma particular." },
+    { "question": "¿Hacen blanqueamiento? ¿Cuánto cuesta?", "answer": "Sí. El blanqueamiento en consultorio cuesta $280.000 e incluye dos sesiones. Requiere una consulta previa." },
+    { "question": "¿Hacen ortodoncia?", "answer": "Sí, con brackets y con alineadores invisibles. El presupuesto se arma después de una consulta de evaluación con radiografías." },
+    { "question": "¿Hacen implantes?", "answer": "Sí. El presupuesto es personalizado y se define después de una evaluación con tomografía." },
+    { "question": "¿Atienden urgencias?", "answer": "Atendemos urgencias en el horario de la clínica, con prioridad sobre los turnos programados. No tenemos guardia las 24 horas." },
+    { "question": "¿Dónde quedan y en qué horario atienden?", "answer": "Estamos en Bv. Illia 450, Nueva Córdoba. Atendemos de lunes a viernes de 8 a 20 y sábados de 9 a 13." },
+    { "question": "¿Cómo saco un turno?", "answer": "Por WhatsApp o por teléfono al (0351) 555-0202." },
+    { "question": "¿Atienden a niños?", "answer": "Sí, tenemos odontopediatría para chicos desde 3 años, los martes y jueves." },
+    { "question": "¿Se puede pagar en cuotas?", "answer": "Los tratamientos de más de $200.000 se pueden pagar en 6 cuotas sin interés con tarjetas de crédito Visa o Mastercard bancarias." },
+    { "question": "¿Cómo cancelo un turno?", "answer": "Le pedimos avisar con al menos 24 horas de anticipación por WhatsApp o teléfono." },
+    { "question": "¿Tienen estacionamiento?", "answer": "No tenemos estacionamiento propio. Hay una playa de estacionamiento a media cuadra, sobre Bv. Illia." }
+  ]
+}

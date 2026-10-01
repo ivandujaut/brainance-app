@@ -1,0 +1,21 @@
+{
+  "id": "tienda-ropa",
+  "name": "La Percha Indumentaria",
+  "description": "tienda online de ropa urbana con showroom en Rosario",
+  "addressing": "vos",
+  "contact": "nuestro WhatsApp +54 9 341 555-0303 (lunes a viernes de 9 a 18)",
+  "faqs": [
+    { "question": "¿Hacen envíos?", "answer": "Sí, enviamos a todo el país por Andreani. Demora entre 3 y 7 días hábiles según la zona. No hacemos envíos al exterior." },
+    { "question": "¿Cuánto cuesta el envío?", "answer": "El costo se calcula en el checkout según el código postal. El envío es gratis en compras desde $90.000." },
+    { "question": "¿Tienen envío en el día en Rosario?", "answer": "Sí, en Rosario hacemos envíos en moto en 24 horas hábiles por $4.500." },
+    { "question": "¿Puedo retirar en persona?", "answer": "Sí, podés retirar gratis en el showroom de Córdoba 1452, Rosario, de lunes a sábados de 10 a 19." },
+    { "question": "¿Cómo hago un cambio?", "answer": "Tenés 30 días desde que recibís el pedido, con la prenda sin uso y con etiqueta. El primer cambio tiene envío gratis; desde el segundo, el envío lo pagás vos." },
+    { "question": "¿Puedo devolver una compra?", "answer": "Sí, tenés 10 días corridos desde que recibís el pedido para arrepentirte. Te devolvemos el dinero por el mismo medio de pago." },
+    { "question": "¿Qué talles tienen?", "answer": "Trabajamos del S al XXL. Cada producto tiene su tabla de medidas en la página." },
+    { "question": "¿Qué medios de pago aceptan?", "answer": "Tarjetas de crédito y débito, Mercado Pago y transferencia bancaria. Pagando por transferencia tenés 10% de descuento." },
+    { "question": "¿Tienen cuotas sin interés?", "answer": "Sí, 3 cuotas sin interés con todas las tarjetas de crédito bancarias." },
+    { "question": "¿Venden por mayor?", "answer": "Sí, con un pedido mínimo de 12 prendas surtidas. La lista mayorista se pide por WhatsApp." },
+    { "question": "¿Cómo sigo mi pedido?", "answer": "Cuando despachamos el pedido te llega por email el código de seguimiento de Andreani." },
+    { "question": "¿Las prendas son de producción propia?", "answer": "Sí, diseñamos y confeccionamos todas las prendas en nuestro taller de Rosario." }
+  ]
+}

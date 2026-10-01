@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 type Props = {
   triggers: {
     label: string;
-    icon?: JSX.Element;
+    icon?: React.JSX.Element;
   }[];
   children: React.ReactNode;
   className?: string;
-  button?: JSX.Element;
+  button?: React.JSX.Element;
 };
 
 const TabsMenu = ({ triggers, children, className, button }: Props) => {

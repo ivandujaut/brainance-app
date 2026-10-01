@@ -9,6 +9,9 @@ import { onGetBlogPosts } from "@/actions/landing";
 import parse from "html-react-parser";
 import { getMonthName } from "@/lib/utils";
 
+// Blog posts come from WordPress at request time; keep this page dynamic.
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   // WIP: Challenge to setup billing card
   const posts:

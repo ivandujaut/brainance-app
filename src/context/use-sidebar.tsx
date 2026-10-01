@@ -1,6 +1,6 @@
 "use client";
 import { useToast } from "@/components/ui/use-toast";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useChatContext } from "./user-chat-context";
 import { onGetConversationMode, onToggleRealtime } from "@/actions/conversation";
@@ -8,7 +8,6 @@ import { useClerk } from "@clerk/nextjs";
 
 const useSideBar = () => {
   const [expand, setExpand] = useState<boolean | undefined>(undefined);
-  const router = useRouter();
   const pathName = usePathname();
   const { toast } = useToast();
   const [realtime, setRealtime] = useState<boolean>(false);
@@ -49,7 +48,7 @@ const useSideBar = () => {
   const page = pathName.split("/").pop();
   const { signOut } = useClerk();
 
-  const onSignOut = () => signOut(() => router.push("/"));
+  const onSignOut = () => signOut({ redirectUrl: "/" });
 
   const onExpand = () => setExpand((prev) => !prev);
 

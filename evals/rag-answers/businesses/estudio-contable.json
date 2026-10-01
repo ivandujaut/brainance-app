@@ -1,0 +1,22 @@
+{
+  "id": "estudio-contable",
+  "name": "Estudio Ferreyra & Asociados",
+  "description": "estudio contable en Palermo, Ciudad de Buenos Aires",
+  "addressing": "usted",
+  "contact": "WhatsApp +54 9 11 5555-0101 (lunes a viernes de 9 a 17) o el email consultas@estudioferreyra.example",
+  "faqs": [
+    { "question": "¿Qué servicios ofrecen?", "answer": "Monotributo (alta, recategorización y baja), responsables inscriptos (IVA y Ganancias), constitución de sociedades SAS y SRL, liquidación de sueldos y declaraciones juradas de Ganancias y Bienes Personales para personas humanas." },
+    { "question": "¿Cuánto cuesta el abono de monotributo?", "answer": "El abono mensual para monotributistas es de $60.000 e incluye la recategorización semestral, el control de facturación y el envío del VEP para el pago mensual." },
+    { "question": "¿Cuánto cuesta el alta de monotributo?", "answer": "El alta de monotributo es un servicio único de $50.000. Se completa en 48 horas hábiles desde que recibimos la documentación." },
+    { "question": "¿Qué necesito para darme de alta en el monotributo?", "answer": "DNI, clave fiscal de ARCA con nivel 3, CBU de una cuenta a su nombre, domicilio fiscal y una descripción de la actividad que va a facturar." },
+    { "question": "¿Cuánto cuesta el servicio para responsables inscriptos?", "answer": "El abono para responsables inscriptos parte de $180.000 por mes. El valor final depende del volumen de comprobantes y se cotiza después de la primera consulta." },
+    { "question": "¿Cuánto cuesta la declaración de Ganancias y Bienes Personales?", "answer": "La declaración jurada anual de Ganancias y Bienes Personales para personas humanas cuesta $250.000 en total." },
+    { "question": "¿La primera consulta tiene costo?", "answer": "La primera consulta es gratuita, dura 30 minutos y puede ser por videollamada o presencial en el estudio." },
+    { "question": "¿Dónde están y en qué horario atienden?", "answer": "Estamos en Av. Santa Fe 3400, piso 5, Ciudad de Buenos Aires. Atendemos de lunes a viernes de 9 a 17." },
+    { "question": "¿Atienden clientes de otras provincias?", "answer": "Sí, trabajamos con clientes de todo el país de forma 100% virtual." },
+    { "question": "¿Cuándo es la recategorización del monotributo?", "answer": "La recategorización es semestral, en enero y en julio. Para nuestros clientes con abono la hacemos nosotros sin costo adicional." },
+    { "question": "¿Cómo se pagan los honorarios?", "answer": "Por transferencia bancaria o Mercado Pago. Emitimos factura por cada pago." },
+    { "question": "¿Hacen trámites jubilatorios o juicios?", "answer": "No. No realizamos trámites jubilatorios ni representación en juicios; nos dedicamos solo a temas contables e impositivos." },
+    { "question": "¿Cuánto tarda constituir una SAS?", "answer": "La constitución de una SAS demora entre 15 y 20 días hábiles, según los tiempos de la Inspección General de Justicia. El presupuesto se arma en la primera consulta." }
+  ]
+}

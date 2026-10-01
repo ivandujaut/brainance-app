@@ -1,6 +1,7 @@
 "use server";
 import { client } from "@/lib/prisma";
-import { clerkClient, currentUser } from "@clerk/nextjs";
+import { clerkClient, currentUser } from "@clerk/nextjs/server";
+import { canAddDomain } from "@/domain/plans";
 
 export const onIntegrateDomain = async (domain: string, icon: string) => {
   const user = await currentUser();
@@ -36,9 +37,10 @@ export const onIntegrateDomain = async (domain: string, icon: string) => {
 
     if (!domainExists) {
       if (
-        (subscription?.subscription?.plan == "STANDARD" && subscription._count.domains < 1) ||
-        (subscription?.subscription?.plan == "PRO" && subscription._count.domains < 5) ||
-        (subscription?.subscription?.plan == "ULTIMATE" && subscription._count.domains < 10)
+        canAddDomain({
+          plan: subscription?.subscription?.plan,
+          currentDomains: subscription?._count.domains ?? 0,
+        })
       ) {
         const newDomain = await client.user.update({
           where: {
@@ -142,7 +144,7 @@ export const onUpdatePassword = async (password: string) => {
     const user = await currentUser();
 
     if (!user) return null;
-    const update = await clerkClient.users.updateUser(user.id, { password });
+    const update = await (await clerkClient()).users.updateUser(user.id, { password });
 
     if (update) {
       return { status: 200, message: "Password updated successfully" };
