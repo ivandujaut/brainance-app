@@ -2,7 +2,7 @@
 import { useToast } from "@/components/ui/use-toast";
 import { UserRegistrationProps, UserRegistrationSchema } from "@/schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSignUp } from "@clerk/nextjs";
+import { useSignUp } from "@clerk/nextjs/legacy";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

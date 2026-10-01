@@ -5,11 +5,11 @@ import parse from "html-react-parser";
 import React from "react";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 const PostPage = async ({ params }: Props) => {
-  const post = await onGetBlogPost(params.id);
+  const post = await onGetBlogPost((await params).id);
   return (
     <div className="container flex justify-center my-10">
       <div className="lg:w-6/12 flex flex-col">

@@ -1,5 +1,4 @@
 import SignUpFormProvider from "@/components/forms/sign-up/form-provider";
-import { SignUp } from "@clerk/nextjs";
 import RegistrationFormStep from "../../../components/forms/sign-up/registration-step";
 import ButtonHandler from "@/components/forms/sign-up/button-handlers";
 import HighLightBar from "@/components/forms/sign-up/hightlight-bar";

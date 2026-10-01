@@ -1,4 +1,5 @@
 import CalIcon from "../../public/icons/cal-icon";
+import type React from "react";
 import ChatIcon from "../../public/icons/chat-icon";
 import DashboardIcon from "../../public/icons/dashboard-icon";
 import EmailIcon from "../../public/icons/email-icon";
@@ -10,7 +11,7 @@ import TimerIcon from "../../public/icons/timer-icon";
 
 export type SIDE_BAR_MENU_PROPS = {
   label: string;
-  icon: JSX.Element;
+  icon: React.JSX.Element;
   path: string;
 };
 
@@ -49,7 +50,7 @@ export const SIDE_BAR_MENU: SIDE_BAR_MENU_PROPS[] = [
 
 type TABS_MENU_PROPS = {
   label: string;
-  icon?: JSX.Element;
+  icon?: React.JSX.Element;
 };
 
 export const TABS_MENU: TABS_MENU_PROPS[] = [

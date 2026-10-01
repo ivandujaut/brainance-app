@@ -2,7 +2,7 @@ import React from "react";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/drawer";
 
 type Props = {
-  onOpen: JSX.Element;
+  onOpen: React.JSX.Element;
   children: React.ReactNode;
   title: string;
   description: string;
