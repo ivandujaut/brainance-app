@@ -6,14 +6,14 @@ Mide qué tan bien responde cada modelo candidato a las consultas de los visitan
 
 | Archivo | Qué es |
 |---|---|
-| `businesses/*.json` | 4 negocios argentinos ficticios con su base de conocimiento, tono (vos/usted) y contacto |
-| `cases.json` | 60 consultas con el comportamiento esperado y los hechos que deben o no aparecer |
+| `businesses/*.json` | 5 negocios argentinos ficticios con su base de conocimiento, tono (vos/usted) y contacto |
+| `cases.json` | 75 consultas con el comportamiento esperado y los hechos que deben o no aparecer |
 | `cases.md` | Vista legible de los casos (`npm run eval:rag:cases` la regenera y valida el set) |
 | `run-eval.mjs` | Runner: llama a `answerQuestion` (`src/server/ai/answer.ts`, el mismo código que usará producción) y califica con un juez IA |
 | `summarize.mjs` | Tabla resumen por variante y por tipo de caso |
 | `results/_state.json` | Métricas, precios por modelo y archivos que forman el harness |
 
-**Tipos de caso** (`tags[0]`): `respondible` (24), `no_en_kb` (12), `multiple` (8), `premisa_falsa` (8) y `fuera_de_tema` (8).
+**Tipos de caso** (`tags[0]`): `respondible` (30), `no_en_kb` (15), `multiple` (10), `premisa_falsa` (10) y `fuera_de_tema` (10).
 
 **Métricas** (cada una aprobada o no, calificadas por separado por el juez):
 - `correcta`: cumple el comportamiento esperado, incluye lo pedido y no hace lo prohibido. **Es la métrica principal.**
@@ -46,17 +46,17 @@ npm run eval:rag -- --flow evals/rag-answers/sanity --variant v1 --model fixture
 node evals/rag-answers/summarize.mjs evals/rag-answers/sanity
 ```
 
-### 3. Piloto (5 casos)
+### 3. Piloto (6 casos, uno por negocio y tipo)
 
 ```bash
-EVAL_ONLY=ec-01,ec-07,cd-12,tr-11,in-14 npm run eval:rag -- --flow evals/rag-answers/pilot --model anthropic/claude-haiku-4.5 --approve-harness
+EVAL_ONLY=ec-01,ec-07,cd-12,tr-11,in-14,tm-03 npm run eval:rag -- --flow evals/rag-answers/pilot --model anthropic/claude-haiku-4.5 --approve-harness
 ```
 
 Leer cada respuesta y su calificación en `pilot/baseline/results.jsonl` (campo `explanation`) y en `pilot/baseline/traces/`. Si alguna calificación no coincide con tu criterio, se ajusta la rúbrica (`JUDGE_SYSTEM` en `run-eval.mjs`) antes de la corrida completa.
 
 ### 4. Corrida completa por modelo
 
-Cada modelo es una variante: `baseline`, `v1`, `v2`… Con 2 repeticiones, el margen de error de cada porcentaje es de unos ±9 puntos, así que diferencias menores no son concluyentes.
+Cada modelo es una variante: `baseline`, `v1`, `v2`… Con 2 repeticiones, el margen de error de cada porcentaje es de unos ±8 puntos, así que diferencias menores no son concluyentes.
 
 ```bash
 npm run eval:rag -- --variant baseline --model anthropic/claude-haiku-4.5 --reps 2 --approve-harness

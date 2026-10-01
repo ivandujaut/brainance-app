@@ -1,6 +1,6 @@
 # 001 — Respuestas con IA (RAG) y su eval set
 
-- **Estado:** Borrador
+- **Estado:** Aprobada (casos, juez `claude-opus-5.5` y candidatos aprobados el 2026-10-01)
 - **ADRs relacionados:** [0001 — Estrategia de modelos de IA](../adr/0001-estrategia-de-modelos-de-ia.md)
 
 ## Problema
@@ -32,7 +32,7 @@ El bot tiene que responder las consultas de los visitantes usando solo la inform
 
 - Prompt de sistema: `src/domain/answer-prompt.ts` (puro, con tests).
 - Punto de entrada que se usará en producción: `src/server/ai/answer.ts`. Llama al modelo vía Vercel AI Gateway con el AI SDK.
-- Eval: `evals/rag-answers/`. Tiene 4 negocios argentinos ficticios, ~60 casos, un runner y un juez con rúbrica. Ver su `README.md`.
+- Eval: `evals/rag-answers/`. Tiene 5 negocios argentinos ficticios, 75 casos, un runner y un juez con rúbrica. Ver su `README.md`.
 - Riesgo: los casos y las respuestas esperadas los generó Claude. El juez califica contra hechos de la base de conocimiento, no contra el estilo de una respuesta modelo. Aun así, conviene sumar casos reales cuando haya tráfico.
 
 ## Plan de tests
