@@ -1,0 +1,21 @@
+{
+  "id": "inmobiliaria",
+  "name": "Propiedades del Sur",
+  "description": "inmobiliaria de Mar del Plata",
+  "addressing": "vos",
+  "contact": "nuestro WhatsApp +54 9 223 555-0404 o la oficina de Av. Colón 2100, Mar del Plata (lunes a viernes de 9:30 a 18 y sábados de 10 a 13)",
+  "faqs": [
+    { "question": "¿Qué requisitos piden para alquilar?", "answer": "DNI, recibos de sueldo o constancia de ingresos que sumen al menos tres veces el valor del alquiler, y una garantía: propietaria en Mar del Plata o seguro de caución." },
+    { "question": "¿Cómo son los contratos de alquiler?", "answer": "Los contratos de vivienda que gestionamos son a 2 años, con actualización trimestral por IPC." },
+    { "question": "¿Cuánto cobran de honorarios al inquilino?", "answer": "Los honorarios para el inquilino equivalen a un mes de alquiler más IVA." },
+    { "question": "¿Cuánto cobran por vender una propiedad?", "answer": "La comisión por venta es del 3% para el vendedor y del 3% para el comprador." },
+    { "question": "¿Hacen tasaciones?", "answer": "Sí, la tasación de tu propiedad es gratuita y sin compromiso. Coordinamos la visita por WhatsApp." },
+    { "question": "¿Tienen alquileres temporarios?", "answer": "Sí, departamentos y casas para temporada. En enero y febrero la estadía mínima es de 7 noches y se reserva con una seña del 30%." },
+    { "question": "¿Aceptan mascotas?", "answer": "Depende de cada propietario; en cada publicación indicamos si se aceptan mascotas." },
+    { "question": "¿Cómo coordino una visita?", "answer": "Por WhatsApp, con al menos 24 horas de anticipación." },
+    { "question": "¿En qué zonas trabajan?", "answer": "Trabajamos en Mar del Plata y Batán." },
+    { "question": "¿Gestionan créditos hipotecarios?", "answer": "No gestionamos créditos, pero te indicamos qué propiedades son aptas para crédito hipotecario." },
+    { "question": "¿Dónde está la oficina y en qué horario atienden?", "answer": "Estamos en Av. Colón 2100, Mar del Plata. Atendemos de lunes a viernes de 9:30 a 18 y los sábados de 10 a 13." },
+    { "question": "¿Administran propiedades?", "answer": "Sí, administramos alquileres: cobranza, pago de impuestos y coordinación de arreglos. La comisión es del 6% del alquiler mensual." }
+  ]
+}

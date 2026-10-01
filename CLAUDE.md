@@ -16,6 +16,7 @@ npm run lint && npm run typecheck && npm test   # correr antes de cada commit
 npm run build
 npm run test:e2e                               # requiere claves de Clerk
 npx prisma migrate dev --name <cambio>         # al cambiar prisma/schema.prisma
+npm run eval:rag -- --variant <id> --model <gateway-id>   # eval de respuestas (ver evals/rag-answers/README.md)
 ```
 
 En sandboxes con Chromium preinstalado: `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e`.
