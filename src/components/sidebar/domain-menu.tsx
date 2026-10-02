@@ -6,6 +6,7 @@ import { AddDomainForm } from "../add-domain-form";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { siteSettingsPath } from "@/lib/routes";
 
 type Props = {
   min?: boolean;
@@ -42,12 +43,12 @@ const DomainMenu = ({ domains, min }: Props) => {
         {domains &&
           domains.map((domain) => (
             <Link
-              href={`/settings/${domain.name.split(".")[0]}`}
+              href={siteSettingsPath(domain.id)}
               key={domain.id}
               className={cn(
                 "flex gap-3 items-center justify-center hover:bg-white rounded-full transition duration-100 ease-in-out cursor-pointer ",
                 !min ? "p-2" : "py-2",
-                domain.name.split(".")[0] == isDomain && "bg-white"
+                domain.id === isDomain && "bg-white"
               )}
             >
               {domain.icon ? (

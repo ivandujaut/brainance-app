@@ -53,7 +53,12 @@ model ChatBot {
   welcomeMessage String?
   icon           String?
   background     String?
+  // No longer written: the widget computes the text color from `background` (spec 004).
   textColor      String?
+  // What the business does, how to address visitors ("vos" | "usted") and where to refer them.
+  description    String?
+  addressing     String  @default("vos")
+  contact        String?
   helpdesk       Boolean @default(false)
   // Set when the owner confirms the snippet is on their site (later: first widget load).
   installedAt    DateTime?

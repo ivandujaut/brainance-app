@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 type Message = { id: string; role: "user" | "assistant"; content: string };
 
-type Config = { name: string; welcomeMessage: string; icon: string | null; background: string; textColor: string };
+export type WidgetConfig = { name: string; welcomeMessage: string; icon: string | null; background: string; textColor: string };
 
 const VISITOR_KEY = "brainance:visitor";
 
@@ -48,18 +48,26 @@ const useHydrated = () =>
 
 const GENERIC_ERROR = "No pudimos enviar tu mensaje. Revisá tu conexión y probá de nuevo.";
 
-export const WidgetChat = ({ domainId, config }: { domainId: string; config: Config }) => {
+type Props = {
+  domainId: string;
+  config: WidgetConfig;
+  /** Settings page preview: shows the look only, never reads or writes a conversation. */
+  preview?: boolean;
+};
+
+export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   // Typing before hydration would be wiped out by React, so the controls wait for it.
-  const hydrated = useHydrated();
+  const hydrated = useHydrated() && !preview;
   const api = `/api/widget/${domainId}`;
   const tooLong = input.trim().length > MAX_MESSAGE_LENGTH;
 
   useEffect(() => {
+    if (preview) return;
     let cancelled = false;
     fetch(`${api}/conversation?visitorId=${getVisitorId()}`)
       .then((res) => (res.ok ? res.json() : { messages: [] }))
@@ -70,7 +78,7 @@ export const WidgetChat = ({ domainId, config }: { domainId: string; config: Con
     return () => {
       cancelled = true;
     };
-  }, [api]);
+  }, [api, preview]);
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
@@ -138,7 +146,12 @@ export const WidgetChat = ({ domainId, config }: { domainId: string; config: Con
   const accent = { backgroundColor: config.background, color: config.textColor };
 
   return (
-    <div className="h-screen w-full flex flex-col bg-white sm:rounded-2xl overflow-hidden border border-gray-200">
+    <div
+      className={cn(
+        "w-full flex flex-col bg-white overflow-hidden border border-gray-200",
+        preview ? "h-full rounded-2xl" : "h-screen sm:rounded-2xl",
+      )}
+    >
       <header className="flex items-center gap-3 px-4 py-3" style={accent}>
         {config.icon ? (
           <Image src={`https://ucarecdn.com/${config.icon}/`} alt="" width={32} height={32} className="rounded-full" />
@@ -148,15 +161,17 @@ export const WidgetChat = ({ domainId, config }: { domainId: string; config: Con
           </span>
         )}
         <p className="font-semibold flex-1 truncate">{config.name}</p>
-        <button
-          type="button"
-          aria-label="Cerrar chat"
-          data-testid="widget-close"
-          disabled={!hydrated}
-          onClick={() => window.parent.postMessage({ type: "brainance:close" }, "*")}
-        >
-          <X size={20} />
-        </button>
+        {!preview && (
+          <button
+            type="button"
+            aria-label="Cerrar chat"
+            data-testid="widget-close"
+            disabled={!hydrated}
+            onClick={() => window.parent.postMessage({ type: "brainance:close" }, "*")}
+          >
+            <X size={20} />
+          </button>
+        )}
       </header>
 
       <div ref={listRef} className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" aria-live="polite">
@@ -185,7 +200,7 @@ export const WidgetChat = ({ domainId, config }: { domainId: string; config: Con
         <textarea
           data-testid="widget-input"
           aria-label="Escribí tu consulta"
-          placeholder="Escribí tu consulta…"
+          placeholder={preview ? "Así lo ven tus visitantes" : "Escribí tu consulta…"}
           rows={1}
           disabled={!hydrated}
           value={input}

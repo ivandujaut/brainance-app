@@ -40,3 +40,23 @@ export const findOwnedChatRoom = async (id: unknown) => {
   if (!owner || !uuid.safeParse(id).success) return null;
   return client.chatRoom.findFirst({ where: ownedChatRoomWhere(owner, id as string), select: { id: true } });
 };
+
+/** Prisma filter for a row hanging from one of `clerkId`'s sites (FAQs, qualifying questions). */
+export const ownedSiteChildWhere = (clerkId: string, id: string) => ({ id, Domain: { User: { clerkId } } });
+
+/** An FAQ on one of the signed-in owner's sites, or null. */
+export const findOwnedFaq = async (id: unknown) => {
+  const owner = await currentOwnerId();
+  if (!owner || !uuid.safeParse(id).success) return null;
+  return client.helpDesk.findFirst({ where: ownedSiteChildWhere(owner, id as string), select: { id: true, domainId: true } });
+};
+
+/** A qualifying question on one of the signed-in owner's sites, or null. */
+export const findOwnedFilterQuestion = async (id: unknown) => {
+  const owner = await currentOwnerId();
+  if (!owner || !uuid.safeParse(id).success) return null;
+  return client.filterQuestions.findFirst({
+    where: ownedSiteChildWhere(owner, id as string),
+    select: { id: true, domainId: true },
+  });
+};

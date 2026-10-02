@@ -14,6 +14,8 @@ const config = {
     },
     extend: {
       colors: {
+        // Deprecated (ADR 0005): legacy brand colors. New code uses the semantic tokens below; these
+        // go away once no component uses them.
         cream: "#F5F5F5",
         gravel: "#4E4E4E",
         iridium: "#3F3F3F",

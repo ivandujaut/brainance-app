@@ -34,6 +34,12 @@ src/server/     Adaptadores: repositorios (Prisma), IA, realtime, email, pagos.
 - No se cambia un modelo ni un prompt sin correr el eval set en español (ver ADR 0001).
 - Hay que empezar simple: un modelo bien configurado antes que un router complejo. El routing se agrega cuando los datos muestran que conviene.
 
+## UI y design system
+
+- Los colores del panel salen de los tokens semánticos de `src/app/globals.css` (`bg-primary`, `text-muted-foreground`, `border-border`…) y los componentes, de `src/components/ui`. No se usan hex sueltos ni colores arbitrarios en código nuevo (ADR 0005).
+- Todo par fondo/texto cumple contraste WCAG AA; `src/styles/design-tokens.test.ts` lo verifica para los tokens.
+- El widget es la excepción: lleva el color del dueño, con el color del texto calculado (`src/domain/color-contrast.ts`).
+
 ## Calidad
 
 - TypeScript estricto. Sin `any` en código nuevo.
@@ -42,10 +48,10 @@ src/server/     Adaptadores: repositorios (Prisma), IA, realtime, email, pagos.
 
 ## Deuda técnica conocida
 
-- Los hooks del dashboard (`src/hooks/settings`, `src/context/use-sidebar.tsx`) hacen fetch en efectos.
-- `User.type` ya no se usa (spec 002): eliminar la columna en una migración aparte.
+- Los hooks del dashboard (`src/context/use-sidebar.tsx` y otros) hacen fetch en efectos. La configuración del bot ya carga sus datos en un Server Component (spec 004).
+- `User.type` (spec 002) y `ChatBot.textColor` (spec 004) ya no se usan: eliminar las columnas en una migración aparte.
 - No hay webhook de Clerk: si se borra un usuario en Clerk, su registro queda en la base.
-- El widget deriva a un contacto genérico y usa voseo para todos los sitios hasta que la configuración del bot guarde contacto y trato (ítem 3 del roadmap).
+- Colores sueltos de `tailwind.config.ts` (`orange`, `cream`, `gravel`, etc.) en pantallas viejas: se migran a tokens cuando se tocan (ADR 0005). Para ver lo que falta: `grep -rnE "(bg|text|border)-(orange|cream|gravel|iridium|peach|platinum|ghost|grandis|porcelain|ironside)" src`.
 - Tailwind 3 y zod 3: actualizar a Tailwind 4 y zod 4 en PRs separados.
 - `src/actions/landing/index.ts` lee `CLOUDWAYS_POSTS_URL`, que no existe (la variable se llama `CLOUDWAYS_POST_URL`).
 - Las reglas `eslint-config-next/typescript` todavía no están activas porque marcan unos 90 problemas en el código heredado.

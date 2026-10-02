@@ -16,7 +16,7 @@ Cada ítem va a tener su spec en `docs/specs/`.
 
 1. **Registro y onboarding** ([spec 002](specs/002-registro-y-onboarding.md)): alta de cuenta, primer dominio y snippet de instalación.
 2. **Dominios**: alta, baja y límites por plan (solo plan gratuito en la beta).
-3. **Configuración del bot**: mensaje de bienvenida, apariencia, FAQ (helpdesk) y preguntas de calificación.
+3. **Configuración del bot** ([spec 004](specs/004-configuracion-del-bot.md)): mensaje de bienvenida, apariencia, FAQ (helpdesk) y preguntas de calificación.
 4. **Base de conocimiento (RAG)**: carga de FAQ y documentos con embeddings en pgvector.
 5. **Widget embebible** ([spec 003](specs/003-widget-embebible.md)): script que se agrega al sitio del cliente y abre el chat.
 6. **Respuestas con IA** ([spec 001](specs/001-respuestas-con-ia.md)): capa de IA según el ADR 0001, con eval set en español.

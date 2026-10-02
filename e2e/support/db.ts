@@ -4,7 +4,9 @@ import { Pool } from "pg";
 // Plain SQL instead of the generated Prisma client, which is ESM-only.
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-export const createSite = async (name: string) => {
+type SiteOptions = { background?: string; contact?: string };
+
+export const createSite = async (name: string, { background = "#123456", contact }: SiteOptions = {}) => {
   const {
     rows: [user],
   } = await pool.query<{ id: string }>(
@@ -18,8 +20,8 @@ export const createSite = async (name: string) => {
     [name, user.id],
   );
   await pool.query(
-    `INSERT INTO "ChatBot" ("welcomeMessage", background, "domainId") VALUES ($1, '#123456', $2)`,
-    ["¡Hola! Soy el asistente de prueba.", domain.id],
+    `INSERT INTO "ChatBot" ("welcomeMessage", background, contact, "domainId") VALUES ($1, $2, $3, $4)`,
+    ["¡Hola! Soy el asistente de prueba.", background, contact ?? null, domain.id],
   );
   await pool.query(`INSERT INTO "HelpDesk" (question, answer, "domainId") VALUES ($1, $2, $3)`, [
     "¿Hacen envíos?",
@@ -40,4 +42,20 @@ export const installedAt = async (domainId: string) => {
     [domainId],
   );
   return rows[0]?.installedAt ?? null;
+};
+
+/** Fills the site's daily quota with `count` visitor messages from another visitor. */
+export const seedVisitorMessages = async (domainId: string, count: number) => {
+  const {
+    rows: [room],
+  } = await pool.query<{ id: string }>(
+    `WITH c AS (INSERT INTO "Customer" ("visitorId", "domainId") VALUES ($1, $2) RETURNING id)
+     INSERT INTO "ChatRoom" ("customerId", "updatedAt") SELECT id, now() FROM c RETURNING id`,
+    [crypto.randomUUID(), domainId],
+  );
+  await pool.query(
+    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt")
+     SELECT 'consulta ' || n, 'user', $1, now() FROM generate_series(1, $2) n`,
+    [room.id, count],
+  );
 };
