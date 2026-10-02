@@ -12,7 +12,7 @@ import { AA_CONTRAST, contrastRatio, isHexColor, LIGHT_TEXT, readableTextColor }
 import { cn } from "@/lib/utils";
 import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from "@/schemas/settings.schema";
 import { Counter, FieldError, Section } from "./section";
-import { useActionToast } from "./use-action-toast";
+import { useActionToast } from "@/hooks/use-action-toast";
 
 export type Look = { background: string; welcomeMessage: string; icon: string | null };
 

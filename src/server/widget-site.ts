@@ -14,9 +14,18 @@ export const getWidgetSite = (db: PrismaClient, domainId: string) =>
       id: true,
       name: true,
       chatBot: {
-        select: { welcomeMessage: true, icon: true, background: true, description: true, addressing: true, contact: true },
+        select: {
+          welcomeMessage: true,
+          icon: true,
+          background: true,
+          description: true,
+          addressing: true,
+          contact: true,
+          leadCapture: true,
+        },
       },
       helpdesk: { select: { question: true, answer: true } },
+      filterQuestions: { select: { id: true, question: true }, orderBy: { question: "asc" } },
     },
   });
 
@@ -30,13 +39,21 @@ export const widgetColors = (bot: Look | null) => {
   return { background, textColor: readableTextColor(background) };
 };
 
-/** What the visitor's browser may see: no FAQs, no business data for the model, no ids beyond the site's own. */
-export const toPublicConfig = (site: WidgetSite) => ({
-  name: site.name,
-  welcomeMessage: site.chatBot?.welcomeMessage || WIDGET_DEFAULT_WELCOME,
-  icon: site.chatBot?.icon || null,
-  ...widgetColors(site.chatBot),
-});
+/**
+ * What the visitor's browser may see: no FAQs and no business data for the model. The qualifying
+ * questions are public: the visitor reads them in the lead card anyway (spec 005).
+ */
+export const toPublicConfig = (site: WidgetSite) => {
+  const leadCapture = site.chatBot?.leadCapture !== false;
+  return {
+    name: site.name,
+    welcomeMessage: site.chatBot?.welcomeMessage || WIDGET_DEFAULT_WELCOME,
+    icon: site.chatBot?.icon || null,
+    ...widgetColors(site.chatBot),
+    leadCapture,
+    leadQuestions: leadCapture ? site.filterQuestions : [],
+  };
+};
 
 const isAddressing = (value: unknown): value is Addressing => ADDRESSING.includes(value as Addressing);
 

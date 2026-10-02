@@ -4,12 +4,37 @@ import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent } from "react";
 import { MAX_MESSAGE_LENGTH } from "@/domain/widget-limits";
 import { cn } from "@/lib/utils";
+import { LeadCard, type LeadQuestion } from "./lead-card";
 
 type Message = { id: string; role: "user" | "assistant"; content: string };
 
-export type WidgetConfig = { name: string; welcomeMessage: string; icon: string | null; background: string; textColor: string };
+export type WidgetConfig = {
+  name: string;
+  welcomeMessage: string;
+  icon: string | null;
+  background: string;
+  textColor: string;
+  leadCapture?: boolean;
+  leadQuestions?: LeadQuestion[];
+};
 
 const VISITOR_KEY = "brainance:visitor";
+const LEAD_DISMISSED_KEY = "brainance:lead-dismissed";
+
+const readFlag = (key: string) => {
+  try {
+    return localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+};
+const writeFlag = (key: string) => {
+  try {
+    localStorage.setItem(key, "1");
+  } catch {
+    // Storage blocked: the card stays dismissed for this tab only.
+  }
+};
 
 /** UUID v4 that also works outside secure contexts, where crypto.randomUUID is missing. */
 const randomId = (): string => {
@@ -60,6 +85,8 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Lead card (spec 005): offered once after the first answer; "Dejar mis datos" reopens it.
+  const [lead, setLead] = useState({ captured: false, dismissed: false, open: false, thanks: null as string | null });
   const listRef = useRef<HTMLDivElement>(null);
   // Typing before hydration would be wiped out by React, so the controls wait for it.
   const hydrated = useHydrated() && !preview;
@@ -71,18 +98,54 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
     let cancelled = false;
     fetch(`${api}/conversation?visitorId=${getVisitorId()}`)
       .then((res) => (res.ok ? res.json() : { messages: [] }))
-      .then((data: { messages: Message[] }) => {
-        if (!cancelled) setMessages(data.messages);
+      .then((data: { messages: Message[]; leadCaptured?: boolean }) => {
+        if (cancelled) return;
+        setMessages(data.messages);
+        setLead((prev) => ({
+          ...prev,
+          captured: Boolean(data.leadCaptured),
+          dismissed: readFlag(`${LEAD_DISMISSED_KEY}:${domainId}`),
+        }));
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, [api, preview]);
+  }, [api, domainId, preview]);
+
+  const leadEnabled = !preview && config.leadCapture === true;
+  const answered = messages.some((m) => m.role === "assistant" && m.content.trim());
+  const showLeadCard = leadEnabled && (lead.open || (answered && !sending && !lead.captured && !lead.dismissed));
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
-  }, [messages]);
+  }, [messages, showLeadCard, lead.thanks]);
+
+  const submitLead = async (data: { email: string; answers: { questionId: string; answer: string }[] }) => {
+    try {
+      const res = await fetch(`${api}/lead`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visitorId: getVisitorId(), ...data }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { email?: string; message?: string };
+      if (!res.ok) return body.message ?? "No pudimos guardar tus datos. Probá de nuevo.";
+      setLead((prev) => ({
+        ...prev,
+        captured: true,
+        open: false,
+        thanks: `¡Gracias! ${config.name} te va a contactar a ${body.email ?? data.email}.`,
+      }));
+      return null;
+    } catch {
+      return "No pudimos guardar tus datos. Revisá tu conexión y probá de nuevo.";
+    }
+  };
+
+  const dismissLead = () => {
+    writeFlag(`${LEAD_DISMISSED_KEY}:${domainId}`);
+    setLead((prev) => ({ ...prev, dismissed: true, open: false }));
+  };
 
   const fail = (text: string, userMessageId: string, message = GENERIC_ERROR) => {
     // Give the visitor their text back so nothing they wrote is lost.
@@ -183,6 +246,20 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
             {m.content || <span className="animate-pulse">…</span>}
           </Bubble>
         ))}
+        {lead.thanks && (
+          <Bubble role="assistant" accent={accent}>
+            <span data-testid="lead-thanks">{lead.thanks}</span>
+          </Bubble>
+        )}
+        {showLeadCard && (
+          <LeadCard
+            businessName={config.name}
+            questions={config.leadQuestions ?? []}
+            accent={accent}
+            onSubmit={submitLead}
+            onDismiss={dismissLead}
+          />
+        )}
       </div>
 
       {error && (
@@ -194,6 +271,18 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
         <p role="alert" className="mx-4 mb-2 text-sm text-red-600">
           Tu mensaje supera los {MAX_MESSAGE_LENGTH} caracteres ({input.trim().length}).
         </p>
+      )}
+
+      {leadEnabled && !showLeadCard && (
+        <button
+          type="button"
+          data-testid="lead-open"
+          disabled={!hydrated}
+          onClick={() => setLead((prev) => ({ ...prev, open: true, thanks: null }))}
+          className="mx-4 mb-2 self-start text-sm text-gray-700 underline underline-offset-2"
+        >
+          Dejar mis datos
+        </button>
       )}
 
       <form onSubmit={onSubmit} className="flex items-end gap-2 border-t border-gray-200 p-3">

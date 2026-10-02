@@ -10,6 +10,7 @@ import { BusinessForm } from "./business-form";
 import { FaqSection } from "./faq-section";
 import { FilterQuestionsSection } from "./filter-questions-section";
 import { InstallSection } from "./install-section";
+import { LeadSettingsSection } from "./lead-settings-section";
 import { Preview } from "./preview";
 
 const SECTIONS = [
@@ -17,6 +18,7 @@ const SECTIONS = [
   { id: "apariencia", label: "Apariencia" },
   { id: "preguntas-frecuentes", label: "Preguntas frecuentes" },
   { id: "calificacion", label: "Calificación" },
+  { id: "captura", label: "Captura de datos" },
   { id: "instalacion", label: "Instalación" },
 ];
 
@@ -71,6 +73,11 @@ export const BotSettings = ({ settings }: { settings: SiteSettings }) => {
           <AppearanceForm siteId={settings.id} look={look} onChange={setLook} />
           <FaqSection siteId={settings.id} faqs={settings.helpdesk} />
           <FilterQuestionsSection siteId={settings.id} questions={settings.filterQuestions} />
+          <LeadSettingsSection
+            siteId={settings.id}
+            leadCapture={bot?.leadCapture ?? true}
+            leadEmail={bot?.leadEmail ?? true}
+          />
           <InstallSection siteId={settings.id} name={settings.name} installedAt={bot?.installedAt ?? null} />
         </div>
         <aside className="hidden lg:block sticky top-0 h-[600px]" aria-label="Vista previa">

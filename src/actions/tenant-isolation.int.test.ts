@@ -17,6 +17,7 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
   const conversation = await import("./conversation");
   const settings = await import("./settings");
   const bot = await import("./settings/bot");
+  const leads = await import("./leads");
 
   const OWNER = "user_int_tenant_owner";
   const INTRUDER = "user_int_tenant_intruder";
@@ -48,7 +49,7 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
             helpdesk: { create: { question: "¿Envíos?", answer: "Sí." } },
             filterQuestions: { create: { question: "¿Cuál es tu email?" } },
             customer: {
-              create: { email: "visitante@example.com", chatRoom: { create: { message: { create: { message: "hola", role: "user" } } } } },
+              create: { email: "visitante@example.com", leadAt: new Date(), chatRoom: { create: { message: { create: { message: "hola", role: "user" } } } } },
             },
           },
         },
@@ -209,6 +210,35 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
       await bot.onCreateFilterQuestion(siteId, { question: "¿Cuál es tu teléfono?" });
       await bot.onDeleteFilterQuestion(questionId);
       expect((await site()).filterQuestions.map((q) => q.question)).toEqual(["¿Cuál es tu teléfono?"]);
+    });
+
+    it("onUpdateLeadSettings: only the owner turns lead capture off", async () => {
+      as(INTRUDER);
+      await bot.onUpdateLeadSettings(siteId, { leadCapture: false, leadEmail: false });
+      expect((await site()).chatBot).toMatchObject({ leadCapture: true, leadEmail: true });
+
+      as(OWNER);
+      await bot.onUpdateLeadSettings(siteId, { leadCapture: false, leadEmail: true });
+      expect((await site()).chatBot).toMatchObject({ leadCapture: false, leadEmail: true });
+    });
+
+    it("leads: only the owner lists, exports and deletes them", async () => {
+      as(INTRUDER);
+      expect(JSON.stringify(await leads.onListLeads())).not.toContain("visitante@example.com");
+      expect(JSON.stringify(await leads.onListLeads(siteId))).not.toContain("visitante@example.com");
+      expect(await leads.onExportLeads(siteId)).not.toContain("visitante@example.com");
+
+      as(OWNER);
+      const [lead] = await leads.onListLeads(siteId);
+      expect(lead.email).toBe("visitante@example.com");
+      expect(await leads.onExportLeads(siteId)).toContain("visitante@example.com");
+
+      as(INTRUDER);
+      await leads.onDeleteLead(lead.id);
+      as(OWNER);
+      expect(await leads.onListLeads(siteId)).toHaveLength(1);
+      await leads.onDeleteLead(lead.id);
+      expect(await leads.onListLeads(siteId)).toHaveLength(0);
     });
 
     it("onDeleteUserDomain: only the owner deletes the site", async () => {

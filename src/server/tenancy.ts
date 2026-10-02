@@ -60,3 +60,13 @@ export const findOwnedFilterQuestion = async (id: unknown) => {
     select: { id: true, domainId: true },
   });
 };
+
+/** A lead (visitor who left their data) on one of the signed-in owner's sites, or null. */
+export const findOwnedLead = async (id: unknown) => {
+  const owner = await currentOwnerId();
+  if (!owner || !uuid.safeParse(id).success) return null;
+  return client.customer.findFirst({
+    where: { ...ownedSiteChildWhere(owner, id as string), leadAt: { not: null } },
+    select: { id: true, domainId: true },
+  });
+};

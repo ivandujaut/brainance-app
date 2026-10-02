@@ -72,7 +72,7 @@ describe.skipIf(!url)("bot settings actions", async () => {
     const icon = "8d3c1f9e-0a6b-4a8e-9c1a-2f7f6b0e5d41";
     const result = await bot.onUpdateAppearance(siteId, { background: "#123456", welcomeMessage: "¡Buen día!", icon });
     expect(result.status).toBe(200);
-    expect(toPublicConfig(await widgetSite())).toEqual({
+    expect(toPublicConfig(await widgetSite())).toMatchObject({
       name: "panaderia.com.ar",
       welcomeMessage: "¡Buen día!",
       icon,

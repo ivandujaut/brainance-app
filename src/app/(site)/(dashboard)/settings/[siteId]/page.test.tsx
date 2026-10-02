@@ -28,6 +28,8 @@ const settings: SiteSettings = {
     addressing: "vos",
     contact: null,
     installedAt: null,
+    leadCapture: true,
+    leadEmail: true,
   },
   helpdesk: [{ id: "f1", question: "¿Abren los domingos?", answer: "Sí, de 8 a 13." }],
   filterQuestions: [],
@@ -43,7 +45,7 @@ describe("site settings page", () => {
   it("shows the sections in Spanish and the real widget as preview", async () => {
     onGetSiteSettings.mockResolvedValue(settings);
     const html = await render();
-    for (const title of ["Negocio", "Apariencia", "Preguntas frecuentes", "Preguntas de calificación", "Instalación"]) {
+    for (const title of ["Negocio", "Apariencia", "Preguntas frecuentes", "Preguntas de calificación", "Captura de datos", "Instalación"]) {
       expect(html).toContain(title);
     }
     expect(html).toContain('data-testid="bot-preview"');
