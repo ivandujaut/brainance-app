@@ -42,7 +42,8 @@ src/server/     Adaptadores: repositorios (Prisma), IA, realtime, email, pagos.
 ## Deuda técnica conocida
 
 - Los hooks del dashboard (`src/hooks/settings`, `src/context/use-sidebar.tsx`) hacen fetch en efectos.
-- El sign-in y el sign-up usan los hooks legacy de Clerk (`@clerk/nextjs/legacy`). Hay que migrarlos a la API actual.
+- `User.type` ya no se usa (spec 002): eliminar la columna en una migración aparte.
+- No hay webhook de Clerk: si se borra un usuario en Clerk, su registro queda en la base.
 - Tailwind 3 y zod 3: actualizar a Tailwind 4 y zod 4 en PRs separados.
 - `src/actions/landing/index.ts` lee `CLOUDWAYS_POSTS_URL`, que no existe (la variable se llama `CLOUDWAYS_POST_URL`).
 - Las reglas `eslint-config-next/typescript` todavía no están activas porque marcan unos 90 problemas en el código heredado.

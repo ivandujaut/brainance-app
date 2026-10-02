@@ -1,81 +1,53 @@
 "use server";
 import { client } from "@/lib/prisma";
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { canAddDomain } from "@/domain/plans";
+import { canAddDomain, domainLimitFor } from "@/domain/plans";
+import { isValidDomain } from "@/domain/domains";
 
 export const onIntegrateDomain = async (domain: string, icon: string) => {
   const user = await currentUser();
   if (!user) return;
+  const name = domain.trim().toLowerCase();
+  if (!isValidDomain(name)) {
+    return { status: 400, message: "El dominio no es válido. Ingresá algo como minegocio.com.ar" };
+  }
   try {
-    const subscription = await client.user.findUnique({
-      where: {
-        clerkId: user.id,
-      },
+    const account = await client.user.findUnique({
+      where: { clerkId: user.id },
       select: {
-        _count: {
-          select: {
-            domains: true,
-          },
-        },
-        subscription: {
-          select: {
-            plan: true,
-          },
-        },
+        _count: { select: { domains: true } },
+        subscription: { select: { plan: true } },
+        domains: { where: { name }, select: { id: true } },
       },
     });
-    const domainExists = await client.user.findFirst({
-      where: {
-        clerkId: user.id,
-        domains: {
-          some: {
-            name: domain,
-          },
-        },
-      },
-    });
+    if (!account) return { status: 400, message: "No encontramos tu cuenta. Volvé a ingresar." };
+    if (account.domains.length) return { status: 400, message: "Ese sitio ya está agregado." };
 
-    if (!domainExists) {
-      if (
-        canAddDomain({
-          plan: subscription?.subscription?.plan,
-          currentDomains: subscription?._count.domains ?? 0,
-        })
-      ) {
-        const newDomain = await client.user.update({
-          where: {
-            clerkId: user.id,
-          },
-          data: {
-            domains: {
-              create: {
-                name: domain,
-                icon,
-                chatBot: {
-                  create: {
-                    welcomeMessage: "Hey there, have  a question? Text us here",
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        if (newDomain) {
-          return { status: 200, message: "Domain successfully added" };
-        }
-      }
+    const plan = account.subscription?.plan;
+    if (!canAddDomain({ plan, currentDomains: account._count.domains })) {
+      const limit = plan ? domainLimitFor(plan) : 0;
       return {
         status: 400,
-        message: "You've reached the maximum number of domains, upgrade your plan",
+        message: `Tu plan permite ${limit === 1 ? "un solo sitio" : `hasta ${limit} sitios`}.`,
       };
     }
-    return {
-      status: 400,
-      message: "Domain already exists",
-    };
+
+    await client.user.update({
+      where: { clerkId: user.id },
+      data: {
+        domains: {
+          create: {
+            name,
+            icon,
+            chatBot: { create: { welcomeMessage: "¡Hola! ¿Tenés alguna consulta? Escribinos acá." } },
+          },
+        },
+      },
+    });
+    return { status: 200, message: "Sitio agregado" };
   } catch (error) {
     console.log(error);
+    return { status: 500, message: "No pudimos agregar el sitio. Probá de nuevo." };
   }
 };
 

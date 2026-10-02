@@ -31,13 +31,13 @@ export const useDomain = () => {
 
   const onAddDomain = handleSubmit(async (values) => {
     setLoading(true);
-    const uploaded = await upload.uploadFile(values.image[0]);
-    const domain = await onIntegrateDomain(values.domain, uploaded.uuid);
+    const icon = values.image?.[0] ? (await upload.uploadFile(values.image[0])).uuid : "";
+    const domain = await onIntegrateDomain(values.domain, icon);
     if (domain) {
       reset();
       setLoading(false);
       toast({
-        title: domain.status === 200 ? "Success" : "Error",
+        title: domain.status === 200 ? "Listo" : "No se pudo agregar",
         description: domain.message,
       });
 

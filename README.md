@@ -18,8 +18,15 @@ SaaS de chatbots con IA para sitios web. Un negocio registra sus dominios, entre
 ```bash
 cp .env.example .env.local   # completar las variables
 npm install                  # también corre `prisma generate`
-npx prisma migrate dev       # aplica el esquema a tu base local
+npx prisma migrate deploy    # aplica las migraciones a tu base
 npm run dev
+```
+
+**Bases creadas antes de las migraciones** (con `prisma db push`): marcá la migración inicial como aplicada antes del primer `migrate deploy`, así no intenta recrear las tablas:
+
+```bash
+npx prisma migrate resolve --applied 20261001000000_init
+npx prisma migrate deploy
 ```
 
 ## Scripts
@@ -30,7 +37,7 @@ npm run dev
 | `npm run build` | Build de producción |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Chequeo de tipos de TypeScript |
-| `npm test` | Tests unitarios (Vitest) |
+| `npm test` | Tests unitarios (Vitest). Con `TEST_DATABASE_URL` apuntando a una base migrada, también los de integración (`*.int.test.ts`) |
 | `npm run test:e2e` | Tests E2E (Playwright; requiere claves de Clerk) |
 
 ## Cómo trabajamos
