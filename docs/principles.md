@@ -50,7 +50,8 @@ src/server/     Adaptadores: repositorios (Prisma), IA, realtime, email, pagos.
 
 - Los hooks del dashboard (`src/context/use-sidebar.tsx` y otros) hacen fetch en efectos. La configuración del bot ya carga sus datos en un Server Component (spec 004).
 - `User.type` (spec 002) y `ChatBot.textColor` (spec 004) ya no se usan: eliminar las columnas en una migración aparte.
-- No hay webhook de Clerk: si se borra un usuario en Clerk, su registro queda en la base.
+- No hay webhook de Clerk: si se borra un usuario en Clerk, su registro queda en la base. El email del dueño para los avisos de leads se lee de Clerk al enviar (spec 005).
+- El listado de leads trae hasta 1.000 por consulta: paginar cuando un dueño se acerque.
 - Colores sueltos de `tailwind.config.ts` (`orange`, `cream`, `gravel`, etc.) en pantallas viejas: se migran a tokens cuando se tocan (ADR 0005). Para ver lo que falta: `grep -rnE "(bg|text|border)-(orange|cream|gravel|iridium|peach|platinum|ghost|grandis|porcelain|ironside)" src`.
 - Tailwind 3 y zod 3: actualizar a Tailwind 4 y zod 4 en PRs separados.
 - `src/actions/landing/index.ts` lee `CLOUDWAYS_POSTS_URL`, que no existe (la variable se llama `CLOUDWAYS_POST_URL`).

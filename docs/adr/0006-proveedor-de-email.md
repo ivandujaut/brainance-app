@@ -1,6 +1,6 @@
 # 0006 — Proveedor de email transaccional
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado
 - **Fecha:** 2026-10-02
 
 ## Contexto

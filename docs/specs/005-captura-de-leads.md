@@ -1,6 +1,6 @@
 # 005 — Captura de leads
 
-- **Estado:** Borrador
+- **Estado:** Aprobada (2026-10-02)
 - **ADRs relacionados:** [0003 — Arquitectura y límites del widget](../adr/0003-arquitectura-del-widget.md), [0004 — Aislamiento multi-tenant](../adr/0004-aislamiento-multi-tenant.md), [0006 — Proveedor de email](../adr/0006-proveedor-de-email.md)
 
 ## Problema
@@ -90,10 +90,12 @@ El bot responde consultas, pero cuando el visitante cierra el chat el negocio no
 | Criterio | Tipo de test | Archivo |
 |---|---|---|
 | 4, 17 | Unitario: validación del envío (email, largos, respuestas) | `src/domain/leads.test.ts` |
+| 11 | Unitario: adaptadores de email (Resend y consola) | `src/server/email/index.test.ts` |
 | 10, 18 | Unitario: límites de envíos por visitante y de emails por sitio | `src/domain/leads.test.ts` |
 | 13 | Unitario: CSV con BOM, comillas y neutralización de fórmulas | `src/domain/leads-csv.test.ts` |
 | 8 | Unitario: contenido del email, escapado y `Reply-To` | `src/domain/lead-email.test.ts` |
 | 5, 6, 9, 10, 11, 17, 18 | Integración (Postgres): guardar, actualizar sin duplicar, email solo en el primer envío, tope diario y error del proveedor | `src/server/leads.int.test.ts` |
 | 12, 14, 15, 16 | Integración: acciones de leads como dueño y como otro tenant | `src/actions/tenant-isolation.int.test.ts`, `src/actions/leads/leads.int.test.ts` |
 | 1, 2, 3, 5, 7 | E2E: la tarjeta aparece tras la primera respuesta, "Ahora no" la oculta, el envío confirma y persiste al recargar; con la captura desactivada no aparece | `e2e/widget-leads.spec.ts` |
+| 12 | Render de la página con las acciones simuladas | `src/app/(site)/(dashboard)/leads/page.test.tsx` |
 | 12, 13, 14 | E2E (requiere Clerk): listado, exportación y borrado | `e2e/leads.spec.ts` |
