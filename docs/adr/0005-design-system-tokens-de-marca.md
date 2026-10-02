@@ -1,6 +1,6 @@
 # 0005 — Design system con tokens de marca
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado
 - **Fecha:** 2026-10-02
 
 ## Contexto
@@ -33,6 +33,6 @@ La spec 004 rehace la pantalla de configuración y es la primera pantalla nueva 
 ## Consecuencias
 
 - Al cambiar `--primary`, los botones y estados de foco de shadcn de todo el panel pasan a naranja de una vez. Es el efecto buscado, pero algunas pantallas viejas van a mezclar el naranja nuevo con colores sueltos hasta que se migren.
-- El contraste de los tokens deja de depender de la revisión visual: si alguien cambia un valor y rompe el AA, el test falla.
+- El contraste de los tokens deja de depender de la revisión visual: si alguien cambia un valor y rompe el AA, el test falla. Al activarlo encontró dos pares heredados que no cumplían en modo claro (texto atenuado sobre `muted` y texto sobre `destructive`), que se oscurecieron.
 - Queda deuda visible y acotada: la lista de usos de colores sueltos (`grep` de `bg-orange`, `text-gravel`, etc.). Se registra en `docs/principles.md`.
 - No se agrega ninguna librería. Si más adelante la UI lo pide (temas por cliente, Tailwind 4 con `@theme`), los tokens ya están centralizados y la migración es mecánica.

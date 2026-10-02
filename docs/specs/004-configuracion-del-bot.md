@@ -1,6 +1,6 @@
 # 004 — Configuración del bot
 
-- **Estado:** Borrador
+- **Estado:** Aprobada (2026-10-02)
 - **ADRs relacionados:** [0001 — Estrategia de modelos de IA](../adr/0001-estrategia-de-modelos-de-ia.md), [0004 — Aislamiento multi-tenant](../adr/0004-aislamiento-multi-tenant.md), [0005 — Design system con tokens de marca](../adr/0005-design-system-tokens-de-marca.md)
 
 ## Problema
@@ -87,11 +87,11 @@ El widget ya responde en el sitio del cliente, pero el bot no sabe a qué se ded
 - La pantalla usa solo los tokens semánticos del ADR 0005 (`bg-primary`, `text-muted-foreground`, etc.) y componentes de `src/components/ui`. El widget no usa tokens: lleva el color del dueño.
 
 **IA**
-- El template del prompt (`buildAnswerSystemPrompt`) no cambia: cambian los datos que recibe. Si el eval set no tiene un negocio con trato de usted, se suma uno y se corre el eval antes del merge (ADR 0001).
+- El template del prompt (`buildAnswerSystemPrompt`) no cambia: cambian los datos que recibe. El eval set ya tiene dos negocios con trato de usted (clínica dental y estudio contable), así que no hace falta correrlo para este cambio (ADR 0001).
 
 ## Preguntas abiertas
 
-- **Conversar con el bot desde la vista previa.** Es útil, pero cada mensaje gasta tokens del modelo y habría que contarlos en otro límite (por dueño, no por visitante). Propuesta: dejarlo para una spec chica posterior.
+- **Conversar con el bot desde la vista previa.** Es útil, pero cada mensaje gasta tokens del modelo y habría que contarlos en otro límite (por dueño, no por visitante). Queda para una spec chica posterior.
 - **Ruta vieja por nombre.** `/settings/<nombre>` deja de existir y responde 404. Como no hay usuarios todavía, no se agrega redirección.
 
 ## Plan de tests
@@ -99,9 +99,11 @@ El widget ya responde en el sitio del cliente, pero el bot no sabe a qué se ded
 | Criterio | Tipo de test | Archivo |
 |---|---|---|
 | 8, 9, 11 | Unitario: contraste, color de texto calculado y validación de hex | `src/domain/color-contrast.test.ts` |
+| ADR 0005 | Unitario: contraste AA de los tokens en claro y oscuro | `src/styles/design-tokens.test.ts` |
 | 5, 11, 13, 14 | Unitario: esquemas y límites de los formularios | `src/domain/bot-settings.test.ts` |
 | 5, 6 | Unitario: `toBusinessKnowledge` con datos completos y con respaldo | `src/server/widget-site.test.ts` |
 | 5, 7, 12, 14, 15 | Integración (Postgres): las acciones guardan, editan y borran | `src/actions/settings/bot-settings.int.test.ts` |
 | 2, 17 | Integración: cada acción nueva como dueño y como otro tenant | `src/actions/tenant-isolation.int.test.ts` |
+| 1, 2, 4, 6 | Render del Server Component con las acciones simuladas | `src/app/(site)/(dashboard)/settings/[siteId]/page.test.tsx` |
 | 1, 3, 4, 10, 12 | E2E: el dueño cambia el color y ve la vista previa, crea, edita y borra una FAQ y llega desde el menú lateral (requiere Clerk) | `e2e/bot-settings.spec.ts` |
 | 7, 10 | E2E: el widget muestra el color guardado con texto legible y, con el tope alcanzado, deriva al contacto | `e2e/widget.spec.ts` |
