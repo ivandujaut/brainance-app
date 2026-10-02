@@ -59,6 +59,9 @@ model ChatBot {
   description    String?
   addressing     String  @default("vos")
   contact        String?
+  // Lead capture (spec 005): show the lead card in the widget, and email the owner on new leads.
+  leadCapture    Boolean @default(true)
+  leadEmail      Boolean @default(true)
   helpdesk       Boolean @default(false)
   // Set when the owner confirms the snippet is on their site (later: first widget load).
   installedAt    DateTime?
@@ -105,6 +108,11 @@ model Customer {
   email String?
   // Anonymous widget visitor: random id kept in the visitor's browser (spec 003).
   visitorId String?
+  // A visitor becomes a lead when they leave their email (spec 005).
+  leadAt    DateTime?
+  consentAt DateTime?
+
+  leadSubmissions LeadSubmission[]
 
   questions CustomerResponses[]
 
@@ -116,6 +124,18 @@ model Customer {
   domainId String? @db.Uuid
 
   @@unique([domainId, visitorId])
+  @@index([domainId, leadAt])
+}
+
+// One row per lead form submission: counts the visitor's rate limit and the site's daily emails (spec 005).
+model LeadSubmission {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt  DateTime @default(now())
+  notified   Boolean  @default(false)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String   @db.Uuid
+
+  @@index([customerId, createdAt])
 }
 
 model ChatRoom {

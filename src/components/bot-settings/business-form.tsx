@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { BusinessInfoSchema, LIMITS } from "@/domain/bot-settings";
 import { Counter, FieldError, Section } from "./section";
-import { useActionToast } from "./use-action-toast";
+import { useActionToast } from "@/hooks/use-action-toast";
 
 type Props = { siteId: string; bot: SiteSettings["chatBot"] };
 

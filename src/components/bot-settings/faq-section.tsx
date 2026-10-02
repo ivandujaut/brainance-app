@@ -14,9 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FaqSchema, LIMITS, MAX_FAQS, canAddFaq, type Faq } from "@/domain/bot-settings";
-import { ConfirmDelete } from "./confirm-delete";
+import { ConfirmDelete } from "@/components/confirm-delete";
 import { Counter, FieldError, Section } from "./section";
-import { useActionToast } from "./use-action-toast";
+import { useActionToast } from "@/hooks/use-action-toast";
 
 type Props = { siteId: string; faqs: SiteSettings["helpdesk"] };
 

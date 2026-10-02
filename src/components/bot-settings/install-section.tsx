@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { ConfirmDelete } from "./confirm-delete";
+import { ConfirmDelete } from "@/components/confirm-delete";
 import { Section } from "./section";
-import { useActionToast } from "./use-action-toast";
+import { useActionToast } from "@/hooks/use-action-toast";
 
 type Props = { siteId: string; name: string; installedAt: Date | null };
 

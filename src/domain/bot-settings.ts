@@ -70,3 +70,8 @@ export const FilterQuestionSchema = z.object({
 export type BusinessInfo = z.output<typeof BusinessInfoSchema>;
 export type Appearance = z.output<typeof AppearanceSchema>;
 export type Faq = z.output<typeof FaqSchema>;
+
+export const LeadSettingsSchema = z.object({
+  leadCapture: z.boolean({ invalid_type_error: "Elegí si el chat pide datos." }),
+  leadEmail: z.boolean({ invalid_type_error: "Elegí si querés el aviso por email." }),
+});

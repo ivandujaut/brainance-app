@@ -10,12 +10,14 @@ const bot: Bot = {
   description: "Panadería artesanal en Rosario.",
   addressing: "usted",
   contact: "WhatsApp +54 9 341 555-0101",
+  leadCapture: true,
 };
 const site = (chatBot: Partial<Bot> | null): WidgetSite => ({
   id: "6f1c7f4e-1f3a-4c8e-9a3b-2d1e0f9c8b7a",
   name: "panaderia.com.ar",
   chatBot: chatBot && { ...bot, ...chatBot },
   helpdesk: [{ question: "¿Abren los domingos?", answer: "Sí, de 8 a 13." }],
+  filterQuestions: [{ id: "0b8e9d3c-5a7f-4e21-8c6d-1f2a3b4c5d6e", question: "¿Qué estás buscando?" }],
 });
 
 describe("toBusinessKnowledge", () => {
@@ -58,6 +60,19 @@ describe("toPublicConfig", () => {
     const config = JSON.stringify(toPublicConfig(site({})));
     expect(config).not.toContain("WhatsApp");
     expect(config).not.toContain("Panadería artesanal");
+  });
+});
+
+describe("toPublicConfig lead capture", () => {
+  it("includes the qualifying questions when lead capture is on", () => {
+    expect(toPublicConfig(site({}))).toMatchObject({
+      leadCapture: true,
+      leadQuestions: [{ id: "0b8e9d3c-5a7f-4e21-8c6d-1f2a3b4c5d6e", question: "¿Qué estás buscando?" }],
+    });
+  });
+
+  it("hides the card and its questions when the owner turned it off", () => {
+    expect(toPublicConfig(site({ leadCapture: false }))).toMatchObject({ leadCapture: false, leadQuestions: [] });
   });
 });
 

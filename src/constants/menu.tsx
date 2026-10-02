@@ -1,4 +1,5 @@
 import CalIcon from "../../public/icons/cal-icon";
+import { Users } from "lucide-react";
 import type React from "react";
 import ChatIcon from "../../public/icons/chat-icon";
 import DashboardIcon from "../../public/icons/dashboard-icon";
@@ -20,6 +21,11 @@ export const SIDE_BAR_MENU: SIDE_BAR_MENU_PROPS[] = [
     label: "Dashboard",
     icon: <DashboardIcon />,
     path: "dashboard",
+  },
+  {
+    label: "Leads",
+    icon: <Users size={20} />,
+    path: "leads",
   },
   {
     label: "Conversations",

@@ -7,6 +7,7 @@ import {
   canAddFaq,
   FaqSchema,
   FilterQuestionSchema,
+  LeadSettingsSchema,
   MAX_FAQS,
 } from "@/domain/bot-settings";
 import { client } from "@/lib/prisma";
@@ -59,6 +60,8 @@ export const onGetSiteSettings = async (id: string) => {
           addressing: true,
           contact: true,
           installedAt: true,
+          leadCapture: true,
+          leadEmail: true,
         },
       },
       helpdesk: { select: { id: true, question: true, answer: true }, orderBy: { question: "asc" } },
@@ -86,6 +89,14 @@ export const onUpdateAppearance = async (id: string, input: unknown) => {
   const parsed = AppearanceSchema.safeParse(input);
   if (!parsed.success) return firstError(parsed.error);
   return attempt(site.id, () => saveBot(site.id, parsed.data), "Apariencia guardada");
+};
+
+export const onUpdateLeadSettings = async (id: string, input: unknown) => {
+  const site = await findOwnedSite(id);
+  if (!site) return NOT_FOUND;
+  const parsed = LeadSettingsSchema.safeParse(input);
+  if (!parsed.success) return firstError(parsed.error);
+  return attempt(site.id, () => saveBot(site.id, parsed.data), "Captura de datos guardada");
 };
 
 export const onCreateHelpDeskQuestion = async (id: string, input: unknown) => {

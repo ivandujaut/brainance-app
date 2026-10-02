@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FilterQuestionSchema } from "@/domain/bot-settings";
-import { ConfirmDelete } from "./confirm-delete";
+import { ConfirmDelete } from "@/components/confirm-delete";
 import { FieldError, Section } from "./section";
-import { useActionToast } from "./use-action-toast";
+import { useActionToast } from "@/hooks/use-action-toast";
 
 type Props = { siteId: string; questions: SiteSettings["filterQuestions"] };
 
@@ -31,7 +31,7 @@ export const FilterQuestionsSection = ({ siteId, questions }: Props) => {
     <Section
       id="calificacion"
       title="Preguntas de calificación"
-      description="Lo que querés saber de cada visitante (por ejemplo, su email). El bot las va a usar cuando se active la captura de contactos."
+      description="Lo que querés saber de cada visitante, además de su email (por ejemplo, su teléfono o qué está buscando). Aparecen en la tarjeta de datos del chat."
     >
       {questions.length > 0 && (
         <ul className="flex flex-col divide-y rounded-md border" data-testid="filter-question-list">
@@ -56,7 +56,7 @@ export const FilterQuestionsSection = ({ siteId, questions }: Props) => {
       <form onSubmit={onSubmit} className="flex flex-col gap-2" noValidate>
         <Label htmlFor="filter-question">Nueva pregunta</Label>
         <div className="flex gap-2">
-          <Input id="filter-question" placeholder="Ej.: ¿Cuál es tu email?" {...form.register("question")} />
+          <Input id="filter-question" placeholder="Ej.: ¿Cuál es tu teléfono?" {...form.register("question")} />
           <Button type="submit" disabled={isSubmitting}>
             Agregar
           </Button>
