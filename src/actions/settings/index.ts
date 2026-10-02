@@ -3,6 +3,7 @@ import { client } from "@/lib/prisma";
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { canAddDomain, domainLimitFor } from "@/domain/plans";
 import { isValidDomain } from "@/domain/domains";
+import { findOwnedSite } from "@/server/tenancy";
 
 export const onIntegrateDomain = async (domain: string, icon: string) => {
   const user = await currentUser();
@@ -172,93 +173,49 @@ export const onGetCurrentDomainInfo = async (domain: string) => {
 };
 
 export const onUpdatedDomain = async (id: string, name: string) => {
+  const site = await findOwnedSite(id);
+  if (!site) return { status: 404, message: "No encontramos ese sitio." };
+  const newName = name.trim().toLowerCase();
+  if (!isValidDomain(newName)) {
+    return { status: 400, message: "El dominio no es válido. Ingresá algo como minegocio.com.ar" };
+  }
   try {
-    // check if domain with name exists
-    const domainExists = await client.domain.findFirst({
-      where: {
-        name: {
-          contains: name,
-        },
-      },
+    // Names only need to be unique within the owner's own sites.
+    const duplicate = await client.domain.findFirst({
+      where: { userId: site.userId, name: newName, NOT: { id: site.id } },
+      select: { id: true },
     });
+    if (duplicate) return { status: 400, message: "Ya tenés un sitio con ese dominio." };
 
-    if (!domainExists) {
-      const domain = await client.domain.update({
-        where: {
-          id,
-        },
-        data: {
-          name,
-        },
-      });
-
-      if (domain) {
-        return { status: 200, message: "Domain updated successfully" };
-      }
-
-      return { status: 400, message: "Oops something went wrong!" };
-    }
-
-    return { status: 400, message: "Domain with this name already exists" };
+    await client.domain.update({ where: { id: site.id }, data: { name: newName } });
+    return { status: 200, message: "Dominio actualizado" };
   } catch (error) {
     console.error(error);
+    return { status: 500, message: "No pudimos actualizar el dominio. Probá de nuevo." };
   }
 };
 
 export const onChatBotImageUpdate = async (id: string, icon: string) => {
-  const user = await currentUser();
-  if (!user) return;
-
+  const site = await findOwnedSite(id);
+  if (!site) return { status: 404, message: "No encontramos ese sitio." };
   try {
-    const domain = await client.domain.update({
-      where: {
-        id,
-      },
-      data: {
-        chatBot: {
-          update: {
-            data: {
-              icon,
-            },
-          },
-        },
-      },
-    });
-
-    if (domain) {
-      return { status: 200, message: "Domain updated" };
-    }
-
-    return { status: 400, message: "Oops something went wrong!" };
+    await client.chatBot.update({ where: { domainId: site.id }, data: { icon } });
+    return { status: 200, message: "Ícono actualizado" };
   } catch (error) {
     console.error(error);
+    return { status: 500, message: "No pudimos actualizar el ícono. Probá de nuevo." };
   }
 };
 
 export const onUpdateWelcomeMessage = async (domainId: string, message: string) => {
-  console.log(domainId, message);
-
+  const site = await findOwnedSite(domainId);
+  if (!site) return { status: 404, message: "No encontramos ese sitio." };
   try {
-    const update = await client.domain.update({
-      where: {
-        id: domainId,
-      },
-      data: {
-        chatBot: {
-          update: {
-            data: {
-              welcomeMessage: message,
-            },
-          },
-        },
-      },
-    });
-
-    if (update) {
-      return { status: 200, message: "Welcome message updated" };
-    }
+    await client.chatBot.update({ where: { domainId: site.id }, data: { welcomeMessage: message } });
+    return { status: 200, message: "Mensaje de bienvenida actualizado" };
   } catch (error) {
     console.error(error);
+    return { status: 500, message: "No pudimos guardar el mensaje. Probá de nuevo." };
   }
 };
 
@@ -297,126 +254,60 @@ export const onDeleteUserDomain = async (id: string) => {
 };
 
 export const onCreateHelpDeskQuestion = async (id: string, question: string, answer: string) => {
+  const site = await findOwnedSite(id);
+  if (!site) return { status: 404, message: "No encontramos ese sitio.", questions: [] };
   try {
-    //ad the quuestion and get all the questions
-    const hekpDeskQuestion = await client.domain.update({
-      where: {
-        id,
-      },
-      data: {
-        helpdesk: {
-          create: {
-            question,
-            answer,
-          },
-        },
-      },
-      include: {
-        helpdesk: {
-          select: {
-            id: true,
-            question: true,
-            answer: true,
-          },
-        },
-      },
+    await client.helpDesk.create({ data: { domainId: site.id, question, answer } });
+    const questions = await client.helpDesk.findMany({
+      where: { domainId: site.id },
+      select: { id: true, question: true, answer: true },
     });
-
-    if (hekpDeskQuestion) {
-      return {
-        status: 200,
-        message: "New help desk question added",
-        questions: hekpDeskQuestion.helpdesk,
-      };
-    }
+    return { status: 200, message: "Pregunta frecuente agregada", questions };
   } catch (error) {
     console.error(error);
   }
 };
 
 export const onGetAllHelpDeskQuestions = async (id: string) => {
+  const site = await findOwnedSite(id);
+  if (!site) return;
   try {
     const questions = await client.helpDesk.findMany({
-      where: {
-        domainId: id,
-      },
-      select: {
-        question: true,
-        answer: true,
-        id: true,
-      },
+      where: { domainId: site.id },
+      select: { question: true, answer: true, id: true },
     });
-
-    return {
-      status: 200,
-      message: "New help desk question added",
-      questions: questions,
-    };
+    return { status: 200, message: "", questions };
   } catch (error) {
     console.error(error);
   }
 };
 
 export const onCreateFilterQuestions = async (id: string, question: string) => {
+  const site = await findOwnedSite(id);
+  if (!site) return { status: 404, message: "No encontramos ese sitio.", questions: [] };
   try {
-    const filterQuestion = await client.domain.update({
-      where: {
-        id,
-      },
-      data: {
-        filterQuestions: {
-          create: {
-            question,
-          },
-        },
-      },
-      include: {
-        filterQuestions: {
-          select: {
-            id: true,
-            question: true,
-          },
-        },
-      },
+    await client.filterQuestions.create({ data: { domainId: site.id, question } });
+    const questions = await client.filterQuestions.findMany({
+      where: { domainId: site.id },
+      select: { id: true, question: true },
     });
-
-    if (filterQuestion) {
-      return {
-        status: 200,
-        message: "Filter question added",
-        questions: filterQuestion.filterQuestions,
-      };
-    }
-    return {
-      status: 400,
-      message: "Oops! something went wrong",
-    };
+    return { status: 200, message: "Pregunta agregada", questions };
   } catch (error) {
     console.error(error);
+    return { status: 500, message: "No pudimos guardar la pregunta. Probá de nuevo." };
   }
 };
 
 export const onGetAllFilterQuestions = async (id: string) => {
-  console.log(id);
+  const site = await findOwnedSite(id);
+  if (!site) return;
   try {
     const questions = await client.filterQuestions.findMany({
-      where: {
-        domainId: id,
-      },
-      select: {
-        question: true,
-        id: true,
-      },
-      orderBy: {
-        question: "asc",
-      },
+      where: { domainId: site.id },
+      select: { question: true, id: true },
+      orderBy: { question: "asc" },
     });
-
-    return {
-      status: 200,
-      message: "",
-      questions: questions,
-    };
+    return { status: 200, message: "", questions };
   } catch (error) {
     console.error(error);
   }
