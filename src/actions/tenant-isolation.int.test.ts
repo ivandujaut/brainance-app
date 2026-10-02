@@ -16,6 +16,7 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
   const { client: db } = await import("@/lib/prisma");
   const conversation = await import("./conversation");
   const settings = await import("./settings");
+  const bot = await import("./settings/bot");
 
   const OWNER = "user_int_tenant_owner";
   const INTRUDER = "user_int_tenant_intruder";
@@ -152,40 +153,62 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
       expect(result?.status).toBe(200);
     });
 
-    it("onChatBotImageUpdate and onUpdateWelcomeMessage: only the owner edits the bot", async () => {
+    it("onGetSiteSettings: hides another tenant's settings", async () => {
       as(INTRUDER);
-      await settings.onChatBotImageUpdate(siteId, "icono-intruso");
-      await settings.onUpdateWelcomeMessage(siteId, "Bienvenida intrusa");
-      expect((await site()).chatBot).toMatchObject({ icon: null, welcomeMessage: "Hola" });
-
+      expect(await bot.onGetSiteSettings(siteId)).toBeNull();
       as(OWNER);
-      await settings.onChatBotImageUpdate(siteId, "icono-propio");
-      await settings.onUpdateWelcomeMessage(siteId, "Bienvenida propia");
-      expect((await site()).chatBot).toMatchObject({ icon: "icono-propio", welcomeMessage: "Bienvenida propia" });
+      expect(JSON.stringify(await bot.onGetSiteSettings(siteId))).toContain("¿Envíos?");
     });
 
-    it("FAQs: only the owner reads and adds them", async () => {
+    it("onUpdateBusinessInfo: only the owner edits the business data", async () => {
+      const info = { description: "Negocio intruso", addressing: "usted", contact: "intruso@example.com" };
       as(INTRUDER);
-      expect(JSON.stringify((await settings.onGetAllHelpDeskQuestions(siteId)) ?? null)).not.toContain("¿Envíos?");
-      await settings.onCreateHelpDeskQuestion(siteId, "¿Pregunta intrusa?", "x");
+      await bot.onUpdateBusinessInfo(siteId, info);
+      expect((await site()).chatBot).toMatchObject({ description: null, addressing: "vos", contact: null });
+
+      as(OWNER);
+      await bot.onUpdateBusinessInfo(siteId, info);
+      expect((await site()).chatBot).toMatchObject(info);
+    });
+
+    it("onUpdateAppearance: only the owner edits the bot's look", async () => {
+      const look = { background: "#123456", welcomeMessage: "Bienvenida", icon: null };
+      as(INTRUDER);
+      await bot.onUpdateAppearance(siteId, { ...look, welcomeMessage: "Bienvenida intrusa" });
+      expect((await site()).chatBot).toMatchObject({ background: null, welcomeMessage: "Hola" });
+
+      as(OWNER);
+      await bot.onUpdateAppearance(siteId, look);
+      expect((await site()).chatBot).toMatchObject({ background: "#123456", welcomeMessage: "Bienvenida" });
+    });
+
+    it("FAQs: only the owner adds, edits and deletes them", async () => {
+      const faqId = (await site()).helpdesk[0].id;
+      as(INTRUDER);
+      await bot.onCreateHelpDeskQuestion(siteId, { question: "¿Pregunta intrusa?", answer: "x" });
+      await bot.onUpdateHelpDeskQuestion(faqId, { question: "¿Editada?", answer: "x" });
+      await bot.onDeleteHelpDeskQuestion(faqId);
       expect((await site()).helpdesk.map((q) => q.question)).toEqual(["¿Envíos?"]);
 
       as(OWNER);
-      expect(JSON.stringify(await settings.onGetAllHelpDeskQuestions(siteId))).toContain("¿Envíos?");
-      await settings.onCreateHelpDeskQuestion(siteId, "¿Horarios?", "De 9 a 18.");
-      expect((await site()).helpdesk).toHaveLength(2);
+      await bot.onCreateHelpDeskQuestion(siteId, { question: "¿Horarios?", answer: "De 9 a 18." });
+      await bot.onUpdateHelpDeskQuestion(faqId, { question: "¿Hacen envíos?", answer: "Sí." });
+      expect((await site()).helpdesk.map((q) => q.question).sort()).toEqual(["¿Hacen envíos?", "¿Horarios?"]);
+      await bot.onDeleteHelpDeskQuestion(faqId);
+      expect((await site()).helpdesk.map((q) => q.question)).toEqual(["¿Horarios?"]);
     });
 
-    it("qualifying questions: only the owner reads and adds them", async () => {
+    it("qualifying questions: only the owner adds and deletes them", async () => {
+      const questionId = (await site()).filterQuestions[0].id;
       as(INTRUDER);
-      expect(JSON.stringify((await settings.onGetAllFilterQuestions(siteId)) ?? null)).not.toContain("¿Cuál es tu email?");
-      await settings.onCreateFilterQuestions(siteId, "¿Pregunta intrusa?");
-      expect((await site()).filterQuestions).toHaveLength(1);
+      await bot.onCreateFilterQuestion(siteId, { question: "¿Pregunta intrusa?" });
+      await bot.onDeleteFilterQuestion(questionId);
+      expect((await site()).filterQuestions.map((q) => q.question)).toEqual(["¿Cuál es tu email?"]);
 
       as(OWNER);
-      expect(JSON.stringify(await settings.onGetAllFilterQuestions(siteId))).toContain("¿Cuál es tu email?");
-      await settings.onCreateFilterQuestions(siteId, "¿Cuál es tu teléfono?");
-      expect((await site()).filterQuestions).toHaveLength(2);
+      await bot.onCreateFilterQuestion(siteId, { question: "¿Cuál es tu teléfono?" });
+      await bot.onDeleteFilterQuestion(questionId);
+      expect((await site()).filterQuestions.map((q) => q.question)).toEqual(["¿Cuál es tu teléfono?"]);
     });
 
     it("onDeleteUserDomain: only the owner deletes the site", async () => {
@@ -200,7 +223,8 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
 
     it("rejects malformed ids without errors", async () => {
       as(OWNER);
-      await expect(settings.onGetAllHelpDeskQuestions("../../etc")).resolves.toBeFalsy();
+      await expect(bot.onGetSiteSettings("../../etc")).resolves.toBeNull();
+      await expect(bot.onDeleteHelpDeskQuestion("no-es-un-id")).resolves.toMatchObject({ status: 404 });
       await expect(conversation.onGetChatMessages("no-es-un-id")).resolves.toBeFalsy();
     });
   });

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { MIN_FAQS, type OnboardingStepId } from "@/domain/onboarding";
+import { siteSettingsPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { InstallSnippet } from "./install-snippet";
 
@@ -37,7 +38,7 @@ export const OnboardingChecklist = ({ steps, site }: Props) => {
           Cargá al menos {MIN_FAQS} preguntas frecuentes con sus respuestas. Llevás {site.faqCount}.
         </p>
         <Button asChild>
-          <Link href={`/settings/${site.name.split(".")[0]}`}>Cargar preguntas frecuentes</Link>
+          <Link href={siteSettingsPath(site.id)}>Cargar preguntas frecuentes</Link>
         </Button>
       </div>
     ),

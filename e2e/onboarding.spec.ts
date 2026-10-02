@@ -37,12 +37,11 @@ test("guides a new account from adding a site to installing the bot", async ({ p
 
   // Step 2: three FAQs from the bot settings page.
   await step("train-bot").getByRole("link", { name: "Cargar preguntas frecuentes" }).click();
-  await page.getByRole("tab", { name: /help desk/i }).click();
   for (const n of [1, 2, 3]) {
-    await page.locator('input[name="question"]').fill(`¿Pregunta ${n}?`);
-    await page.locator('textarea[name="answer"]').fill(`Respuesta ${n}.`);
-    await page.getByRole("button", { name: "Create" }).click();
-    await expect(page.getByText(`¿Pregunta ${n}?`)).toBeVisible();
+    await page.locator("#faq-new-question").fill(`¿Pregunta ${n}?`);
+    await page.locator("#faq-new-answer").fill(`Respuesta ${n}.`);
+    await page.getByRole("button", { name: "Agregar", exact: true }).first().click();
+    await expect(page.getByTestId("faq-list").getByText(`¿Pregunta ${n}?`)).toBeVisible();
   }
 
   // Progress is derived from data, so it survives navigation.

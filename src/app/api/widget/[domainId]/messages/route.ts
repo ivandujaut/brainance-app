@@ -19,7 +19,7 @@ import {
   getOrCreateRoom,
   listMessages,
 } from "@/server/conversations";
-import { DEFAULT_CONTACT, getWidgetSite, toBusinessKnowledge } from "@/server/widget-site";
+import { getWidgetSite, siteCapReply, toBusinessKnowledge } from "@/server/widget-site";
 
 const body = z.object({ visitorId: z.string(), text: z.string() });
 
@@ -28,8 +28,6 @@ const REJECTIONS: Record<Exclude<RejectReason, "site_cap">, { status: number; me
   too_long: { status: 400, message: `Tu mensaje es muy largo: escribilo en menos de ${MAX_MESSAGE_LENGTH} caracteres.` },
   visitor_rate: { status: 429, message: "Enviaste muchos mensajes seguidos. Esperá unos minutos y volvé a intentar." },
 };
-
-const SITE_CAP_REPLY = `En este momento no puedo responder más consultas. Podés comunicarte con el negocio por ${DEFAULT_CONTACT}.`;
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ domainId: string }> }) {
   const { domainId } = await params;
@@ -60,8 +58,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   if (!check.ok) {
     // Over the site's daily cap: answer without calling the model.
-    await addMessage(client, room, "assistant", SITE_CAP_REPLY);
-    return NextResponse.json({ reply: SITE_CAP_REPLY });
+    const reply = siteCapReply(site);
+    await addMessage(client, room, "assistant", reply);
+    return NextResponse.json({ reply });
   }
 
   const answer = streamAnswer({

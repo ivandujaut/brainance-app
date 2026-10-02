@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { createSite, deleteUsers, installedAt } from "./support/db";
+import { createSite, deleteUsers, installedAt, seedVisitorMessages } from "./support/db";
 
 // Spec 003. The customer's site is simulated on its own origin; the widget loads from the app.
 // Chrome's local-network protections are relaxed in playwright.config.ts so these fake public
@@ -20,9 +20,9 @@ const hostPage = async (page: Page, host: string, domainId: string, appOrigin: s
   await page.goto(`http://${host}/`);
 };
 
-const newSite = async (label: string) => {
+const newSite = async (label: string, options?: Parameters<typeof createSite>[1]) => {
   const name = `${label}-${Date.now()}.test`;
-  const site = await createSite(name);
+  const site = await createSite(name, options);
   created.push(site.userId);
   return { ...site, name };
 };
@@ -50,6 +50,30 @@ test("a visitor chats on the customer's site and finds the conversation after re
   await page.getByRole("button", { name: "Abrir chat" }).click();
   await expect(chat.getByText("Respuesta de prueba a: ¿Hacen envíos?")).toBeVisible();
   await expect(chat.getByText("¿Hacen envíos?", { exact: true })).toBeVisible();
+});
+
+// Spec 004: the owner picks one color and the widget computes a readable text color.
+test("the chat uses the owner's color with readable text", async ({ page, baseURL }) => {
+  const { domainId, name } = await newSite("amarillo", { background: "#FACC15" });
+  await hostPage(page, name, domainId, new URL(baseURL!).origin);
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  const header = page.frameLocator('iframe[data-brainance="chat"]').locator("header");
+  await expect(header).toHaveCSS("background-color", "rgb(250, 204, 21)");
+  await expect(header).toHaveCSS("color", "rgb(15, 23, 42)");
+});
+
+// Spec 004, criterion 7: over the daily cap, the fixed reply refers to the owner's contact.
+test("over the site's daily cap, the bot refers to the owner's contact", async ({ page, baseURL }) => {
+  const { domainId, name } = await newSite("tope", { contact: "WhatsApp +54 9 341 555-0101" });
+  await seedVisitorMessages(domainId, 300);
+  await hostPage(page, name, domainId, new URL(baseURL!).origin);
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  const chat = page.frameLocator('iframe[data-brainance="chat"]');
+  await chat.getByTestId("widget-input").fill("¿Hacen envíos?");
+  await chat.getByTestId("widget-send").click();
+  await expect(chat.locator('[data-testid="widget-message"][data-role="assistant"]').last()).toContainText(
+    "WhatsApp +54 9 341 555-0101",
+  );
 });
 
 test("an unknown site id shows nothing and warns in the console", async ({ page, baseURL }) => {
