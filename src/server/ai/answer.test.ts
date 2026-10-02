@@ -1,7 +1,7 @@
-import { MockLanguageModelV4 } from "ai/test";
-import { describe, expect, it } from "vitest";
+import { MockLanguageModelV4, simulateReadableStream } from "ai/test";
+import { describe, expect, it, vi } from "vitest";
 import type { BusinessKnowledge } from "@/domain/answer-prompt";
-import { answerQuestion } from "./answer";
+import { answerQuestion, streamAnswer } from "./answer";
 
 const business: BusinessKnowledge = {
   name: "Sonrisa Plena",
@@ -66,5 +66,79 @@ describe("answerQuestion", () => {
     expect(prompt[0].role).toBe("system");
     expect(JSON.stringify(prompt[0].content)).toContain("OSDE 210 en adelante");
     expect(prompt.map((m) => m.role)).toEqual(["system", "user", "assistant", "user"]);
+  });
+});
+
+const streamingModel = (chunks: string[], { fail = false } = {}) =>
+  new MockLanguageModelV4({
+    provider: "mock",
+    modelId: "mock-stream",
+    doStream: async () => {
+      if (fail) throw new Error("provider down");
+      return {
+        stream: simulateReadableStream({
+          chunks: [
+            { type: "text-start" as const, id: "t1" },
+            ...chunks.map((delta) => ({ type: "text-delta" as const, id: "t1", delta })),
+            { type: "text-end" as const, id: "t1" },
+            {
+              type: "finish" as const,
+              finishReason: { unified: "stop" as const, raw: "stop" },
+              usage: {
+                inputTokens: { total: 900, noCache: 900, cacheRead: 0, cacheWrite: 0 },
+                outputTokens: { total: 8, text: 8, reasoning: 0 },
+              },
+            },
+          ],
+        }),
+      };
+    },
+  });
+
+describe("streamAnswer", () => {
+  it("streams the answer in pieces and reports the full text when it ends", async () => {
+    let finished: { text: string; finishReason: string } | undefined;
+    const result = streamAnswer({
+      business,
+      question: "¿Atienden OSDE?",
+      model: streamingModel(["Sí, ", "OSDE 210 ", "en adelante."]),
+      onEnd: (end) => {
+        finished = end;
+      },
+    });
+
+    const pieces: string[] = [];
+    for await (const piece of result.textStream) pieces.push(piece);
+
+    expect(pieces).toEqual(["Sí, ", "OSDE 210 ", "en adelante."]);
+    await result.finished;
+    expect(finished).toEqual({ text: "Sí, OSDE 210 en adelante.", finishReason: "stop" });
+  });
+
+  it("uses the same system prompt and history order as answerQuestion", async () => {
+    const model = streamingModel(["ok"]);
+    const result = streamAnswer({
+      business,
+      question: "¿Y Swiss Medical?",
+      history: [
+        { role: "user", content: "¿Atienden OSDE?" },
+        { role: "assistant", content: "Sí." },
+      ],
+      model,
+    });
+    for await (const piece of result.textStream) void piece;
+    const prompt = model.doStreamCalls[0].prompt;
+    expect(prompt.map((m) => m.role)).toEqual(["system", "user", "assistant", "user"]);
+    expect(JSON.stringify(prompt[0].content)).toContain("OSDE 210 en adelante");
+  });
+
+  it("does not report an answer when the model fails", async () => {
+    const onEnd = vi.fn();
+    const result = streamAnswer({ business, question: "hola", model: streamingModel([], { fail: true }), onEnd });
+    await expect(async () => {
+      for await (const piece of result.textStream) void piece;
+      await result.finished;
+    }).rejects.toThrow();
+    expect(onEnd).not.toHaveBeenCalled();
   });
 });

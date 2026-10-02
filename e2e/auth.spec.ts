@@ -2,6 +2,8 @@ import { clerk, setupClerkTestingToken } from "@clerk/testing/playwright";
 import { expect, test } from "@playwright/test";
 import { createTestUser, deleteTestUsers, TEST_PASSWORD, testEmail, VERIFICATION_CODE } from "./support/users";
 
+test.skip(!process.env.CLERK_SECRET_KEY, "Needs Clerk test keys (E2E_CLERK_* secrets in CI)");
+
 // Spec 002, criteria 1–4. Google sign-in is covered by manual QA (OAuth can't run in CI).
 const created: string[] = [];
 test.afterAll(() => deleteTestUsers(created));

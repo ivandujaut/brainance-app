@@ -1,6 +1,6 @@
 # 003 — Widget embebible
 
-- **Estado:** Borrador
+- **Estado:** Aprobada (2026-10-02)
 - **ADRs relacionados:** [0001 — Estrategia de modelos de IA](../adr/0001-estrategia-de-modelos-de-ia.md), [0003 — Arquitectura y límites del widget](../adr/0003-arquitectura-del-widget.md)
 
 ## Problema
@@ -55,10 +55,11 @@ El onboarding le pide al dueño que pegue `<script src=".../widget.js">` en su s
 - `GET /api/widget/[domainId]/config`: ícono, colores, mensaje de bienvenida. Es público y cacheable.
 - `GET /api/widget/[domainId]/conversation?visitorId=…` y `POST /api/widget/[domainId]/messages`: historial y envío con streaming (AI SDK `streamText`).
 - `src/server/ai/answer.ts` suma `streamAnswer`, que comparte el prompt con `answerQuestion`. El modelo sale de `AI_ANSWER_MODEL` (por defecto `anthropic/claude-haiku-4.5`).
+- Hasta que la configuración del bot (ítem 3 del roadmap) guarde un canal de contacto, el bot deriva a "los canales de contacto que figuran en este sitio" y trata al visitante de vos.
 
 **Seguridad** (ver ADR 0003)
 - La página del iframe responde con `Content-Security-Policy: frame-ancestors https://<dominio> https://*.<dominio>`. Así el navegador impide que otro sitio embeba el bot de un cliente.
-- La instalación se marca (`ChatBot.installedAt`) cuando la página se pide embebida (`Sec-Fetch-Dest: iframe`) y el `Referer` coincide con el dominio o un subdominio.
+- La instalación se marca (`ChatBot.installedAt`) cuando `widget.js` pide la configuración desde una página cuyo `Origin` coincide con el dominio o un subdominio. Los navegadores siempre envían `Origin` en pedidos entre sitios y no se puede falsificar desde una página. Esto permite crear el iframe recién cuando el visitante abre el chat.
 - El visitante se identifica con un `visitorId` aleatorio de 128 bits generado en el iframe y guardado en su `localStorage`. Los navegadores particionan ese almacenamiento por sitio, así que cada sitio tiene su propia conversación. Funciona como una credencial: sin él no se puede leer el historial.
 - Los límites se calculan en la base, sin infraestructura nueva: se cuentan los mensajes de visitantes por `visitorId` y por sitio en la ventana de tiempo. Los valores quedan en constantes de `src/domain/widget-limits.ts`.
 

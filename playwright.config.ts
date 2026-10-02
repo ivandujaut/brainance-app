@@ -20,7 +20,14 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         // Lets sandboxes with a preinstalled Chromium skip `playwright install`.
-        launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH || undefined },
+        launchOptions: {
+          executablePath: process.env.PW_CHROMIUM_PATH || undefined,
+          // The widget E2E serves fake customer sites on public-looking origins that load the app
+          // from localhost; Chrome's local-network protections would block that in tests only.
+          args: [
+            "--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessRespectPreflightResults",
+          ],
+        },
       },
     },
   ],
@@ -29,7 +36,8 @@ export default defineConfig({
     ? undefined
     : {
         command: `npm run start -- -p ${PORT}`,
-        url: baseURL,
+        // A static file: readiness does not depend on Clerk or the database.
+        url: `${baseURL}/widget.js`,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
       },

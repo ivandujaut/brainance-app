@@ -60,31 +60,26 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/brainance
       DIRECT_URL: postgresql://postgres:postgres@localhost:5432/brainance
       NEXT_PUBLIC_APP_URL: http://localhost:3000
+      # Widget E2E: fake customer sites over http and a free, deterministic model.
+      WIDGET_ALLOW_HTTP: "true"
+      AI_ANSWER_MODEL: mock/echo
+      AI_ALLOW_MOCK_MODEL: "true"
+      # Sign-up/onboarding specs skip themselves when these secrets are missing.
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.E2E_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.E2E_CLERK_SECRET_KEY }}
       NEXT_PUBLIC_CLERK_SIGN_IN_URL: /auth/sign-in
       NEXT_PUBLIC_CLERK_SIGN_UP_URL: /auth/sign-up
     steps:
-      - name: Skip without Clerk test keys
-        if: env.CLERK_SECRET_KEY == ''
-        run: echo "::notice::E2E skipped — add E2E_CLERK_PUBLISHABLE_KEY and E2E_CLERK_SECRET_KEY repository secrets to enable it."
       - uses: actions/checkout@v4
-        if: env.CLERK_SECRET_KEY != ''
       - uses: actions/setup-node@v4
-        if: env.CLERK_SECRET_KEY != ''
         with:
           node-version: 22
           cache: npm
-      - if: env.CLERK_SECRET_KEY != ''
-        run: npm ci
-      - if: env.CLERK_SECRET_KEY != ''
-        run: npx playwright install --with-deps chromium
-      - if: env.CLERK_SECRET_KEY != ''
-        run: npx prisma migrate deploy
-      - if: env.CLERK_SECRET_KEY != ''
-        run: npm run build
-      - if: env.CLERK_SECRET_KEY != ''
-        run: npm run test:e2e
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx prisma migrate deploy
+      - run: npm run build
+      - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

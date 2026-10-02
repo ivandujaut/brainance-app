@@ -2,6 +2,8 @@ import { clerk } from "@clerk/testing/playwright";
 import { expect, test } from "@playwright/test";
 import { createTestUser, deleteTestUsers } from "./support/users";
 
+test.skip(!process.env.CLERK_SECRET_KEY, "Needs Clerk test keys (E2E_CLERK_* secrets in CI)");
+
 // Spec 002, criteria 6–12: the whole checklist, from a new account to an installed bot.
 const created: string[] = [];
 test.afterAll(() => deleteTestUsers(created));
