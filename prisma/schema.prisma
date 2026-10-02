@@ -97,7 +97,9 @@ model CustomerResponses {
 
 model Customer {
   id    String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email String? 
+  email String?
+  // Anonymous widget visitor: random id kept in the visitor's browser (spec 003).
+  visitorId String?
 
   questions CustomerResponses[]
 
@@ -107,6 +109,8 @@ model Customer {
 
   Domain   Domain? @relation(fields: [domainId], references: [id], onDelete: Cascade)
   domainId String? @db.Uuid
+
+  @@unique([domainId, visitorId])
 }
 
 model ChatRoom {
@@ -130,6 +134,8 @@ model ChatMessage {
   ChatRoom   ChatRoom? @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
   chatRoomId String?   @db.Uuid
   seen       Boolean   @default(false)
+
+  @@index([chatRoomId, createdAt])
 }
 
 model Bookings {

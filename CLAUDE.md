@@ -22,6 +22,8 @@ npm run eval:rag -- --variant <id> --model <gateway-id>   # eval de respuestas (
 
 En sandboxes con Chromium preinstalado: `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e`.
 
+Los E2E del widget no necesitan Clerk: levantan la app con `WIDGET_ALLOW_HTTP=true AI_ANSWER_MODEL=mock/echo AI_ALLOW_MOCK_MODEL=true` y una base migrada en `DATABASE_URL`. Los de registro y onboarding se saltean si falta `CLERK_SECRET_KEY`.
+
 ## Arquitectura
 
 - `src/app/`: rutas y UI. Sin lógica de negocio.

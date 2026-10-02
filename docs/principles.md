@@ -44,6 +44,7 @@ src/server/     Adaptadores: repositorios (Prisma), IA, realtime, email, pagos.
 - Los hooks del dashboard (`src/hooks/settings`, `src/context/use-sidebar.tsx`) hacen fetch en efectos.
 - `User.type` ya no se usa (spec 002): eliminar la columna en una migración aparte.
 - No hay webhook de Clerk: si se borra un usuario en Clerk, su registro queda en la base.
+- El widget deriva a un contacto genérico y usa voseo para todos los sitios hasta que la configuración del bot guarde contacto y trato (ítem 3 del roadmap).
 - Tailwind 3 y zod 3: actualizar a Tailwind 4 y zod 4 en PRs separados.
 - `src/actions/landing/index.ts` lee `CLOUDWAYS_POSTS_URL`, que no existe (la variable se llama `CLOUDWAYS_POST_URL`).
 - Las reglas `eslint-config-next/typescript` todavía no están activas porque marcan unos 90 problemas en el código heredado.

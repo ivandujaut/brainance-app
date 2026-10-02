@@ -1,17 +1,5 @@
-import { Prisma, type PrismaClient, type User } from "@/generated/prisma/client";
-
-const isUniqueViolation = (error: unknown) =>
-  error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
-
-/** Runs a create-if-missing write; if a concurrent request won the race, reads its row instead. */
-const createOrRead = async <T>(write: () => Promise<T>, read: () => Promise<T>): Promise<T> => {
-  try {
-    return await write();
-  } catch (error) {
-    if (isUniqueViolation(error)) return read();
-    throw error;
-  }
-};
+import type { PrismaClient, User } from "@/generated/prisma/client";
+import { createOrRead } from "./db-utils";
 
 /**
  * Makes sure the Clerk user has its database user and STANDARD billing.
