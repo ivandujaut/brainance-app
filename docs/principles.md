@@ -18,7 +18,8 @@ src/server/     Adaptadores: repositorios (Prisma), IA, realtime, email, pagos.
 
 ## Datos y multi-tenancy
 
-- Toda consulta a datos de un tenant filtra por el usuario o dominio dueño. Nunca se confía en un id que venga del cliente sin verificar a quién pertenece.
+- Toda consulta a datos de un tenant filtra por el usuario o dominio dueño. Nunca se confía en un id que venga del cliente: se resuelve con `src/server/tenancy.ts`, que devuelve `null` si no es del usuario actual (ADR 0004).
+- Cada acción que recibe un id tiene su test de ataque en `src/actions/tenant-isolation.int.test.ts`.
 - Los cambios de esquema se hacen con migraciones de Prisma (`prisma migrate dev`), nunca con `db push` en entornos compartidos.
 
 ## Seguridad

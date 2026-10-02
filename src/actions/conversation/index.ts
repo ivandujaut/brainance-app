@@ -1,56 +1,41 @@
 "use server";
 import { client } from "@/lib/prisma";
+import { findOwnedChatRoom, findOwnedSite } from "@/server/tenancy";
+
+// Every action resolves its id through src/server/tenancy.ts: ids from the browser are only
+// trusted after checking they belong to the signed-in owner (ADR 0004).
 
 export const onToggleRealtime = async (id: string, state: boolean) => {
+  const room = await findOwnedChatRoom(id);
+  if (!room) return;
   try {
     const chatRoom = await client.chatRoom.update({
-      where: {
-        id,
-      },
-      data: {
-        live: state,
-      },
-      select: {
-        id: true,
-        live: true,
-      },
+      where: { id: room.id },
+      data: { live: state },
+      select: { id: true, live: true },
     });
-
-    if (chatRoom) {
-      return {
-        status: 200,
-        message: chatRoom.live ? "Realtime mode enabled" : "Realtime mode disabled",
-        chatRoom,
-      };
-    }
+    return {
+      status: 200,
+      message: chatRoom.live ? "Tomaste el control de la conversación" : "El bot vuelve a responder",
+      chatRoom,
+    };
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
 export const onGetConversationMode = async (id: string) => {
-  try {
-    const mode = await client.chatRoom.findUnique({
-      where: {
-        id,
-      },
-      select: {
-        live: true,
-      },
-    });
-    console.log(mode);
-    return mode;
-  } catch (error) {
-    console.log(error);
-  }
+  const room = await findOwnedChatRoom(id);
+  if (!room) return null;
+  return client.chatRoom.findUnique({ where: { id: room.id }, select: { live: true } });
 };
 
 export const onGetDomainChatRooms = async (id: string) => {
+  const site = await findOwnedSite(id);
+  if (!site) return;
   try {
-    const domains = await client.domain.findUnique({
-      where: {
-        id,
-      },
+    return await client.domain.findUnique({
+      where: { id: site.id },
       select: {
         customer: {
           select: {
@@ -60,14 +45,8 @@ export const onGetDomainChatRooms = async (id: string) => {
                 createdAt: true,
                 id: true,
                 message: {
-                  select: {
-                    message: true,
-                    createdAt: true,
-                    seen: true,
-                  },
-                  orderBy: {
-                    createdAt: "desc",
-                  },
+                  select: { message: true, createdAt: true, seen: true },
+                  orderBy: { createdAt: "desc" },
                   take: 1,
                 },
               },
@@ -76,97 +55,57 @@ export const onGetDomainChatRooms = async (id: string) => {
         },
       },
     });
-
-    if (domains) {
-      return domains;
-    }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
 export const onGetChatMessages = async (id: string) => {
+  const room = await findOwnedChatRoom(id);
+  if (!room) return;
   try {
-    const messages = await client.chatRoom.findMany({
-      where: {
-        id,
-      },
+    return await client.chatRoom.findMany({
+      where: { id: room.id },
       select: {
         id: true,
         live: true,
         message: {
-          select: {
-            id: true,
-            role: true,
-            message: true,
-            createdAt: true,
-            seen: true,
-          },
-          orderBy: {
-            createdAt: "asc",
-          },
+          select: { id: true, role: true, message: true, createdAt: true, seen: true },
+          orderBy: { createdAt: "asc" },
         },
       },
     });
-
-    if (messages) {
-      return messages;
-    }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
 export const onViewUnReadMessages = async (id: string) => {
+  const room = await findOwnedChatRoom(id);
+  if (!room) return;
   try {
-    await client.chatMessage.updateMany({
-      where: {
-        chatRoomId: id,
-      },
-      data: {
-        seen: true,
-      },
-    });
+    await client.chatMessage.updateMany({ where: { chatRoomId: room.id }, data: { seen: true } });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
 export const onOwnerSendMessage = async (chatroom: string, message: string, role: "assistant" | "user") => {
+  const room = await findOwnedChatRoom(chatroom);
+  if (!room) return;
   try {
-    const chat = await client.chatRoom.update({
-      where: {
-        id: chatroom,
-      },
-      data: {
-        message: {
-          create: {
-            message,
-            role,
-          },
-        },
-      },
+    return await client.chatRoom.update({
+      where: { id: room.id },
+      data: { message: { create: { message, role } } },
       select: {
         message: {
-          select: {
-            id: true,
-            role: true,
-            message: true,
-            createdAt: true,
-            seen: true,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
+          select: { id: true, role: true, message: true, createdAt: true, seen: true },
+          orderBy: { createdAt: "desc" },
           take: 1,
         },
       },
     });
-
-    if (chat) {
-      return chat;
-    }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
