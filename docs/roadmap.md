@@ -25,6 +25,7 @@ Cada ítem va a tener su spec en `docs/specs/`.
 ## Lanzamiento
 
 - **Lanzamiento de la beta** ([spec 008](specs/008-lanzamiento-de-la-beta.md)): checklist de despliegue y QA, términos y privacidad, limpieza del código heredado.
+- **Landing con personalidad** ([spec 009](specs/009-landing.md)): dirección editorial, demo con el widget real y figuras de Hairline.
 
 ## v1: después de la beta
 
