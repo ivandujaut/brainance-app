@@ -96,3 +96,55 @@ export const seedLead = async (domainId: string, email: string, answer: { questi
     customer.id,
   ]);
 };
+
+/** The visitor's conversation on a site (spec 006). */
+export const roomOf = async (domainId: string) => {
+  const { rows } = await pool.query<{ id: string }>(
+    `SELECT r.id FROM "ChatRoom" r JOIN "Customer" c ON c.id = r."customerId" WHERE c."domainId" = $1 LIMIT 1`,
+    [domainId],
+  );
+  return rows[0]?.id ?? null;
+};
+
+/** Simulates the owner taking over from the inbox and replying (same rows the inbox writes). */
+export const ownerTakesOver = async (roomId: string, businessName: string) => {
+  await pool.query(`UPDATE "ChatRoom" SET "liveSince" = now(), live = true, "lastMessageAt" = now() WHERE id = $1`, [roomId]);
+  await pool.query(
+    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", seen, "updatedAt") VALUES ($1, 'system', $2, true, now())`,
+    [`Ahora te atiende una persona de ${businessName}.`, roomId],
+  );
+};
+
+export const ownerSays = async (roomId: string, text: string) => {
+  await pool.query(`INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt") VALUES ($1, 'owner', $2, now())`, [
+    text,
+    roomId,
+  ]);
+};
+
+export const messagesOf = async (roomId: string) => {
+  const { rows } = await pool.query<{ role: string; message: string }>(
+    `SELECT role, message FROM "ChatMessage" WHERE "chatRoomId" = $1 ORDER BY "createdAt", id`,
+    [roomId],
+  );
+  return rows.map((r) => `${r.role}:${r.message}`);
+};
+
+/** A visitor conversation the bot could not answer, as the inbox would receive it. */
+export const seedConversation = async (domainId: string) => {
+  const {
+    rows: [room],
+  } = await pool.query<{ id: string }>(
+    `WITH c AS (INSERT INTO "Customer" ("visitorId", "domainId") VALUES ($1, $2) RETURNING id)
+     INSERT INTO "ChatRoom" ("customerId", "updatedAt", "lastMessageAt", "needsAttention", "attentionReason")
+     SELECT id, now(), now(), true, 'derivation' FROM c RETURNING id`,
+    [crypto.randomUUID(), domainId],
+  );
+  await pool.query(
+    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt", "createdAt") VALUES
+     ('¿Tienen sin TACC?', 'user', $1, now(), now() - interval '2 seconds'),
+     ('No tengo ese dato. Escribinos por WhatsApp.', 'assistant', $1, now(), now() - interval '1 second')`,
+    [room.id],
+  );
+  return room.id;
+};

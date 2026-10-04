@@ -5,7 +5,10 @@ import { client } from "@/lib/prisma";
 import { listMessages } from "@/server/conversations";
 import { leadCaptured } from "@/server/leads";
 
-/** The visitor's previous messages on this site (empty if they never wrote), and whether they left their data. */
+/**
+ * The visitor's conversation on this site: messages (only new ones with `after`), whether a person is
+ * attending it, and whether the visitor left their data. Without the right visitorId there is nothing.
+ */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ domainId: string }> }) {
   const { domainId } = await params;
   const visitorId = request.nextUrl.searchParams.get("visitorId");
@@ -16,14 +19,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const room = await client.chatRoom.findFirst({
     where: { Customer: { domainId, visitorId } },
     orderBy: { createdAt: "asc" },
-    select: { id: true },
+    select: { id: true, liveSince: true },
   });
+  // `after` is the last message id the widget has: polling only returns what is new (ADR 0007).
+  const after = request.nextUrl.searchParams.get("after");
   const [messages, captured] = await Promise.all([
-    room ? listMessages(client, room.id) : [],
+    room ? listMessages(client, room.id, 50, z.string().uuid().safeParse(after).success ? after! : undefined) : [],
     leadCaptured(client, domainId, visitorId),
   ]);
   return NextResponse.json(
-    { messages: messages.map(({ id, role, content }) => ({ id, role, content })), leadCaptured: captured },
+    {
+      roomId: room?.id ?? null,
+      live: Boolean(room?.liveSince),
+      messages: messages.map(({ id, role, content }) => ({ id, role, content })),
+      leadCaptured: captured,
+    },
     { headers: { "Cache-Control": "no-store" } },
   );
 }

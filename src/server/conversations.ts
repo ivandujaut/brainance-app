@@ -1,7 +1,8 @@
+import type { StoredRole } from "@/domain/takeover";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { createOrRead } from "./db-utils";
 
-export type WidgetRole = "user" | "assistant";
+export type WidgetRole = StoredRole;
 
 /**
  * The visitor's conversation on a site, created on first use. Safe under concurrent calls:
@@ -30,19 +31,30 @@ export const getOrCreateRoom = async (
   });
 };
 
+/** Stores a message and moves the conversation to the top of the owner's inbox. */
 export const addMessage = async (db: PrismaClient, chatRoomId: string, role: WidgetRole, content: string) => {
-  const message = await db.chatMessage.create({
-    data: { chatRoomId, role, message: content },
-    select: { id: true },
-  });
+  const [message] = await db.$transaction([
+    db.chatMessage.create({ data: { chatRoomId, role, message: content }, select: { id: true, createdAt: true } }),
+    db.chatRoom.update({ where: { id: chatRoomId }, data: { lastMessageAt: new Date() } }),
+  ]);
   return message.id;
 };
 
-/** The conversation in chronological order (at most the last `limit` messages). */
-export const listMessages = async (db: PrismaClient, chatRoomId: string, limit = 50) => {
+/**
+ * The conversation in chronological order (at most the last `limit` messages). With `after`, only
+ * messages since that one: clients poll with the last id they have and merge by id (ADR 0007).
+ */
+export const listMessages = async (db: PrismaClient, chatRoomId: string, limit = 50, after?: string) => {
+  const cursor = after
+    ? await db.chatMessage.findFirst({ where: { id: after, chatRoomId }, select: { id: true, createdAt: true } })
+    : null;
   const rows = await db.chatMessage.findMany({
-    where: { chatRoomId, role: { not: null } },
-    orderBy: { createdAt: "desc" },
+    where: {
+      chatRoomId,
+      role: { not: null },
+      ...(cursor && { createdAt: { gte: cursor.createdAt }, id: { not: cursor.id } }),
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: limit,
     select: { id: true, role: true, message: true, createdAt: true },
   });

@@ -140,7 +140,13 @@ model LeadSubmission {
 
 model ChatRoom {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // Legacy flag; spec 006 uses liveSince (null = the bot answers).
   live       Boolean   @default(false)
+  liveSince       DateTime?
+  needsAttention  Boolean   @default(false)
+  // "derivation" | "human_request" | "site_cap"
+  attentionReason String?
+  lastMessageAt   DateTime?
   mailed     Boolean   @default(false)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -148,6 +154,8 @@ model ChatRoom {
   customerId String?   @db.Uuid
 
   message ChatMessage[]
+
+  @@index([lastMessageAt])
 }
 
 model ChatMessage {
@@ -161,6 +169,7 @@ model ChatMessage {
   seen       Boolean   @default(false)
 
   @@index([chatRoomId, createdAt])
+  @@index([chatRoomId, seen])
 }
 
 model Bookings {
@@ -204,4 +213,7 @@ enum Plans {
 enum Role {
   user
   assistant
+  // Spec 006: messages written by the owner from the inbox, and notices shown to the visitor.
+  owner
+  system
 }

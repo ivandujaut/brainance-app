@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const onLoadAccount = vi.fn();
 vi.mock("@/actions/auth", () => ({ onLoadAccount: () => onLoadAccount() }));
 vi.mock("@/components/sidebar", () => ({ default: () => null }));
-vi.mock("@/context/user-chat-context", () => ({ ChatProvider: ({ children }: { children: unknown }) => children }));
 
 const { default: OwnerLayout } = await import("./layout");
 const { AccountError } = await import("@/components/account-error");

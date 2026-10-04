@@ -49,7 +49,7 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
             helpdesk: { create: { question: "¿Envíos?", answer: "Sí." } },
             filterQuestions: { create: { question: "¿Cuál es tu email?" } },
             customer: {
-              create: { email: "visitante@example.com", leadAt: new Date(), chatRoom: { create: { message: { create: { message: "hola", role: "user" } } } } },
+              create: { email: "visitante@example.com", leadAt: new Date(), chatRoom: { create: { lastMessageAt: new Date(), message: { create: { message: "hola", role: "user" } } } } },
             },
           },
         },
@@ -73,62 +73,61 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
     });
 
   describe("conversations", () => {
-    it("onToggleRealtime: only the owner can take over a conversation", async () => {
+    it("onListConversations: does not list another tenant's conversations", async () => {
       as(INTRUDER);
-      await conversation.onToggleRealtime(roomId, true);
-      expect((await room()).live).toBe(false);
-
+      expect(JSON.stringify(await conversation.onListConversations({}))).not.toContain(roomId);
+      expect(JSON.stringify(await conversation.onListConversations({ siteId }))).not.toContain(roomId);
       as(OWNER);
-      await conversation.onToggleRealtime(roomId, true);
-      expect((await room()).live).toBe(true);
+      expect(JSON.stringify(await conversation.onListConversations({}))).toContain(roomId);
     });
 
-    it("onGetConversationMode: hides other tenants' conversations", async () => {
+    it("onGetConversation: does not return another tenant's messages", async () => {
       as(INTRUDER);
-      expect(await conversation.onGetConversationMode(roomId)).toBeFalsy();
+      expect(await conversation.onGetConversation(roomId)).toBeNull();
       as(OWNER);
-      expect(await conversation.onGetConversationMode(roomId)).toEqual({ live: false });
+      expect(JSON.stringify(await conversation.onGetConversation(roomId))).toContain("hola");
     });
 
-    it("onGetDomainChatRooms: does not list another tenant's visitors", async () => {
+    it("onMarkRead: only the owner marks messages as seen", async () => {
       as(INTRUDER);
-      expect(JSON.stringify((await conversation.onGetDomainChatRooms(siteId)) ?? null)).not.toContain("visitante@example.com");
-      as(OWNER);
-      expect(JSON.stringify(await conversation.onGetDomainChatRooms(siteId))).toContain("visitante@example.com");
-    });
-
-    it("onGetChatMessages: does not return another tenant's messages", async () => {
-      as(INTRUDER);
-      expect(JSON.stringify((await conversation.onGetChatMessages(roomId)) ?? null)).not.toContain("hola");
-      as(OWNER);
-      expect(JSON.stringify(await conversation.onGetChatMessages(roomId))).toContain("hola");
-    });
-
-    it("onViewUnReadMessages: only the owner marks messages as seen", async () => {
-      as(INTRUDER);
-      await conversation.onViewUnReadMessages(roomId);
+      await conversation.onMarkRead(roomId);
       expect((await room()).message.every((m) => !m.seen)).toBe(true);
 
       as(OWNER);
-      await conversation.onViewUnReadMessages(roomId);
+      await conversation.onMarkRead(roomId);
       expect((await room()).message.every((m) => m.seen)).toBe(true);
     });
 
-    it("onOwnerSendMessage: nobody else can write into a conversation", async () => {
+    it("onTakeOver and onReleaseToBot: only the owner takes a conversation", async () => {
       as(INTRUDER);
-      await conversation.onOwnerSendMessage(roomId, "mensaje intruso", "assistant");
+      await conversation.onTakeOver(roomId);
+      expect((await room()).liveSince).toBeNull();
+
+      as(OWNER);
+      await conversation.onTakeOver(roomId);
+      expect((await room()).liveSince).not.toBeNull();
+
+      as(INTRUDER);
+      await conversation.onReleaseToBot(roomId);
+      expect((await room()).liveSince).not.toBeNull();
+    });
+
+    it("onOwnerReply: nobody else can write into a conversation", async () => {
+      as(INTRUDER);
+      await conversation.onOwnerReply(roomId, "mensaje intruso");
       expect((await room()).message.map((m) => m.message)).not.toContain("mensaje intruso");
 
       as(OWNER);
-      await conversation.onOwnerSendMessage(roomId, "respuesta del negocio", "assistant");
+      await conversation.onOwnerReply(roomId, "respuesta del negocio");
       expect((await room()).message.map((m) => m.message)).toContain("respuesta del negocio");
     });
 
     it("rejects anonymous callers", async () => {
       as(null);
-      await conversation.onToggleRealtime(roomId, true);
-      expect((await room()).live).toBe(false);
-      expect(await conversation.onGetChatMessages(roomId)).toBeFalsy();
+      await conversation.onTakeOver(roomId);
+      expect((await room()).liveSince).toBeNull();
+      expect(await conversation.onGetConversation(roomId)).toBeNull();
+      expect(await conversation.onListConversations({})).toEqual([]);
     });
   });
 
@@ -255,7 +254,7 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
       as(OWNER);
       await expect(bot.onGetSiteSettings("../../etc")).resolves.toBeNull();
       await expect(bot.onDeleteHelpDeskQuestion("no-es-un-id")).resolves.toMatchObject({ status: 404 });
-      await expect(conversation.onGetChatMessages("no-es-un-id")).resolves.toBeFalsy();
+      await expect(conversation.onGetConversation("no-es-un-id")).resolves.toBeNull();
     });
   });
 });
