@@ -11,7 +11,10 @@ import {
 } from "@/domain/widget-limits";
 import { client } from "@/lib/prisma";
 import { streamAnswer } from "@/server/ai/answer";
-import { resolveAnswerModel } from "@/server/ai/models";
+import { answerModelId, resolveAnswerModel } from "@/server/ai/models";
+import { recordModelCall, siteCostState } from "@/server/ai/usage";
+import { dailyCostCapUsd } from "@/domain/cost-cap";
+import { captureError } from "@/server/observability";
 import {
   addMessage,
   countSiteMessagesSince,
@@ -69,8 +72,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const question = check.ok ? check.text : parsed.data.text.trim();
   await addMessage(client, room, "user", question);
 
-  if (!check.ok) {
-    // Over the site's daily cap: answer without calling the model.
+  // Spec 007: over the site's daily AI cost cap, the model is not called either.
+  const overCost = check.ok && (await siteCostState(client, domainId, dailyCostCapUsd(process.env.AI_SITE_DAILY_COST_USD))) === "blocked";
+
+  if (!check.ok || overCost) {
+    // Over the site's daily cap (messages or cost): answer without calling the model.
     const reply = siteCapReply(site);
     await addMessage(client, room, "assistant", reply);
     await flagAttention(client, room, "site_cap");
@@ -83,6 +89,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     history,
     question,
     model: resolveAnswerModel(),
+    onSettled: (report) =>
+      recordModelCall(client, { domainId, chatRoomId: room, purpose: "answer", requestedModel: answerModelId(), report }),
     onEnd: async ({ text }) => {
       if (text.trim()) await addMessage(client, room, "assistant", text);
       const reason = detectAttention({ visitorText: question, reply: text, contact: site.chatBot?.contact ?? null });
@@ -91,7 +99,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     },
   });
   // Keep the function alive until the answer is stored, even after the response is sent.
-  after(() => answer.finished.catch((error) => console.error("Widget answer failed", error)));
+  after(() => answer.finished.catch((error) => captureError(error, { area: "widget", domainId })));
 
   return answer.toTextStreamResponse({ headers: { "Cache-Control": "no-store" } });
 }

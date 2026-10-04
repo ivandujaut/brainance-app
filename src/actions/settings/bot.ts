@@ -12,6 +12,7 @@ import {
 } from "@/domain/bot-settings";
 import { client } from "@/lib/prisma";
 import { findOwnedFaq, findOwnedFilterQuestion, findOwnedSite } from "@/server/tenancy";
+import { captureError } from "@/server/observability";
 
 // Bot settings (spec 004). Every id is resolved through src/server/tenancy.ts (ADR 0004) and every
 // input is validated with the schemas the forms use (src/domain/bot-settings.ts).
@@ -37,7 +38,7 @@ const attempt = async (siteId: string | null, write: () => Promise<unknown>, mes
     refresh(siteId);
     return { status: 200, message };
   } catch (error) {
-    console.error(error);
+    captureError(error, { area: "settings", domainId: siteId ?? undefined });
     return FAILED;
   }
 };

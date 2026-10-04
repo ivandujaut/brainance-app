@@ -132,6 +132,30 @@ describe("streamAnswer", () => {
     expect(JSON.stringify(prompt[0].content)).toContain("OSDE 210 en adelante");
   });
 
+  it("reports usage, served model and latency when it ends (spec 007)", async () => {
+    const onSettled = vi.fn();
+    const result = streamAnswer({ business, question: "hola", model: streamingModel(["Hola"]), onSettled });
+    for await (const piece of result.textStream) void piece;
+    await result.finished;
+    expect(onSettled).toHaveBeenCalledWith({
+      servedModel: "mock-stream",
+      usage: { inputTokens: 900, outputTokens: 8, cacheReadTokens: 0, cacheWriteTokens: 0 },
+      latencyMs: expect.any(Number),
+      finishReason: "stop",
+      error: null,
+    });
+  });
+
+  it("reports the failure too, so failed calls are counted", async () => {
+    const onSettled = vi.fn();
+    const result = streamAnswer({ business, question: "hola", model: streamingModel([], { fail: true }), onSettled });
+    await expect(async () => {
+      for await (const piece of result.textStream) void piece;
+      await result.finished;
+    }).rejects.toThrow();
+    expect(onSettled).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringContaining("provider down") }));
+  });
+
   it("does not report an answer when the model fails", async () => {
     const onEnd = vi.fn();
     const result = streamAnswer({ business, question: "hola", model: streamingModel([], { fail: true }), onEnd });

@@ -148,3 +148,27 @@ export const seedConversation = async (domainId: string) => {
   );
   return room.id;
 };
+
+/** Spends the site's daily AI budget (spec 007): one recorded call of `costUsd`. */
+export const seedModelSpend = async (domainId: string, costUsd: number) => {
+  await pool.query(
+    `INSERT INTO "ModelCall" ("domainId", purpose, "requestedModel", "latencyMs", "costUsd") VALUES ($1, 'answer', 'anthropic/claude-haiku-4.5', 900, $2)`,
+    [domainId, costUsd],
+  );
+};
+
+export const modelCallsOf = async (domainId: string) => {
+  const { rows } = await pool.query<{ requestedModel: string; costUsd: string | null }>(
+    `SELECT "requestedModel", "costUsd" FROM "ModelCall" WHERE "domainId" = $1 ORDER BY "createdAt"`,
+    [domainId],
+  );
+  return rows;
+};
+
+/** Completes the onboarding of a site created from the UI: three FAQs and the bot installed. */
+export const completeOnboarding = async (domainId: string) => {
+  for (const n of [1, 2, 3]) {
+    await pool.query(`INSERT INTO "HelpDesk" (question, answer, "domainId") VALUES ($1, $2, $3)`, [`¿Pregunta ${n}?`, `Respuesta ${n}.`, domainId]);
+  }
+  await pool.query(`UPDATE "ChatBot" SET "installedAt" = now() WHERE "domainId" = $1`, [domainId]);
+};

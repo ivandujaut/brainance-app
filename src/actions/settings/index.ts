@@ -4,6 +4,7 @@ import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { canAddDomain, domainLimitFor } from "@/domain/plans";
 import { isValidDomain } from "@/domain/domains";
 import { findOwnedSite } from "@/server/tenancy";
+import { captureError } from "@/server/observability";
 
 export const onIntegrateDomain = async (domain: string, icon: string) => {
   const user = await currentUser();
@@ -72,7 +73,7 @@ export const onGetSubscriptionPlan = async () => {
       return plan.subscription?.plan;
     }
   } catch (error) {
-    console.error(error);
+    captureError(error, { area: "settings" });
   }
 };
 
@@ -108,7 +109,7 @@ export const onGetAllAccountDomains = async () => {
 
     return { ...domains };
   } catch (error) {
-    console.error(error);
+    captureError(error, { area: "settings" });
   }
 };
 
@@ -123,7 +124,7 @@ export const onUpdatePassword = async (password: string) => {
       return { status: 200, message: "Password updated successfully" };
     }
   } catch (error) {
-    console.error(error);
+    captureError(error, { area: "settings" });
   }
 };
 
@@ -145,7 +146,7 @@ export const onUpdatedDomain = async (id: string, name: string) => {
     await client.domain.update({ where: { id: site.id }, data: { name: newName } });
     return { status: 200, message: "Dominio actualizado" };
   } catch (error) {
-    console.error(error);
+    captureError(error, { area: "settings" });
     return { status: 500, message: "No pudimos actualizar el dominio. Probá de nuevo." };
   }
 };
@@ -158,7 +159,7 @@ export const onDeleteUserDomain = async (id: string) => {
     await client.domain.delete({ where: { id: site.id } });
     return { status: 200, message: `Borraste ${site.name}` };
   } catch (error) {
-    console.error(error);
+    captureError(error, { area: "settings" });
     return { status: 500, message: "No pudimos borrar el sitio. Probá de nuevo." };
   }
 };

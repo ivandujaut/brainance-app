@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { leadsToCsv } from "@/domain/leads-csv";
 import { client } from "@/lib/prisma";
 import { currentOwnerId, findOwnedLead, findOwnedSite } from "@/server/tenancy";
+import { captureError } from "@/server/observability";
 
 // Leads of the signed-in owner (spec 005). Ids are resolved through src/server/tenancy.ts (ADR 0004).
 
@@ -56,7 +57,7 @@ export const onDeleteLead = async (id: string) => {
     revalidatePath("/leads");
     return { status: 200, message: "Borraste los datos del lead" };
   } catch (error) {
-    console.error(error);
+    captureError(error, { area: "leads", domainId: lead.domainId ?? undefined });
     return { status: 500, message: "No pudimos borrar el lead. Probá de nuevo." };
   }
 };

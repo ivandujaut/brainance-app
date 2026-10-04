@@ -10,6 +10,7 @@ import {
 import type { PrismaClient } from "@/generated/prisma/client";
 import { createOrRead } from "./db-utils";
 import type { EmailSender } from "./email";
+import { captureError } from "@/server/observability";
 
 // Lead capture from the public widget (spec 005). The visitor is identified by their secret
 // visitorId (ADR 0003); every question id is checked against the site's own questions.
@@ -108,7 +109,7 @@ export const sendLeadNotice = async (notice: LeadNotice, { sender, ownerEmail, a
     await sender.send({ to, ...email });
     return true;
   } catch (error) {
-    console.error("Lead notice failed", error);
+    captureError(error, { area: "email" });
     return false;
   }
 };
