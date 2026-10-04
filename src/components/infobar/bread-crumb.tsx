@@ -1,28 +1,15 @@
 "use client";
 import useSideBar from "@/context/use-sidebar";
 import React from "react";
-import { Loader } from "../loader";
-import { Switch } from "@radix-ui/react-switch";
 
 type Props = {};
 
 const BreadCrumb = (props: Props) => {
-  // TODO: Set up Use side bar hook for real time chat and chatbot stuff
-  // TODO: setup the description and the switch
-  const { chatRoom, expand, loading, onActivateRealTime, onExpand, page, onSignOut, realtime } = useSideBar();
+  const { page } = useSideBar();
   return (
     <div className="flex flex-col">
       <div className="flex gap-5 items-center">
         <h2 className="text-3xl font-bold capitalize">{page}</h2>
-        {page === "settings" && chatRoom && (
-          <Loader loading={loading} className="p-0 inline">
-            <Switch
-              defaultChecked={realtime}
-              onClick={(e) => onActivateRealTime(e)}
-              className="data-[state=checked]:bg-orange data-[state=unchecked]:bg-peach"
-            />
-          </Loader>
-        )}
       </div>
       <p className="text-gray-500 text-sm">
         <p className="text-gray-500 text-sm">

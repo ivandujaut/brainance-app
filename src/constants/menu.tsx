@@ -28,9 +28,9 @@ export const SIDE_BAR_MENU: SIDE_BAR_MENU_PROPS[] = [
     path: "leads",
   },
   {
-    label: "Conversations",
+    label: "Conversaciones",
     icon: <ChatIcon />,
-    path: "conversation",
+    path: "conversations",
   },
   {
     label: "Integrations",

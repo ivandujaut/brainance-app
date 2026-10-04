@@ -147,6 +147,7 @@ import { generateText, Output } from 'ai';
 import { z } from 'zod';
 import { answerQuestion } from '../../src/server/ai/answer.ts';
 import { buildAnswerSystemPrompt } from '../../src/domain/answer-prompt.ts';
+import { toModelHistory } from '../../src/domain/takeover.ts';
 
 const EVAL_DIR = dirname(fileURLToPath(import.meta.url));
 const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || 'anthropic/claude-opus-5.5';
@@ -182,10 +183,12 @@ async function runCase(input, ctx) {
     return {
       output, model: ctx.model, stop_reason: 'end_turn', words: 0, cost_usd: 0,
       usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
-      transcript: [{ role: 'user', content: input.question }, { role: 'assistant', content: output }],
+      transcript: [...toModelHistory(input.history ?? []), { role: 'user', content: input.question }, { role: 'assistant', content: output }],
     };
   }
-  const res = await answerQuestion({ business, question: input.question, model: ctx.model });
+  // Optional prior turns (spec 006): the owner's messages reach the model as the business's replies.
+  const history = toModelHistory(input.history ?? []);
+  const res = await answerQuestion({ business, question: input.question, history, model: ctx.model });
   if (!normalizeModelId(res.servedModel).startsWith(normalizeModelId(ctx.model))) {
     const e = new Error(`served model ${res.servedModel} != requested ${ctx.model}`);
     e.failure_class = 'serving_substitution';
@@ -210,6 +213,7 @@ async function runCase(input, ctx) {
     words: res.text.trim() ? res.text.trim().split(/\s+/).length : 0,
     transcript: [
       { role: 'system', content: buildAnswerSystemPrompt(business) },
+      ...history,
       { role: 'user', content: input.question },
       { role: 'assistant', content: res.text },
     ],
@@ -241,6 +245,20 @@ Calificá tres criterios por separado, cada uno aprobado o no:
 
 No premies la longitud: una respuesta corta que cumple es mejor que una larga.`;
 
+const SPEAKERS = { user: 'Cliente', assistant: 'Bot', owner: 'Persona del negocio' };
+
+/** Prior conversation, if the case has one. What the business's person wrote is valid information. */
+function previousTurns(history) {
+  if (!history?.length) return '';
+  const lines = history.map(t => `${SPEAKERS[t.role]}: ${t.content}`).join('\n');
+  return `<conversacion_previa>
+${lines}
+</conversacion_previa>
+(Lo que escribió la "Persona del negocio" cuenta como información válida del negocio, igual que la base de conocimiento.)
+
+`;
+}
+
 function judgePrompt(input, output) {
   const b = loadBusiness(input.business);
   const e = input.expected;
@@ -251,7 +269,7 @@ function judgePrompt(input, output) {
 ${kb}
 </base_de_conocimiento>
 
-<consulta_del_cliente>
+${previousTurns(input.history)}<consulta_del_cliente>
 ${input.question}
 </consulta_del_cliente>
 

@@ -27,6 +27,8 @@ for (const c of cases) {
   if (!businesses[c.business]) problems.push(`${c.id}: unknown business ${c.business}`);
   if (c.tags?.[1] !== c.business) problems.push(`${c.id}: tags[1] must be the business id`);
   if (!BEHAVIORS.includes(c.expected?.behavior)) problems.push(`${c.id}: bad behavior`);
+  if (c.history && !c.history.every((t) => ["user", "assistant", "owner"].includes(t.role) && t.content))
+    problems.push(`${c.id}: history turns need a role (user, assistant, owner) and content`);
   if (["answer", "partial"].includes(c.expected?.behavior) && !c.expected.must_include?.length)
     problems.push(`${c.id}: answer/partial cases need must_include`);
 }
@@ -67,7 +69,10 @@ for (const b of Object.values(businesses)) {
   for (const f of b.faqs) lines.push(`- **${f.question}** ${f.answer}`);
   lines.push("", "</details>", "");
   for (const c of cases.filter((x) => x.business === b.id)) {
-    lines.push(`### ${c.id} · ${c.tags[0]} · ${c.tags[2]} → \`${c.expected.behavior}\``, "", fence(c.question), "");
+    lines.push(`### ${c.id} · ${c.tags[0]} · ${c.tags[2]} → \`${c.expected.behavior}\``, "");
+    const speakers = { user: "Cliente", assistant: "Bot", owner: "Persona del negocio" };
+    if (c.history?.length) lines.push("Conversación previa:", "", ...c.history.map((t) => `> **${speakers[t.role]}:** ${t.content}`), "");
+    lines.push(fence(c.question), "");
     if (c.expected.must_include.length) lines.push(`- Debe incluir: ${c.expected.must_include.join("; ")}`);
     if (c.expected.must_not.length) lines.push(`- No debe: ${c.expected.must_not.join("; ")}`);
     lines.push("");

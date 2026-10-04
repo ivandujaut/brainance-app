@@ -19,6 +19,10 @@ import {
   getOrCreateRoom,
   listMessages,
 } from "@/server/conversations";
+import { detectAttention } from "@/domain/attention";
+import { toModelHistory } from "@/domain/takeover";
+import { flagAttention, resolveVisitorTurn } from "@/server/live";
+import { notifyRoomChanged } from "@/server/realtime";
 import { getWidgetSite, siteCapReply, toBusinessKnowledge } from "@/server/widget-site";
 
 const body = z.object({ visitorId: z.string(), text: z.string() });
@@ -39,10 +43,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!site) return NextResponse.json({ error: "not_found", message: "Este chat no está disponible." }, { status: 404 });
 
   const room = await getOrCreateRoom(client, { domainId, visitorId: parsed.data.visitorId });
+  // Spec 006: while a person attends the conversation, the bot stays quiet.
+  const turn = await resolveVisitorTurn(client, room);
   const now = Date.now();
   const [visitorRecent, siteDaily] = await Promise.all([
     countVisitorMessagesSince(client, room, new Date(now - VISITOR_LIMIT.windowMs)),
-    countSiteMessagesSince(client, domainId, new Date(now - SITE_DAILY_LIMIT.windowMs)),
+    // The site's daily cap only protects the model's cost: it does not apply to a person's conversation.
+    turn === "owner" ? 0 : countSiteMessagesSince(client, domainId, new Date(now - SITE_DAILY_LIMIT.windowMs)),
   ]);
   const check = checkIncomingMessage(parsed.data.text, { visitorRecent, siteDaily });
 
@@ -51,8 +58,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: check.reason, message }, { status });
   }
 
+  if (turn === "owner" && check.ok) {
+    const id = await addMessage(client, room, "user", check.text);
+    after(() => notifyRoomChanged(client, room));
+    return NextResponse.json({ live: true, id }, { headers: { "Cache-Control": "no-store" } });
+  }
+
   // Read the context before storing the new question, so it is not sent twice.
-  const history = recentHistory(await listMessages(client, room, 20)).map(({ role, content }) => ({ role, content }));
+  const history = recentHistory(toModelHistory(await listMessages(client, room, 20)));
   const question = check.ok ? check.text : parsed.data.text.trim();
   await addMessage(client, room, "user", question);
 
@@ -60,6 +73,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Over the site's daily cap: answer without calling the model.
     const reply = siteCapReply(site);
     await addMessage(client, room, "assistant", reply);
+    await flagAttention(client, room, "site_cap");
+    after(() => notifyRoomChanged(client, room));
     return NextResponse.json({ reply });
   }
 
@@ -70,6 +85,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     model: resolveAnswerModel(),
     onEnd: async ({ text }) => {
       if (text.trim()) await addMessage(client, room, "assistant", text);
+      const reason = detectAttention({ visitorText: question, reply: text, contact: site.chatBot?.contact ?? null });
+      if (reason) await flagAttention(client, room, reason);
+      await notifyRoomChanged(client, room);
     },
   });
   // Keep the function alive until the answer is stored, even after the response is sent.

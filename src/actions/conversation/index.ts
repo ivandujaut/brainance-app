@@ -1,111 +1,153 @@
 "use server";
 import { client } from "@/lib/prisma";
-import { findOwnedChatRoom, findOwnedSite } from "@/server/tenancy";
+import { listMessages } from "@/server/conversations";
+import { OWNER_MESSAGE_MAX, ownerReply, releaseToBot, takeOver } from "@/server/live";
+import { notifyRoomChanged, ownerChannel, publicRealtimeConfig } from "@/server/realtime";
+import { currentOwnerId, findOwnedChatRoom, findOwnedSite } from "@/server/tenancy";
 
-// Every action resolves its id through src/server/tenancy.ts: ids from the browser are only
-// trusted after checking they belong to the signed-in owner (ADR 0004).
+// The owner's inbox (spec 006). Every id is resolved through src/server/tenancy.ts (ADR 0004).
 
-export const onToggleRealtime = async (id: string, state: boolean) => {
-  const room = await findOwnedChatRoom(id);
-  if (!room) return;
-  try {
-    const chatRoom = await client.chatRoom.update({
-      where: { id: room.id },
-      data: { live: state },
-      select: { id: true, live: true },
-    });
-    return {
-      status: 200,
-      message: chatRoom.live ? "Tomaste el control de la conversación" : "El bot vuelve a responder",
-      chatRoom,
-    };
-  } catch (error) {
-    console.error(error);
+export type InboxFilter = "all" | "unread" | "attention";
+
+/** Enough for the beta; paginate when an owner gets close. */
+const MAX_CONVERSATIONS = 200;
+const UNREAD = { seen: false, role: "user" as const };
+
+export const onListConversations = async ({ siteId, filter = "all" }: { siteId?: string; filter?: InboxFilter }) => {
+  const owner = await currentOwnerId();
+  if (!owner) return [];
+  let domainId: string | undefined;
+  if (siteId !== undefined) {
+    const site = await findOwnedSite(siteId);
+    if (!site) return [];
+    domainId = site.id;
   }
+  const rooms = await client.chatRoom.findMany({
+    where: {
+      lastMessageAt: { not: null },
+      Customer: { Domain: { User: { clerkId: owner } }, ...(domainId && { domainId }) },
+      ...(filter === "unread" && { message: { some: UNREAD } }),
+      ...(filter === "attention" && { needsAttention: true }),
+    },
+    orderBy: { lastMessageAt: "desc" },
+    take: MAX_CONVERSATIONS,
+    select: {
+      id: true,
+      lastMessageAt: true,
+      liveSince: true,
+      needsAttention: true,
+      attentionReason: true,
+      Customer: { select: { email: true, leadAt: true, Domain: { select: { name: true } } } },
+      message: {
+        where: { role: { not: "system" } },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { message: true },
+      },
+      _count: { select: { message: { where: UNREAD } } },
+    },
+  });
+  return rooms.map((room) => ({
+    id: room.id,
+    site: room.Customer?.Domain?.name ?? "",
+    visitor: room.Customer?.leadAt && room.Customer.email ? room.Customer.email : "Visitante",
+    lastMessage: room.message[0]?.message ?? "",
+    lastMessageAt: room.lastMessageAt!,
+    unread: room._count.message,
+    live: Boolean(room.liveSince),
+    needsAttention: room.needsAttention,
+    attentionReason: room.attentionReason,
+  }));
 };
 
-export const onGetConversationMode = async (id: string) => {
-  const room = await findOwnedChatRoom(id);
-  if (!room) return null;
-  return client.chatRoom.findUnique({ where: { id: room.id }, select: { live: true } });
-};
+export type ConversationSummary = Awaited<ReturnType<typeof onListConversations>>[number];
 
-export const onGetDomainChatRooms = async (id: string) => {
-  const site = await findOwnedSite(id);
-  if (!site) return;
-  try {
-    return await client.domain.findUnique({
-      where: { id: site.id },
+/** A conversation with its messages (only those after `after`, for polling), or null. */
+export const onGetConversation = async (id: string, after?: string) => {
+  const owned = await findOwnedChatRoom(id);
+  if (!owned) return null;
+  const [room, messages] = await Promise.all([
+    client.chatRoom.findUniqueOrThrow({
+      where: { id: owned.id },
       select: {
-        customer: {
+        liveSince: true,
+        needsAttention: true,
+        attentionReason: true,
+        Customer: {
           select: {
             email: true,
-            chatRoom: {
-              select: {
-                createdAt: true,
-                id: true,
-                message: {
-                  select: { message: true, createdAt: true, seen: true },
-                  orderBy: { createdAt: "desc" },
-                  take: 1,
-                },
-              },
-            },
+            leadAt: true,
+            Domain: { select: { name: true } },
+            questions: { select: { question: true, answered: true } },
           },
         },
       },
-    });
-  } catch (error) {
-    console.error(error);
-  }
+    }),
+    listMessages(client, owned.id, 200, after),
+  ]);
+  const customer = room.Customer;
+  return {
+    id: owned.id,
+    site: customer?.Domain?.name ?? "",
+    live: Boolean(room.liveSince),
+    needsAttention: room.needsAttention,
+    attentionReason: room.attentionReason,
+    lead:
+      customer?.leadAt && customer.email
+        ? { email: customer.email, responses: customer.questions.map((q) => ({ question: q.question, answered: q.answered ?? "" })) }
+        : null,
+    messages: messages.map(({ id: messageId, role, content, createdAt }) => ({ id: messageId, role, content, createdAt })),
+  };
 };
 
-export const onGetChatMessages = async (id: string) => {
+export type Conversation = NonNullable<Awaited<ReturnType<typeof onGetConversation>>>;
+
+export const onMarkRead = async (id: string) => {
   const room = await findOwnedChatRoom(id);
   if (!room) return;
-  try {
-    return await client.chatRoom.findMany({
-      where: { id: room.id },
-      select: {
-        id: true,
-        live: true,
-        message: {
-          select: { id: true, role: true, message: true, createdAt: true, seen: true },
-          orderBy: { createdAt: "asc" },
-        },
-      },
-    });
-  } catch (error) {
-    console.error(error);
-  }
+  await client.chatMessage.updateMany({ where: { chatRoomId: room.id, seen: false }, data: { seen: true } });
 };
 
-export const onViewUnReadMessages = async (id: string) => {
+const NOT_FOUND = { status: 404, message: "No encontramos esa conversación." } as const;
+
+const siteName = async (roomId: string) =>
+  (
+    await client.chatRoom.findUniqueOrThrow({
+      where: { id: roomId },
+      select: { Customer: { select: { Domain: { select: { name: true } } } } },
+    })
+  ).Customer?.Domain?.name ?? "el negocio";
+
+export const onTakeOver = async (id: string) => {
   const room = await findOwnedChatRoom(id);
-  if (!room) return;
-  try {
-    await client.chatMessage.updateMany({ where: { chatRoomId: room.id }, data: { seen: true } });
-  } catch (error) {
-    console.error(error);
-  }
+  if (!room) return NOT_FOUND;
+  await takeOver(client, room.id, await siteName(room.id));
+  await notifyRoomChanged(client, room.id);
+  return { status: 200, message: "Tomaste el control: el bot no responde en esta conversación." } as const;
 };
 
-export const onOwnerSendMessage = async (chatroom: string, message: string, role: "assistant" | "user") => {
-  const room = await findOwnedChatRoom(chatroom);
-  if (!room) return;
-  try {
-    return await client.chatRoom.update({
-      where: { id: room.id },
-      data: { message: { create: { message, role } } },
-      select: {
-        message: {
-          select: { id: true, role: true, message: true, createdAt: true, seen: true },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
-      },
-    });
-  } catch (error) {
-    console.error(error);
-  }
+export const onReleaseToBot = async (id: string) => {
+  const room = await findOwnedChatRoom(id);
+  if (!room) return NOT_FOUND;
+  await releaseToBot(client, room.id);
+  await notifyRoomChanged(client, room.id);
+  return { status: 200, message: "El bot vuelve a responder esta conversación." } as const;
+};
+
+export const onOwnerReply = async (id: string, text: string) => {
+  const room = await findOwnedChatRoom(id);
+  if (!room) return NOT_FOUND;
+  const reply = await ownerReply(client, room.id, String(text ?? ""), await siteName(room.id));
+  if (!reply) return { status: 400, message: `Escribí un mensaje de hasta ${OWNER_MESSAGE_MAX} caracteres.` } as const;
+  await notifyRoomChanged(client, room.id);
+  return { status: 200, message: "Mensaje enviado", id: reply.id } as const;
+};
+
+/** Push settings for the owner's inbox; without Pusher keys the inbox runs on polling (ADR 0007). */
+export const onGetInboxRealtime = async () => {
+  const owner = await currentOwnerId();
+  const config = publicRealtimeConfig();
+  if (!owner || !config) return null;
+  const user = await client.user.findUnique({ where: { clerkId: owner }, select: { id: true } });
+  return user ? { config, channel: ownerChannel(user.id) } : null;
 };

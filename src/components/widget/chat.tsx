@@ -3,10 +3,27 @@ import { Send, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent } from "react";
 import { MAX_MESSAGE_LENGTH } from "@/domain/widget-limits";
+import { useLiveUpdates, type RealtimeClientConfig } from "@/hooks/use-live-updates";
 import { cn } from "@/lib/utils";
 import { LeadCard, type LeadQuestion } from "./lead-card";
 
-type Message = { id: string; role: "user" | "assistant"; content: string };
+type Role = "user" | "assistant" | "owner" | "system";
+type Message = { id: string; role: Role; content: string };
+
+/** Messages not yet confirmed by the server carry a local id until polling brings the stored copy. */
+const LOCAL = "local-";
+
+/** Adds the server's messages, replacing the local copy of each one and skipping those already shown. */
+const mergeMessages = (current: Message[], incoming: Message[]) => {
+  const next = [...current];
+  for (const message of incoming) {
+    if (next.some((m) => m.id === message.id)) continue;
+    const local = next.findIndex((m) => m.id.startsWith(LOCAL) && m.role === message.role && m.content === message.content);
+    if (local === -1) next.push(message);
+    else next[local] = message;
+  }
+  return next;
+};
 
 export type WidgetConfig = {
   name: string;
@@ -16,6 +33,8 @@ export type WidgetConfig = {
   textColor: string;
   leadCapture?: boolean;
   leadQuestions?: LeadQuestion[];
+  /** Pusher, when configured; otherwise the chat keeps up by polling (ADR 0007). */
+  realtime?: RealtimeClientConfig;
 };
 
 const VISITOR_KEY = "brainance:visitor";
@@ -87,6 +106,11 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
   const [error, setError] = useState<string | null>(null);
   // Lead card (spec 005): offered once after the first answer; "Dejar mis datos" reopens it.
   const [lead, setLead] = useState({ captured: false, dismissed: false, open: false, thanks: null as string | null });
+  // Spec 006: whether a person of the business attends the conversation, and the room for push.
+  const [live, setLive] = useState(false);
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const cursor = useRef<string | null>(null);
+  const sendingRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   // Typing before hydration would be wiped out by React, so the controls wait for it.
   const hydrated = useHydrated() && !preview;
@@ -98,9 +122,12 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
     let cancelled = false;
     fetch(`${api}/conversation?visitorId=${getVisitorId()}`)
       .then((res) => (res.ok ? res.json() : { messages: [] }))
-      .then((data: { messages: Message[]; leadCaptured?: boolean }) => {
+      .then((data: { messages: Message[]; leadCaptured?: boolean; live?: boolean; roomId?: string | null }) => {
         if (cancelled) return;
         setMessages(data.messages);
+        cursor.current = data.messages.at(-1)?.id ?? null;
+        setLive(Boolean(data.live));
+        setRoomId(data.roomId ?? null);
         setLead((prev) => ({
           ...prev,
           captured: Boolean(data.leadCaptured),
@@ -113,8 +140,34 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
     };
   }, [api, domainId, preview]);
 
+  /** New messages since the last one we have (owner replies, notices, the stored copy of ours). */
+  const refresh = async () => {
+    // While an answer streams, its stored copy is not final yet: catch up when it ends.
+    if (sendingRef.current) return;
+    const after = cursor.current ? `&after=${cursor.current}` : "";
+    const res = await fetch(`${api}/conversation?visitorId=${getVisitorId()}${after}`);
+    if (!res.ok) return;
+    const data = (await res.json()) as { messages: Message[]; live: boolean; roomId: string | null };
+    if (data.messages.length) {
+      cursor.current = data.messages.at(-1)!.id;
+      setMessages((prev) => mergeMessages(prev, data.messages));
+    }
+    setLive(data.live);
+    setRoomId(data.roomId);
+  };
+
+  useLiveUpdates({
+    refresh,
+    live,
+    enabled: hydrated,
+    realtime: config.realtime,
+    channel: roomId ? `private-room-${roomId}` : null,
+    authEndpoint: `${api}/realtime/auth`,
+    authParams: hydrated ? { visitorId: getVisitorId() } : undefined,
+  });
+
   const leadEnabled = !preview && config.leadCapture === true;
-  const answered = messages.some((m) => m.role === "assistant" && m.content.trim());
+  const answered = messages.some((m) => (m.role === "assistant" || m.role === "owner") && m.content.trim());
   const showLeadCard = leadEnabled && (lead.open || (answered && !sending && !lead.captured && !lead.dismissed));
 
   useEffect(() => {
@@ -156,11 +209,12 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
 
   const send = async (text: string) => {
     if (sending || !text.trim() || text.trim().length > MAX_MESSAGE_LENGTH) return;
-    const userMessageId = randomId();
+    const userMessageId = `${LOCAL}${randomId()}`;
     const replyId = `${userMessageId}-reply`;
     setError(null);
     setInput("");
     setSending(true);
+    sendingRef.current = true;
     setMessages((prev) => [...prev, { id: userMessageId, role: "user", content: text.trim() }]);
 
     try {
@@ -170,7 +224,13 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
         body: JSON.stringify({ visitorId: getVisitorId(), text }),
       });
       if (res.headers.get("content-type")?.includes("application/json")) {
-        const data = (await res.json()) as { reply?: string; message?: string };
+        const data = (await res.json()) as { reply?: string; message?: string; live?: boolean; id?: string };
+        if (res.ok && data.live && data.id) {
+          // A person attends the conversation: no bot reply, the owner answers from the inbox.
+          setMessages((prev) => prev.map((m) => (m.id === userMessageId ? { ...m, id: data.id! } : m)));
+          setLive(true);
+          return;
+        }
         if (!res.ok || !data.reply) return fail(text, userMessageId, data.message);
         setMessages((prev) => [...prev, { id: replyId, role: "assistant", content: data.reply! }]);
         return;
@@ -191,6 +251,9 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
       fail(text, userMessageId);
     } finally {
       setSending(false);
+      sendingRef.current = false;
+      // Swap the local copies for the stored ones and pick up the room for push.
+      void refresh().catch(() => {});
     }
   };
 
@@ -241,11 +304,17 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
         <Bubble role="assistant" accent={accent}>
           {config.welcomeMessage}
         </Bubble>
-        {messages.map((m) => (
-          <Bubble key={m.id} role={m.role} accent={accent}>
-            {m.content || <span className="animate-pulse">…</span>}
-          </Bubble>
-        ))}
+        {messages.map((m) =>
+          m.role === "system" ? (
+            <p key={m.id} data-testid="widget-notice" className="self-center text-center text-xs text-gray-600 px-4">
+              {m.content}
+            </p>
+          ) : (
+            <Bubble key={m.id} role={m.role} accent={accent} label={m.role === "owner" ? config.name : undefined}>
+              {m.content || <span className="animate-pulse">…</span>}
+            </Bubble>
+          ),
+        )}
         {lead.thanks && (
           <Bubble role="assistant" accent={accent}>
             <span data-testid="lead-thanks">{lead.thanks}</span>
@@ -315,21 +384,29 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
 const Bubble = ({
   role,
   accent,
+  label,
   children,
 }: {
-  role: Message["role"];
+  role: Exclude<Role, "system">;
   accent: { backgroundColor: string; color: string };
+  /** Shown above the owner's messages, so the visitor tells a person from the bot. */
+  label?: string;
   children: React.ReactNode;
 }) => (
-  <div
-    data-testid="widget-message"
-    data-role={role}
-    className={cn(
-      "max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap",
-      role === "user" ? "self-end rounded-br-sm" : "self-start rounded-bl-sm bg-gray-100 text-gray-800",
-    )}
-    style={role === "user" ? accent : undefined}
-  >
-    {children}
+  <div className={cn("max-w-[85%] flex flex-col gap-0.5", role === "user" ? "self-end" : "self-start")}>
+    {label && <span className="text-xs font-medium text-gray-600 px-1">{label}</span>}
+    <div
+      data-testid="widget-message"
+      data-role={role}
+      className={cn(
+        "rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap",
+        role === "user" && "rounded-br-sm",
+        role === "assistant" && "rounded-bl-sm bg-gray-100 text-gray-800",
+        role === "owner" && "rounded-bl-sm border border-gray-300 bg-white text-gray-900",
+      )}
+      style={role === "user" ? accent : undefined}
+    >
+      {children}
+    </div>
   </div>
 );
