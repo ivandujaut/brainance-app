@@ -42,7 +42,7 @@ describe.skipIf(!url)("human takeover", () => {
     const state = await room();
     expect(state.liveSince).toBeInstanceOf(Date);
     // The reason is kept as history for the dashboard; only the active flag is cleared.
-    expect(state).toMatchObject({ live: true, needsAttention: false, attentionReason: "derivation" });
+    expect(state).toMatchObject({ needsAttention: false, attentionReason: "derivation" });
     expect(await roles()).toEqual(["user:¿Tienen sin TACC?", `system:Ahora te atiende una persona de ${NAME}.`]);
   });
 
@@ -73,7 +73,7 @@ describe.skipIf(!url)("human takeover", () => {
     await takeOver(db, roomId, NAME);
     expect(await releaseToBot(db, roomId)).toBe(true);
     expect(await releaseToBot(db, roomId)).toBe(false);
-    expect(await room()).toMatchObject({ liveSince: null, live: false });
+    expect((await room()).liveSince).toBeNull();
     expect((await roles()).at(-1)).toBe(`system:${RELEASE_NOTICE}`);
   });
 

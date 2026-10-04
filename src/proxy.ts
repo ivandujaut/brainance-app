@@ -4,7 +4,7 @@ import { frameAncestors } from "@/domain/widget-origin";
 import { client } from "@/lib/prisma";
 import { allowHttpOrigins } from "@/server/widget-site";
 
-const isPublicRoute = createRouteMatcher(["/", "/auth(.*)", "/portal(.*)", "/images(.*)"]);
+const isPublicRoute = createRouteMatcher(["/auth(.*)", "/images(.*)"]);
 
 const clerk = clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
@@ -33,6 +33,8 @@ export default function proxy(req: NextRequest, event: NextFetchEvent) {
   // The widget runs inside customers' sites for anonymous visitors: no Clerk session involved.
   if (pathname.startsWith("/widget/")) return widgetPage(req);
   if (pathname.startsWith("/api/widget/")) return NextResponse.next();
+  // Landing and legal pages are static and public (spec 008): readable even if Clerk is down.
+  if (pathname === "/" || pathname === "/terminos" || pathname === "/privacidad") return NextResponse.next();
   return clerk(req, event);
 }
 

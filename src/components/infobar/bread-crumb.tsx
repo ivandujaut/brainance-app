@@ -1,31 +1,19 @@
 "use client";
 import useSideBar from "@/context/use-sidebar";
-import React from "react";
 
-type Props = {};
+const PAGES: Record<string, { title: string; description: string }> = {
+  dashboard: { title: "Dashboard", description: "Lo que trajo tu bot: conversaciones, leads y lo que necesitó tu atención." },
+  settings: { title: "Cuenta", description: "Tu contraseña y el tema de la interfaz." },
+};
 
-const BreadCrumb = (props: Props) => {
+const BreadCrumb = () => {
   const { page } = useSideBar();
+  const current = PAGES[page ?? ""];
+  if (!current) return null;
   return (
     <div className="flex flex-col">
-      <div className="flex gap-5 items-center">
-        <h2 className="text-3xl font-bold capitalize">{page}</h2>
-      </div>
-      <p className="text-gray-500 text-sm">
-        <p className="text-gray-500 text-sm">
-          {page == "settings"
-            ? "Manage your account settings, preferences and integrations"
-            : page == "dashboard"
-            ? "A detailed overview of your metrics, usage, customers and more"
-            : page == "appointment"
-            ? "View and edit all your appointments"
-            : page == "email-marketing"
-            ? "Send bulk emails to your customers"
-            : page == "integration"
-            ? "Connect third-party applications into Corinna-AI"
-            : "Modify domain settings, change chatbot options, enter sales questions and train your bot to do what you want it to."}
-        </p>
-      </p>
+      <h2 className="text-3xl font-bold">{current.title}</h2>
+      <p className="text-muted-foreground text-sm">{current.description}</p>
     </div>
   );
 };

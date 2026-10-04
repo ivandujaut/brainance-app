@@ -108,7 +108,7 @@ export const roomOf = async (domainId: string) => {
 
 /** Simulates the owner taking over from the inbox and replying (same rows the inbox writes). */
 export const ownerTakesOver = async (roomId: string, businessName: string) => {
-  await pool.query(`UPDATE "ChatRoom" SET "liveSince" = now(), live = true, "lastMessageAt" = now() WHERE id = $1`, [roomId]);
+  await pool.query(`UPDATE "ChatRoom" SET "liveSince" = now(), "lastMessageAt" = now() WHERE id = $1`, [roomId]);
   await pool.query(
     `INSERT INTO "ChatMessage" (message, role, "chatRoomId", seen, "updatedAt") VALUES ($1, 'system', $2, true, now())`,
     [`Ahora te atiende una persona de ${businessName}.`, roomId],

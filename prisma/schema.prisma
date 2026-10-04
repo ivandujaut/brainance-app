@@ -17,16 +17,13 @@ model User {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   fullname  String
   clerkId   String   @unique
-  // Unused since spec 002; drop in a later migration.
-  type      String   @default("owner")
+  // Terms and privacy policy accepted at sign-up or later (spec 008).
+  termsAcceptedAt DateTime?
+  termsVersion    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  stripeId String?
-
   domains Domain[]
-
-  campaign Campaign[]
 
   subscription Billings?
 }
@@ -39,13 +36,10 @@ model Domain {
   chatBot         ChatBot?
   helpdesk        HelpDesk[]
   filterQuestions FilterQuestions[]
-  products        Product[]
 
   customer   Customer[]
   User       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String?    @db.Uuid
-  Campaign   Campaign?  @relation(fields: [campaignId], references: [id])
-  campaignId String?    @db.Uuid
 
   modelCalls ModelCall[]
 }
@@ -55,8 +49,6 @@ model ChatBot {
   welcomeMessage String?
   icon           String?
   background     String?
-  // No longer written: the widget computes the text color from `background` (spec 004).
-  textColor      String?
   // What the business does, how to address visitors ("vos" | "usted") and where to refer them.
   description    String?
   addressing     String  @default("vos")
@@ -64,7 +56,6 @@ model ChatBot {
   // Lead capture (spec 005): show the lead card in the widget, and email the owner on new leads.
   leadCapture    Boolean @default(true)
   leadEmail      Boolean @default(true)
-  helpdesk       Boolean @default(false)
   // Set when the owner confirms the snippet is on their site (later: first widget load).
   installedAt    DateTime?
   Domain         Domain? @relation(fields: [domainId], references: [id], onDelete: Cascade)
@@ -91,7 +82,6 @@ model HelpDesk {
 model FilterQuestions {
   id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   question String
-  answered String?
 
   Domain   Domain? @relation(fields: [domainId], references: [id], onDelete: Cascade)
   domainId String? @db.Uuid
@@ -120,8 +110,6 @@ model Customer {
 
   chatRoom ChatRoom[]
 
-  booking Bookings[]
-
   Domain   Domain? @relation(fields: [domainId], references: [id], onDelete: Cascade)
   domainId String? @db.Uuid
 
@@ -142,14 +130,11 @@ model LeadSubmission {
 
 model ChatRoom {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  // Legacy flag; spec 006 uses liveSince (null = the bot answers).
-  live       Boolean   @default(false)
   liveSince       DateTime?
   needsAttention  Boolean   @default(false)
   // "derivation" | "human_request" | "site_cap"
   attentionReason String?
   lastMessageAt   DateTime?
-  mailed     Boolean   @default(false)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   Customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -172,38 +157,6 @@ model ChatMessage {
 
   @@index([chatRoomId, createdAt])
   @@index([chatRoomId, seen])
-}
-
-model Bookings {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  date       DateTime
-  slot       String
-  email      String
-  Customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId String?   @db.Uuid
-  domainId   String?   @db.Uuid
-  createdAt  DateTime  @default(now())
-}
-
-model Campaign {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  customers String[]
-  domain    Domain[]
-  template  String?
-  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String?  @db.Uuid
-  createdAt DateTime @default(now())
-}
-
-model Product {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  price     Int
-  image     String
-  createdAt DateTime @default(now())
-  Domain    Domain?  @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  domainId  String?  @db.Uuid
 }
 
 enum Plans {

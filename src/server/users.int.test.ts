@@ -1,7 +1,8 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaClient } from "@/generated/prisma/client";
-import { ensureUser } from "./users";
+import { TERMS_VERSION } from "@/domain/legal";
+import { acceptTerms, ensureUser } from "./users";
 
 // Integration test: needs a migrated Postgres in TEST_DATABASE_URL (CI provides one).
 const url = process.env.TEST_DATABASE_URL;
@@ -24,6 +25,22 @@ describe.skipIf(!url)("ensureUser", () => {
     const billing = await db.billings.findUnique({ where: { userId: user.id } });
     expect(user.fullname).toBe("Ana Pérez");
     expect(billing?.plan).toBe("STANDARD");
+  });
+
+  it("records the accepted terms when the account is created (spec 008)", async () => {
+    const user = await ensureUser(db, { clerkId, fullname: "Ana Pérez" });
+    expect(user.termsVersion).toBe(TERMS_VERSION);
+    expect(user.termsAcceptedAt).toBeInstanceOf(Date);
+  });
+
+  it("does not mark older accounts as accepting new terms on their next visit", async () => {
+    await db.user.create({ data: { clerkId, fullname: "Ana Pérez" } });
+    const user = await ensureUser(db, { clerkId, fullname: "Ana Pérez" });
+    expect(user.termsVersion).toBeNull();
+
+    const accepted = await acceptTerms(db, user.id);
+    expect(accepted.termsVersion).toBe(TERMS_VERSION);
+    expect(accepted.termsAcceptedAt).toBeInstanceOf(Date);
   });
 
   it("returns the existing user on later visits without changing it", async () => {

@@ -2,14 +2,8 @@ import { onUpdatePassword } from "@/actions/settings";
 import { useToast } from "@/components/ui/use-toast";
 import { ChangePasswordProps, ChangePasswordSchema } from "@/schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTheme } from "next-themes";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-export const useThemeMode = () => {
-  const { setTheme, theme } = useTheme();
-  return { setTheme, theme };
-};
 
 export const useChangePassword = () => {
   const {
@@ -32,7 +26,7 @@ export const useChangePassword = () => {
         reset();
         setLoading(false);
         toast({
-          title: "Success",
+          title: "Listo",
           description: updated.message,
         });
       }

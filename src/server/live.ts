@@ -30,7 +30,7 @@ export const takeOver = (db: PrismaClient, roomId: string, businessName: string)
     const now = new Date();
     await tx.chatRoom.update({
       where: { id: roomId },
-      data: { liveSince: now, live: true, needsAttention: false, lastMessageAt: now },
+      data: { liveSince: now, needsAttention: false, lastMessageAt: now },
     });
     await notice(tx, roomId, takeOverNotice(businessName), now);
     return true;
@@ -42,7 +42,7 @@ export const releaseToBot = (db: PrismaClient, roomId: string) =>
     const room = await tx.chatRoom.findUniqueOrThrow({ where: { id: roomId }, select: { liveSince: true } });
     if (!room.liveSince) return false;
     const now = new Date();
-    await tx.chatRoom.update({ where: { id: roomId }, data: { liveSince: null, live: false, lastMessageAt: now } });
+    await tx.chatRoom.update({ where: { id: roomId }, data: { liveSince: null, lastMessageAt: now } });
     await notice(tx, roomId, RELEASE_NOTICE, now);
     return true;
   });

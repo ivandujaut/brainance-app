@@ -1,53 +1,52 @@
 "use client";
-import { useThemeMode } from "@/hooks/settings/use-settings";
-import React from "react";
-import Section from "../section-label";
+import { Monitor, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useSyncExternalStore } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { SystemMode } from "../themes-placeholder/systemmode";
-import { LightMode } from "../themes-placeholder/lightmode";
-import { DarkMode } from "../themes-placeholder/darkmode";
 
-type Props = {};
+const OPTIONS = [
+  { value: "system", label: "Igual que el sistema", icon: Monitor },
+  { value: "light", label: "Claro", icon: Sun },
+  { value: "dark", label: "Oscuro", icon: Moon },
+] as const;
 
-const DarkModeToggle = (props: Props) => {
-  const { setTheme, theme } = useThemeMode();
-  return <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-    <div className="lg:col-span-1">
-        <Section 
-            label="Interface Theme"
-            message="Select or customize your UI theme."
-        />
-    </div>
-    <div className="lg:col-span-4 flex lg:flex-row flex-col items-start gap-5">
-        <div 
-            className={cn(
-                'rounded-3xl overflow-hidden cursor-pointer border-4 border-transparent',
-                theme == 'system' && 'border-orange'
-            )}
-            onClick={() => setTheme('system')}
-        >
-            <SystemMode />
+const subscribeNoop = () => () => {};
+
+const DarkModeToggle = () => {
+  const { setTheme, theme } = useTheme();
+  // The theme is only known in the browser; avoid a mismatched first render.
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Tema</CardTitle>
+        <CardDescription>Cómo se ve el panel.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div role="radiogroup" aria-label="Tema" className="flex flex-wrap gap-3">
+          {OPTIONS.map(({ value, label, icon: Icon }) => {
+            const selected = mounted && theme === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => setTheme(value)}
+                className={cn(
+                  "flex items-center gap-2 rounded-md border px-4 py-3 text-sm hover:bg-accent hover:text-accent-foreground",
+                  selected && "border-primary ring-2 ring-ring",
+                )}
+              >
+                <Icon className="h-4 w-4" /> {label}
+              </button>
+            );
+          })}
         </div>
-        <div 
-            className={cn(
-                'rounded-3xl overflow-hidden cursor-pointer border-4 border-transparent',
-                theme == 'light' && 'border-orange'
-            )}
-            onClick={() => setTheme('light')}
-        >
-            <LightMode />
-        </div>
-        <div 
-            className={cn(
-                'rounded-3xl overflow-hidden cursor-pointer border-4 border-transparent',
-                theme == 'dark' && 'border-orange'
-            )}
-            onClick={() => setTheme('dark')}
-        >
-            <DarkMode />
-        </div>
-    </div>
-  </div>;
+      </CardContent>
+    </Card>
+  );
 };
 
 export default DarkModeToggle;

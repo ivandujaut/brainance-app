@@ -15,6 +15,8 @@ test("signs up with email and a verification code, in Spanish, and lands on the 
 
   await page.goto("/auth/sign-up");
   await expect(page.getByRole("heading", { name: "Creá tu cuenta" })).toBeVisible();
+  // Spec 008, criterion 7: signing up accepts the terms, linked from the page.
+  await expect(page.getByTestId("terms-notice").getByRole("link", { name: "Términos" })).toHaveAttribute("href", "/terminos");
   await page.locator('input[name="emailAddress"]').fill(email);
   await page.locator('input[name="password"]').fill(TEST_PASSWORD);
   await page.getByRole("button", { name: "Continuar", exact: true }).click();

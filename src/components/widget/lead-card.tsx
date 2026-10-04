@@ -71,7 +71,10 @@ export const LeadCard = ({ businessName, questions, accent, onSubmit, onDismiss 
         </p>
       )}
       <p className="text-xs text-gray-600" data-testid="lead-consent">
-        Al enviar, aceptás que {businessName} use estos datos para responder tu consulta.
+        Al enviar, aceptás que {businessName} use estos datos para responder tu consulta.{" "}
+        <a href="/privacidad" target="_blank" rel="noopener" className="underline underline-offset-2" data-testid="lead-privacy">
+          Más información
+        </a>
       </p>
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onDismiss} className="rounded-full px-3 py-1.5 text-gray-700 hover:bg-gray-100">

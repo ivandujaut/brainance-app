@@ -9,13 +9,13 @@ export const ChangePasswordSchema: ZodType<ChangePasswordProps> = z
   .object({
     password: z
       .string()
-      .min(8, { message: "Your password must be atleast 8 characters long" })
+      .min(8, { message: "La contraseña tiene que tener al menos 8 caracteres." })
       .max(64, {
-        message: "Your password can not be longer then 64 characters long",
+        message: "La contraseña puede tener hasta 64 caracteres.",
       }),
     confirmPassword: z.string(),
   })
   .refine((schema) => schema.password === schema.confirmPassword, {
-    message: "passwords do not match",
+    message: "Las contraseñas no coinciden.",
     path: ["confirmPassword"],
   });
