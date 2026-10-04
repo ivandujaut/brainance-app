@@ -53,66 +53,6 @@ export const onIntegrateDomain = async (domain: string, icon: string) => {
   }
 };
 
-export const onGetSubscriptionPlan = async () => {
-  try {
-    const user = await currentUser();
-    if (!user) return;
-    const plan = await client.user.findUnique({
-      where: {
-        clerkId: user.id,
-      },
-      select: {
-        subscription: {
-          select: {
-            plan: true,
-          },
-        },
-      },
-    });
-    if (plan) {
-      return plan.subscription?.plan;
-    }
-  } catch (error) {
-    captureError(error, { area: "settings" });
-  }
-};
-
-export const onGetAllAccountDomains = async () => {
-  const user = await currentUser();
-  if (!user) return;
-  try {
-    const domains = await client.user.findUnique({
-      where: {
-        clerkId: user.id,
-      },
-      select: {
-        id: true,
-        domains: {
-          select: {
-            name: true,
-            icon: true,
-            id: true,
-            customer: {
-              select: {
-                chatRoom: {
-                  select: {
-                    id: true,
-                    live: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return { ...domains };
-  } catch (error) {
-    captureError(error, { area: "settings" });
-  }
-};
-
 export const onUpdatePassword = async (password: string) => {
   try {
     const user = await currentUser();
@@ -121,7 +61,7 @@ export const onUpdatePassword = async (password: string) => {
     const update = await (await clerkClient()).users.updateUser(user.id, { password });
 
     if (update) {
-      return { status: 200, message: "Password updated successfully" };
+      return { status: 200, message: "Cambiaste tu contraseña." };
     }
   } catch (error) {
     captureError(error, { area: "settings" });

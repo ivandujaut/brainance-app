@@ -1,3 +1,4 @@
+import { TERMS_VERSION } from "@/domain/legal";
 import type { PrismaClient, User } from "@/generated/prisma/client";
 import { createOrRead } from "./db-utils";
 
@@ -11,7 +12,13 @@ export const ensureUser = async (
   { clerkId, fullname }: { clerkId: string; fullname: string },
 ): Promise<User> => {
   const user = await createOrRead(
-    () => db.user.upsert({ where: { clerkId }, update: {}, create: { clerkId, fullname } }),
+    // Signing up means accepting the terms shown on the sign-up page (spec 008).
+    () =>
+      db.user.upsert({
+        where: { clerkId },
+        update: {},
+        create: { clerkId, fullname, termsAcceptedAt: new Date(), termsVersion: TERMS_VERSION },
+      }),
     () => db.user.findUniqueOrThrow({ where: { clerkId } }),
   );
   await createOrRead(
@@ -20,3 +27,7 @@ export const ensureUser = async (
   );
   return user;
 };
+
+/** Records that the owner accepted the current terms (accounts older than them, or after a change). */
+export const acceptTerms = (db: PrismaClient, userId: string) =>
+  db.user.update({ where: { id: userId }, data: { termsAcceptedAt: new Date(), termsVersion: TERMS_VERSION } });

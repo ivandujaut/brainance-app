@@ -1,22 +1,16 @@
 import InfoBar from "@/components/infobar";
-import BillingSettings from "@/components/settings/billing-settings";
 import ChangePassword from "@/components/settings/change-password";
 import DarkModeToggle from "@/components/settings/dark-mode";
-import React from "react";
 
-type Props = {};
+// The owner's account (spec 008): no billing in the beta.
+const AccountPage = () => (
+  <>
+    <InfoBar />
+    <div className="overflow-y-auto w-full flex-1 h-0 flex flex-col gap-6 max-w-3xl pb-10">
+      <DarkModeToggle />
+      <ChangePassword />
+    </div>
+  </>
+);
 
-const Page = (props: Props) => {
-  return (
-    <>
-      <InfoBar />
-      <div className="overflow-y-auto w-full chat-window flex-1 h-0 flex flex-col gap-10">
-        <BillingSettings />
-        <DarkModeToggle />
-        <ChangePassword />
-      </div>
-    </>
-  );
-};
-
-export default Page;
+export default AccountPage;

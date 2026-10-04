@@ -2,7 +2,9 @@ import { unstable_rethrow } from "next/navigation";
 import React from "react";
 import { onLoadAccount } from "@/actions/auth";
 import { AccountError } from "@/components/account-error";
+import { TermsBanner } from "@/components/legal/terms-banner";
 import SideBar from "@/components/sidebar";
+import { needsTermsAcceptance } from "@/domain/legal";
 import { captureError } from "@/server/observability";
 
 type Props = {
@@ -22,7 +24,10 @@ const OwnerLayout = async ({ children }: Props) => {
   return (
     <div className="flex h-screen w-full">
       <SideBar domains={account.domains} />
-      <div className="w-full h-screen flex flex-col py-3 pr-10 pl-20 md:px-10">{children}</div>
+      <div className="w-full h-screen flex flex-col py-3 pr-10 pl-20 md:px-10">
+        {needsTermsAcceptance(account.user) && <TermsBanner />}
+        {children}
+      </div>
     </div>
   );
 };

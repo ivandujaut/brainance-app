@@ -1,5 +1,5 @@
 import { SIDE_BAR_MENU } from "@/constants/menu";
-import { ChevronLeft, ChevronLeftCircle, LogOut, Menu, MonitorSmartphone } from "lucide-react";
+import { ChevronLeft, ChevronLeftCircle, LogOut, Menu } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import MenuItem from "./menu-item";
@@ -45,16 +45,15 @@ const MaxMenu = ({ current, domains, onExpand, onSignOut }: Props) => {
       </div>
       <div className="animate-fade-in opacity-0 delay-300 fill-mode-forwards flex flex-col justify-between h-full pt-10">
         <div className="flex flex-col">
-          <p className="text-xs text-gray-500 mb-3">MENU</p>
+          <p className="text-xs text-muted-foreground mb-3">MENÚ</p>
           {SIDE_BAR_MENU.map((menu, key) => (
             <MenuItem size="max" {...menu} key={key} current={current} />
           ))}
           <DomainMenu domains={domains} />
         </div>
         <div className="flex flex-col">
-          <p className="text-xs text-gray-500 mb-3">OPTIONS</p>
-          <MenuItem size="max" label="Sign out" icon={<LogOut />} onSignOut={onSignOut} />
-          <MenuItem size="max" label="Mobile App" icon={<MonitorSmartphone />} />
+          <p className="text-xs text-muted-foreground mb-3">OPCIONES</p>
+          <MenuItem size="max" label="Cerrar sesión" icon={<LogOut />} onSignOut={onSignOut} />
         </div>
       </div>
     </div>

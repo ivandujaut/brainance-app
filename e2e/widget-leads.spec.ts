@@ -33,6 +33,9 @@ test("the lead card appears after the first answer and stores the visitor's data
   const card = chat.getByTestId("lead-card");
   await expect(card).toBeVisible();
   await expect(card.getByTestId("lead-consent")).toContainText(`Al enviar, aceptás que ${name}`);
+  // Spec 008, criterion 8: the notice links to the privacy policy, in a new tab.
+  await expect(card.getByTestId("lead-privacy")).toHaveAttribute("href", "/privacidad");
+  await expect(card.getByTestId("lead-privacy")).toHaveAttribute("target", "_blank");
 
   // Criterion 4: an invalid email is not sent.
   await card.getByLabel("Tu email").fill("ana@");

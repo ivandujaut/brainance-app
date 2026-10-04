@@ -1,6 +1,6 @@
 import { SIDE_BAR_MENU } from "@/constants/menu";
 import React from "react";
-import { ChevronRight, ChevronRightCircle, LogOut, Menu, MonitorSmartphone } from "lucide-react";
+import { ChevronRight, ChevronRightCircle, LogOut, Menu } from "lucide-react";
 import MenuItem from "./menu-item";
 import DomainMenu from "./domain-menu";
 
@@ -32,8 +32,7 @@ export const MinMenu = ({ onShrink, current, onSignOut, domains }: MinMenuProps)
           <DomainMenu min domains={domains} />
         </div>
         <div className="flex flex-col">
-          <MenuItem size="min" label="Sign out" icon={<LogOut />} onSignOut={onSignOut} />
-          <MenuItem size="min" label="Mobile App" icon={<MonitorSmartphone />} />
+          <MenuItem size="min" label="Cerrar sesión" icon={<LogOut />} onSignOut={onSignOut} />
         </div>
       </div>
     </div>

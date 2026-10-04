@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  # Manual re-run, e.g. after loading the E2E_CLERK_* secrets (docs/lanzamiento.md).
+  workflow_dispatch:
   pull_request:
   push:
     branches: [main, develop]
