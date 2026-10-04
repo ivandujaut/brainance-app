@@ -1,6 +1,6 @@
 # 006 — Bandeja de conversaciones
 
-- **Estado:** Borrador
+- **Estado:** Aprobada (2026-10-04)
 - **ADRs relacionados:** [0003 — Arquitectura y límites del widget](../adr/0003-arquitectura-del-widget.md), [0004 — Aislamiento multi-tenant](../adr/0004-aislamiento-multi-tenant.md), [0007 — Tiempo real híbrido](../adr/0007-tiempo-real-hibrido.md)
 
 ## Problema
@@ -103,10 +103,12 @@ Las conversaciones del widget se guardan, pero el dueño no puede verlas: el ít
 | 5, 6 | Unitario: detección de derivación y pedidos de persona (con casos negativos) | `src/domain/attention.test.ts` |
 | 12, 13 | Unitario: devolución automática a los 30 minutos y mapeo de roles para el modelo | `src/domain/takeover.test.ts` |
 | 14 | Unitario: intervalos de polling | `src/domain/polling.test.ts` |
-| 5, 7, 8, 10, 11, 12, 15 | Integración (Postgres): mensajes con la sala en vivo, devolución automática, marca de atención y límites | `src/server/conversations.int.test.ts` |
+| 7, 8, 11, 12 | Integración (Postgres): toma de control, respuesta del dueño, devolución manual y automática, cursor | `src/server/live.int.test.ts` |
 | 1, 2, 3 | Integración: listado, filtros, no leídos y orden | `src/actions/conversation/conversation.int.test.ts` |
 | 16 | Integración: cada acción como dueño y como otro tenant | `src/actions/tenant-isolation.int.test.ts` |
-| 17 | Integración: el cursor del widget exige el `visitorId`; autorización de canales | `src/app/api/...` (tests de las rutas) |
-| 9, 11, 13 | Unitario: publicador `noop`/`pusher` y endpoint de autorización con Pusher simulado | `src/server/realtime/*.test.ts` |
-| 8, 9, 10, 11 | E2E del widget: la sala pasa a vivo (vía base), el visitante ve el aviso y el mensaje del dueño sin recargar, y no se llama al modelo | `e2e/widget-live.spec.ts` |
+| 17 | Integración: el cursor del widget exige el `visitorId`; sin push, la autorización de canales se rechaza | `src/app/api/widget/[domainId]/conversation/route.int.test.ts` |
+| 14, 17 | Unitario: publicador `noop`/`pusher` y autorización de canales del dueño y del visitante | `src/server/realtime/index.test.ts` |
+| 1, 2, 3 | Render de la bandeja con las acciones simuladas | `src/app/(site)/(dashboard)/conversations/page.test.tsx` |
+| 13 | Eval: caso con un mensaje del dueño en el historial | `evals/rag-answers/cases.json` (`cd-takeover-01`) |
+| 8, 9, 10, 14 | E2E del widget (sin Pusher, por polling): la sala pasa a vivo (vía base), el visitante ve el aviso y los mensajes del dueño sin recargar, y no se llama al modelo | `e2e/widget-live.spec.ts` |
 | 1–4, 8–11 | E2E del panel (requiere Clerk): abrir, tomar el control, responder y devolver | `e2e/conversations.spec.ts` |

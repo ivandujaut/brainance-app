@@ -1,6 +1,6 @@
 # 0007 — Tiempo real híbrido: push como aviso, polling como respaldo
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado
 - **Fecha:** 2026-10-04
 
 ## Contexto
