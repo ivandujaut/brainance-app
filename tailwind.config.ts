@@ -13,6 +13,9 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
+      },
       colors: {
         // Deprecated (ADR 0005): legacy brand colors. New code uses the semantic tokens below; these
         // go away once no component uses them.

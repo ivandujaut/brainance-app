@@ -1,75 +1,102 @@
-import { Bot, MessageSquareText, UserPlus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ChatDemo } from "@/components/landing/chat-demo";
+import { HowItWorks } from "@/components/landing/how-it-works";
+import { SpotlightCard } from "@/components/landing/spotlight-card";
 import Navbar from "@/components/navbar";
 import { SiteFooter } from "@/components/site/footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
-const STEPS = [
+export const dynamic = "force-static";
+
+const BUSINESSES = ["panaderías", "talleres", "inmobiliarias", "consultorios", "estudios contables", "tiendas de ropa", "gimnasios"];
+
+const FEATURES = [
   {
-    icon: Bot,
-    title: "Contale a tu bot sobre tu negocio",
-    text: "Cargá a qué te dedicás, tus preguntas frecuentes y a dónde derivar. Elegí los colores y el mensaje de bienvenida.",
+    title: "Responde con tus datos",
+    text: "Usa tu descripción y tus preguntas frecuentes. Habla como vos elegís: de vos o de usted.",
   },
   {
-    icon: MessageSquareText,
-    title: "Pegá una línea en tu sitio",
-    text: "El chat aparece abajo a la derecha y responde las consultas de tus visitantes con la información de tu negocio.",
+    title: "No inventa",
+    text: "Si un precio o un horario no está cargado, lo dice y deriva a tu WhatsApp o a tu email.",
   },
   {
-    icon: UserPlus,
-    title: "Recibí los contactos",
-    text: "El bot les ofrece dejar su email y te avisa. Si hace falta, tomás la conversación y respondés vos.",
+    title: "Te trae los contactos",
+    text: "Después de ayudar, ofrece dejar el email y tus preguntas. Te llega un aviso y los tenés en tu panel.",
+  },
+  {
+    title: "Te avisa cuando hacés falta",
+    text: "Si alguien pide hablar con una persona, la conversación se marca y la tomás en el momento.",
   },
 ];
 
-// Public landing (spec 008), static: what BrAInance is and how to start. The beta only has a free plan.
-export const dynamic = "force-static";
-
+// Public landing (spec 009): warm editorial look, the real widget as the hero, Hairline figures.
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="theme-paper min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
       <main className="flex-1">
-        <section className="px-4 py-16 md:py-24 text-center flex flex-col items-center gap-6 max-w-3xl mx-auto">
-          <span className="rounded-full border px-3 py-1 text-sm text-muted-foreground">Beta gratuita</span>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Un chat con IA que atiende tu sitio y te trae clientes</h1>
-          <p className="text-lg text-muted-foreground">
-            BrAInance responde las consultas de tus visitantes con la información de tu negocio, a cualquier hora, y te pasa los
-            contactos de los interesados.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/auth/sign-up">Crear mi bot gratis</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/auth/sign-in">Ya tengo cuenta</Link>
-            </Button>
+        <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 md:px-8 lg:grid-cols-[1.05fr_1fr] lg:py-24">
+          <div className="flex flex-col gap-6">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Beta gratuita · Hecho en Argentina</p>
+            <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-6xl">
+              Tu negocio responde a las 3 de la mañana.
+              <span className="block italic text-muted-foreground">Vos dormís.</span>
+            </h1>
+            <p className="max-w-lg text-lg leading-relaxed text-muted-foreground">
+              BrAInance es un chat con IA para tu sitio. Contesta con la información de tu negocio, te pasa los contactos de
+              los interesados y te avisa cuando hace falta una persona.
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button asChild size="lg">
+                <Link href="/auth/sign-up">
+                  Crear mi bot gratis <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+              <span className="text-sm text-muted-foreground">Sin tarjeta. Se instala con una línea.</span>
+            </div>
           </div>
+          <ChatDemo />
         </section>
 
-        <section aria-labelledby="como-funciona" className="px-4 pb-20 max-w-5xl mx-auto">
-          <h2 id="como-funciona" className="text-2xl font-bold text-center mb-8">
-            Cómo funciona
+        <section aria-label="Para quién es" className="border-t">
+          <p className="mx-auto max-w-6xl px-4 py-6 font-display text-lg italic text-muted-foreground md:px-8">
+            Para {BUSINESSES.slice(0, -1).join(", ")} y {BUSINESSES.at(-1)}. Para cualquiera que conteste la misma pregunta
+            veinte veces por día.
+          </p>
+        </section>
+
+        <HowItWorks />
+
+        <section aria-labelledby="que-hace" className="mx-auto max-w-6xl px-4 py-20 md:px-8">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Qué hace por vos</p>
+          <h2 id="que-hace" className="mt-3 max-w-xl font-display text-3xl leading-tight md:text-4xl">
+            Atiende como alguien de tu equipo, <span className="italic text-muted-foreground">no como un contestador.</span>
           </h2>
-          <ol className="grid gap-4 md:grid-cols-3">
-            {STEPS.map(({ icon: Icon, title, text }, i) => (
-              <li key={title}>
-                <Card className="h-full">
-                  <CardContent className="p-6 flex flex-col gap-3">
-                    <span className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold">
-                        {i + 1}
-                      </span>
-                      <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-                    </span>
-                    <h3 className="font-semibold">{title}</h3>
-                    <p className="text-sm text-muted-foreground">{text}</p>
-                  </CardContent>
-                </Card>
+          <ul className="mt-12 grid gap-4 sm:grid-cols-2">
+            {FEATURES.map((f, i) => (
+              <li key={f.title}>
+                <SpotlightCard className="h-full">
+                  <span className="font-mono text-xs text-muted-foreground">0{i + 1}</span>
+                  <h3 className="mt-3 font-display text-xl">{f.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
+                </SpotlightCard>
               </li>
             ))}
-          </ol>
+          </ul>
+        </section>
+
+        <section className="border-t">
+          <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 md:flex-row md:items-end md:justify-between md:px-8">
+            <h2 className="max-w-2xl font-display text-4xl leading-tight md:text-5xl">
+              Probalo en tu sitio hoy. <span className="italic text-muted-foreground">Mañana ya responde.</span>
+            </h2>
+            <Button asChild size="lg">
+              <Link href="/auth/sign-up">
+                Crear mi bot gratis <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </section>
       </main>
       <SiteFooter />

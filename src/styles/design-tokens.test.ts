@@ -7,10 +7,14 @@ import { AA_CONTRAST, contrastRatio, hslToHex } from "@/domain/color-contrast";
 // pair must meet WCAG AA in light and dark mode.
 const css = readFileSync(path.join(process.cwd(), "src/app/globals.css"), "utf8");
 
-const tokensIn = (selector: string) => {
-  const block = new RegExp(`${selector.replace(".", "\\.")}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+// The paper palette only overrides surfaces and text; primary, ring and destructive come from the base.
+const BASE: Record<string, string> = { ".theme-paper": ":root", ".dark .theme-paper": ".dark" };
+
+const tokensIn = (selector: string): Record<string, string> => {
+  const block = new RegExp(`(?:^|[\\s}])${selector.replaceAll(".", "\\.")}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
   if (!block) throw new Error(`No ${selector} block in globals.css`);
-  return Object.fromEntries([...block.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(([, name, value]) => [name, value.trim()]));
+  const own = Object.fromEntries([...block.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(([, name, value]) => [name, value.trim()]));
+  return BASE[selector] ? { ...tokensIn(BASE[selector]), ...own } : own;
 };
 
 const PAIRS = [
@@ -26,7 +30,7 @@ const PAIRS = [
   ["background", "muted-foreground"],
 ] as const;
 
-describe.each([":root", ".dark"])("design tokens in %s", (selector) => {
+describe.each([":root", ".dark", ".theme-paper", ".dark .theme-paper"])("design tokens in %s", (selector) => {
   const tokens = tokensIn(selector);
 
   it.each(PAIRS)("%s / %s meets AA", (background, text) => {

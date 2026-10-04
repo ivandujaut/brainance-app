@@ -90,6 +90,41 @@ body {
     --chart-1: #3987e5;
     --chart-2: #d95926;
   }
+
+  /* Warm "paper" palette for the public pages (spec 009): same semantic tokens, warmer values. */
+  .theme-paper {
+    --background: 36.9 44.8% 94.3%;
+    --foreground: 24.0 9.8% 10.0%;
+    --card: 40.0 100.0% 98.8%;
+    --card-foreground: 24.0 9.8% 10.0%;
+    --popover: 40.0 100.0% 98.8%;
+    --popover-foreground: 24.0 9.8% 10.0%;
+    --muted: 37.1 39.6% 89.6%;
+    --muted-foreground: 31.4 12.9% 32.0%;
+    --accent: 37.1 39.6% 89.6%;
+    --accent-foreground: 24.0 9.8% 10.0%;
+    --secondary: 37.1 39.6% 89.6%;
+    --secondary-foreground: 24.0 9.8% 10.0%;
+    --border: 36.4 32.6% 83.1%;
+    --input: 36.4 32.6% 83.1%;
+  }
+
+  .dark .theme-paper {
+    --background: 34.3 20.0% 6.9%;
+    --foreground: 37.5 42.1% 92.5%;
+    --card: 33.3 17.6% 10.0%;
+    --card-foreground: 37.5 42.1% 92.5%;
+    --popover: 33.3 17.6% 10.0%;
+    --popover-foreground: 37.5 42.1% 92.5%;
+    --muted: 32.7 15.1% 14.3%;
+    --muted-foreground: 36.4 16.5% 66.7%;
+    --accent: 32.7 15.1% 14.3%;
+    --accent-foreground: 37.5 42.1% 92.5%;
+    --secondary: 32.7 15.1% 14.3%;
+    --secondary-foreground: 37.5 42.1% 92.5%;
+    --border: 33.8 16.0% 19.6%;
+    --input: 33.8 16.0% 19.6%;
+  }
 }
 
 @layer base {
