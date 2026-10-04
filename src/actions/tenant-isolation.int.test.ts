@@ -18,6 +18,7 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
   const settings = await import("./settings");
   const bot = await import("./settings/bot");
   const leads = await import("./leads");
+  const metrics = await import("./metrics");
 
   const OWNER = "user_int_tenant_owner";
   const INTRUDER = "user_int_tenant_intruder";
@@ -238,6 +239,15 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
       expect(await leads.onListLeads(siteId)).toHaveLength(1);
       await leads.onDeleteLead(lead.id);
       expect(await leads.onListLeads(siteId)).toHaveLength(0);
+    });
+
+    it("onGetOwnerMetrics: never counts another tenant's conversations", async () => {
+      as(INTRUDER);
+      expect(await metrics.onGetOwnerMetrics({ days: 7, siteId })).toBeNull();
+      expect(await metrics.onGetOwnerMetrics({ days: 7 })).toMatchObject({ conversations: 0, leads: 0 });
+
+      as(OWNER);
+      expect(await metrics.onGetOwnerMetrics({ days: 7, siteId })).toMatchObject({ conversations: 1, leads: 1 });
     });
 
     it("onDeleteUserDomain: only the owner deletes the site", async () => {

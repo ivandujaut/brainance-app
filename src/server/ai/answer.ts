@@ -10,6 +10,14 @@ export type AnswerUsage = {
   cacheWriteTokens: number;
 };
 
+export type AnswerReport = {
+  servedModel: string | null;
+  usage: AnswerUsage;
+  latencyMs: number;
+  finishReason: AnswerResult["finishReason"];
+  error: string | null;
+};
+
 export type AnswerResult = {
   text: string;
   /** Model id reported by the provider, which may differ from the requested alias. */
@@ -74,6 +82,7 @@ export const streamAnswer = ({
   model,
   maxOutputTokens = 1024,
   onEnd,
+  onSettled,
 }: {
   business: BusinessKnowledge;
   question: string;
@@ -81,7 +90,10 @@ export const streamAnswer = ({
   model: LanguageModel;
   maxOutputTokens?: number;
   onEnd?: (end: { text: string; finishReason: AnswerResult["finishReason"] }) => void | Promise<void>;
+  /** Called once when the call ends, successfully or not, with what it cost (spec 007). */
+  onSettled?: (report: AnswerReport) => void | Promise<void>;
 }) => {
+  const startedAt = performance.now();
   let failure: unknown;
   const result = streamText({
     model,
@@ -92,10 +104,49 @@ export const streamAnswer = ({
     },
   });
 
+  let settled = false;
+  const settle = async (report: Omit<AnswerReport, "latencyMs">) => {
+    // Once per call, even if onEnd fails after a successful answer.
+    if (settled) return;
+    settled = true;
+    try {
+      await onSettled?.({ ...report, latencyMs: Math.round(performance.now() - startedAt) });
+    } catch {
+      // Recording usage must never break the answer.
+    }
+  };
+
   const finished = (async () => {
-    const [text, finishReason] = await Promise.all([result.text, result.finishReason]);
-    if (failure) throw failure;
-    await onEnd?.({ text, finishReason });
+    try {
+      const [text, finishReason, usage, response] = await Promise.all([
+        result.text,
+        result.finishReason,
+        result.totalUsage,
+        result.response,
+      ]);
+      if (failure) throw failure;
+      await settle({
+        servedModel: response.modelId,
+        usage: {
+          inputTokens: usage.inputTokens ?? 0,
+          outputTokens: usage.outputTokens ?? 0,
+          cacheReadTokens: usage.inputTokenDetails.cacheReadTokens ?? 0,
+          cacheWriteTokens: usage.inputTokenDetails.cacheWriteTokens ?? 0,
+        },
+        finishReason,
+        error: null,
+      });
+      await onEnd?.({ text, finishReason });
+    } catch (error) {
+      const cause = failure ?? error;
+      await settle({
+        servedModel: null,
+        usage: { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
+        finishReason: "error",
+        error: cause instanceof Error ? cause.message : String(cause),
+      });
+      throw cause;
+    }
   })();
 
   return {

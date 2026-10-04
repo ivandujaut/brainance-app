@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { createSite, deleteUsers, installedAt, seedVisitorMessages } from "./support/db";
+import { createSite, deleteUsers, installedAt, modelCallsOf, seedModelSpend, seedVisitorMessages } from "./support/db";
 
 // Spec 003. The customer's site is simulated on its own origin; the widget loads from the app.
 // Chrome's local-network protections are relaxed in playwright.config.ts so these fake public
@@ -74,6 +74,33 @@ test("over the site's daily cap, the bot refers to the owner's contact", async (
   await expect(chat.locator('[data-testid="widget-message"][data-role="assistant"]').last()).toContainText(
     "WhatsApp +54 9 341 555-0101",
   );
+});
+
+// Spec 007, criterion 5: every answer records its model call (the mock model costs nothing).
+test("each answer records its model call", async ({ page, baseURL }) => {
+  const { domainId, name } = await newSite("registro");
+  await hostPage(page, name, domainId, new URL(baseURL!).origin);
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  const chat = page.frameLocator('iframe[data-brainance="chat"]');
+  await chat.getByTestId("widget-input").fill("Hola");
+  await chat.getByTestId("widget-send").click();
+  await expect(chat.locator('[data-testid="widget-message"][data-role="assistant"]').last()).toContainText("Hola");
+  await expect.poll(() => modelCallsOf(domainId)).toEqual([{ requestedModel: "mock/echo", costUsd: "0.000000" }]);
+});
+
+// Spec 007, criterion 9: over the site's daily AI cost cap, the bot refers to the contact without the model.
+test("over the site's daily AI cost cap, the bot refers to the owner's contact", async ({ page, baseURL }) => {
+  const { domainId, name } = await newSite("costo", { contact: "WhatsApp +54 9 341 555-0101" });
+  await seedModelSpend(domainId, 2);
+  await hostPage(page, name, domainId, new URL(baseURL!).origin);
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  const chat = page.frameLocator('iframe[data-brainance="chat"]');
+  await chat.getByTestId("widget-input").fill("¿Hacen envíos?");
+  await chat.getByTestId("widget-send").click();
+  const reply = chat.locator('[data-testid="widget-message"][data-role="assistant"]').last();
+  await expect(reply).toContainText("WhatsApp +54 9 341 555-0101");
+  await expect(reply).not.toContainText("Respuesta de prueba");
+  expect(await modelCallsOf(domainId)).toHaveLength(1);
 });
 
 test("an unknown site id shows nothing and warns in the console", async ({ page, baseURL }) => {

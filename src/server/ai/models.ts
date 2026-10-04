@@ -40,8 +40,10 @@ const echoModel = () =>
  * Model used to answer widget visitors: AI_ANSWER_MODEL (a Vercel AI Gateway id) or the default.
  * "mock/echo" is only allowed when AI_ALLOW_MOCK_MODEL=true (E2E runs), never by accident.
  */
+export const answerModelId = () => process.env.AI_ANSWER_MODEL || DEFAULT_ANSWER_MODEL;
+
 export const resolveAnswerModel = (): LanguageModel => {
-  const id = process.env.AI_ANSWER_MODEL || DEFAULT_ANSWER_MODEL;
+  const id = answerModelId();
   if (id === "mock/echo") {
     if (process.env.AI_ALLOW_MOCK_MODEL !== "true") throw new Error("The mock model needs AI_ALLOW_MOCK_MODEL=true");
     return echoModel();

@@ -22,7 +22,7 @@ Cada ítem va a tener su spec en `docs/specs/`.
 6. **Respuestas con IA** ([spec 001](specs/001-respuestas-con-ia.md)): capa de IA según el ADR 0001, con eval set en español.
 7. **Captura de leads** ([spec 005](specs/005-captura-de-leads.md)): preguntas de calificación y guardado del email.
 8. **Bandeja de conversaciones** ([spec 006](specs/006-bandeja-de-conversaciones.md)): listado, lectura y toma de control humana en tiempo real.
-9. **Observabilidad**: Sentry, y costo y latencia por conversación.
+9. **Observabilidad** ([spec 007](specs/007-observabilidad.md)): Sentry, y costo y latencia por conversación.
 
 ## v1: después de la beta
 

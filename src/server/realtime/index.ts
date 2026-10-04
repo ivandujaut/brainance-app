@@ -1,6 +1,7 @@
 import Pusher from "pusher";
 import { isVisitorId } from "@/domain/widget-limits";
 import type { PrismaClient } from "@/generated/prisma/client";
+import { captureError } from "@/server/observability";
 
 // Push as a hint, polling as the fallback (ADR 0007). Events carry no content: clients fetch what
 // changed through the endpoints that already check access.
@@ -58,7 +59,7 @@ export const notifyRoomChanged = async (db: PrismaClient, roomId: string, realti
     await realtime.publish(userId ? [roomChannel(roomId), ownerChannel(userId)] : [roomChannel(roomId)]);
   } catch (error) {
     // Polling picks the change up anyway.
-    console.error("Realtime publish failed", error);
+    captureError(error, { area: "realtime" });
   }
 };
 

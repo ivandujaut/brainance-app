@@ -3,6 +3,7 @@ import React from "react";
 import { onLoadAccount } from "@/actions/auth";
 import { AccountError } from "@/components/account-error";
 import SideBar from "@/components/sidebar";
+import { captureError } from "@/server/observability";
 
 type Props = {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ const OwnerLayout = async ({ children }: Props) => {
     account = await onLoadAccount();
   } catch (error) {
     unstable_rethrow(error);
-    console.error("Failed to load account", error);
+    captureError(error, { area: "settings", extra: { step: "load account" } });
     return <AccountError />;
   }
 

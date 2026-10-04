@@ -30,7 +30,7 @@ export const takeOver = (db: PrismaClient, roomId: string, businessName: string)
     const now = new Date();
     await tx.chatRoom.update({
       where: { id: roomId },
-      data: { liveSince: now, live: true, needsAttention: false, attentionReason: null, lastMessageAt: now },
+      data: { liveSince: now, live: true, needsAttention: false, lastMessageAt: now },
     });
     await notice(tx, roomId, takeOverNotice(businessName), now);
     return true;
@@ -52,7 +52,7 @@ export const ownerReply = async (db: PrismaClient, roomId: string, raw: string, 
   const text = raw.trim();
   if (!text || text.length > OWNER_MESSAGE_MAX) return null;
   await takeOver(db, roomId, businessName);
-  await db.chatRoom.update({ where: { id: roomId }, data: { needsAttention: false, attentionReason: null } });
+  await db.chatRoom.update({ where: { id: roomId }, data: { needsAttention: false } });
   return { id: await addMessage(db, roomId, "owner", text) };
 };
 
@@ -77,5 +77,6 @@ export const resolveVisitorTurn = async (db: PrismaClient, roomId: string, now =
   return turn;
 };
 
+/** The reason stays after the flag is cleared: the dashboard counts conversations that needed attention (spec 007). */
 export const flagAttention = (db: PrismaClient, roomId: string, reason: AttentionReason) =>
   db.chatRoom.update({ where: { id: roomId }, data: { needsAttention: true, attentionReason: reason } });
