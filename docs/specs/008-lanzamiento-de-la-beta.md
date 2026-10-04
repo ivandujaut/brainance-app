@@ -1,6 +1,6 @@
 # 008 — Lanzamiento de la beta
 
-- **Estado:** Borrador
+- **Estado:** Aprobada (2026-10-07)
 - **ADRs relacionados:** [0002 — Base de datos](../adr/0002-base-de-datos-neon-vs-supabase.md), [0004 — Aislamiento multi-tenant](../adr/0004-aislamiento-multi-tenant.md), [0005 — Design system](../adr/0005-design-system-tokens-de-marca.md), [0008 — Errores y métricas](../adr/0008-errores-y-metricas.md)
 
 ## Problema
@@ -60,7 +60,7 @@ Las funciones de la beta están completas, pero el producto todavía no se puede
 11. **Dado** la página de cuenta (`/settings`), **entonces** está en español, permite cambiar la contraseña y el tema, y no muestra facturación.
 12. **Dado** el código heredado que la beta no usa (ruta de citas, blog, planes y facturación, componentes y acciones sin referencias), **entonces** se elimina. Queda preservado en el tag de git `legado-corinna`, para retomarlo en la v1 (roadmap).
 13. **Dado** el esquema, **entonces** una migración elimina:
-    - las columnas sin uso `User.type`, `ChatBot.textColor`, `ChatBot.helpdesk`, `ChatRoom.live`, `ChatRoom.mailed` y `FilterQuestions.answered`;
+    - las columnas sin uso `User.type`, `User.stripeId`, `Domain.campaignId`, `ChatBot.textColor`, `ChatBot.helpdesk`, `ChatRoom.live`, `ChatRoom.mailed` y `FilterQuestions.answered`;
     - las tablas `Bookings`, `Campaign` y `Product`, si están vacías en producción; si tienen datos, se exportan antes.
 14. **Dado** el menú lateral, **entonces** solo muestra lo que existe en la beta (Dashboard, Conversaciones, Leads, Configuración) y sus textos están en español.
 15. **Dado** las pantallas que esta limpieza toca, **entonces** usan solo tokens del design system (ADR 0005). Los colores sueltos que queden en pantallas no tocadas siguen en la lista de deuda.
@@ -80,7 +80,7 @@ Las funciones de la beta están completas, pero el producto todavía no se puede
 - Si una suite E2E falla al correr con claves reales por primera vez, se diagnostica igual que un CI rojo: se busca la causa, sin reintentos a ciegas y sin desactivar tests.
 
 **Parte B**
-- Las páginas legales son Server Components estáticos en `(site)`, agregados a `isPublicRoute`. El texto vive en `src/content/legal/*.md` (fácil de revisar y versionar para el abogado) y se renderiza con los tokens.
+- Las páginas legales y la portada son Server Components estáticos en el grupo `(public)`, con su propio layout sin Clerk: se leen aunque Clerk no esté configurado o falle, y `proxy.ts` no les aplica el middleware. El texto vive en `src/content/legal/*.md` (fácil de revisar y versionar para el abogado) y se renderiza con los tokens.
 - `User` suma `termsAcceptedAt DateTime?` y `termsVersion String?`. `ensureUser` los completa en el alta. La versión vigente está en `src/domain/legal.ts` (`TERMS_VERSION`).
 - Los usuarios existentes antes del cambio aceptan en su próximo ingreso con un aviso no bloqueante. Hoy no hay usuarios reales, así que alcanza con eso.
 
@@ -104,8 +104,9 @@ Las funciones de la beta están completas, pero el producto todavía no se puede
 |---|---|---|
 | 2 | E2E con Clerk (las seis suites existentes) | `e2e/*.spec.ts` |
 | 3, 4 | QA manual guionado en la preview | `docs/lanzamiento.md` |
-| 5, 6, 8 | E2E: páginas legales públicas y enlace desde la tarjeta de leads | `e2e/legal.spec.ts`, `e2e/widget-leads.spec.ts` |
+| 5, 6, 8, 10 | E2E sin Clerk: portada y páginas legales públicas; enlace desde la tarjeta de leads | `e2e/public.spec.ts`, `e2e/widget-leads.spec.ts` |
 | 7 | Integración: el alta guarda la aceptación y la versión | `src/server/users.int.test.ts` |
 | 7 | E2E (requiere Clerk): el registro muestra el aviso con enlaces | `e2e/auth.spec.ts` |
-| 10, 11, 14 | Render: portada, cuenta y menú en español, sin precios ni blog | tests de página y `e2e/smoke.spec.ts` |
+| 11, 14 | Unitario y render: menú y página de cuenta en español, sin facturación | `src/constants/menu.test.tsx`, `src/app/(site)/(dashboard)/settings/page.test.tsx` |
+| 5, 6 | Unitario: textos legales con contacto y responsable, y renderizador de markdown seguro | `src/domain/legal.test.ts`, `src/lib/simple-markdown.test.ts` |
 | 12, 13 | Build, typecheck y la suite completa después de borrar; la migración se aplica sobre una base con datos de prueba | CI |

@@ -32,6 +32,8 @@ Los E2E del widget no necesitan Clerk: levantan la app con `WIDGET_ALLOW_HTTP=tr
 - `src/server/`: adaptadores (repositorios, IA, realtime, email) detrás de interfaces.
 - `src/generated/prisma/`: cliente de Prisma generado (no se edita ni se commitea). Se importa desde `@/generated/prisma/client`; la instancia compartida está en `src/lib/prisma.ts`.
 - `src/proxy.ts`: middleware de Clerk (Next 16 renombró `middleware.ts` a `proxy.ts`). Las rutas nuevas son privadas salvo que se agreguen a `isPublicRoute`.
+- Grupos de rutas con su propio layout raíz: `(site)` (con Clerk: panel y auth), `(widget)` (iframe del chat, sin Clerk) y `(public)` (portada y páginas legales, estáticas y sin Clerk).
+- Los pasos manuales de despliegue están en `docs/lanzamiento.md`.
 
 ## Convenciones
 

@@ -6,9 +6,7 @@
 - [x] Actualizar a Next 16, React 19, Clerk 7 y Prisma 7
 - [x] Vitest, Playwright y CI en GitHub Actions
 - [x] Documentación del flujo, principios y ADRs iniciales
-- [ ] **Rotar las credenciales que quedaron en el historial de git** (Clerk, Uploadcare, base de datos) *(manual)*
-- [ ] Configurar en GitHub los secrets `E2E_CLERK_PUBLISHABLE_KEY` y `E2E_CLERK_SECRET_KEY` *(manual)*
-- [ ] Crear el proyecto en Vercel y la base de datos según el ADR 0002 *(manual)*
+- Los pasos manuales de despliegue (credenciales, base, proveedores, secrets y QA) están en [docs/lanzamiento.md](lanzamiento.md).
 
 ## Beta: "pongo un bot en mi web y me trae leads"
 
