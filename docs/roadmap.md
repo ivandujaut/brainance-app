@@ -24,6 +24,10 @@ Cada ítem va a tener su spec en `docs/specs/`.
 8. **Bandeja de conversaciones** ([spec 006](specs/006-bandeja-de-conversaciones.md)): listado, lectura y toma de control humana en tiempo real.
 9. **Observabilidad** ([spec 007](specs/007-observabilidad.md)): Sentry, y costo y latencia por conversación.
 
+## Lanzamiento
+
+- **Lanzamiento de la beta** ([spec 008](specs/008-lanzamiento-de-la-beta.md)): checklist de despliegue y QA, términos y privacidad, limpieza del código heredado.
+
 ## v1: después de la beta
 
 Se mantiene en el backlog para iterar cuando la beta valide el producto:
