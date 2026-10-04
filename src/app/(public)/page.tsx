@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { ChatDemo } from "@/components/landing/chat-demo";
 import { HowItWorks } from "@/components/landing/how-it-works";
+import { ProductShot } from "@/components/landing/product-shot";
 import { SpotlightCard } from "@/components/landing/spotlight-card";
 import Navbar from "@/components/navbar";
 import { SiteFooter } from "@/components/site/footer";
@@ -30,16 +30,16 @@ const FEATURES = [
   },
 ];
 
-// Public landing (spec 009): warm editorial look, the real widget as the hero, Hairline figures.
+// Public landing (spec 009): warm editorial look, the real inbox as the hero, Hairline figures.
 export default function Home() {
   return (
     <div className="theme-paper min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
       <main className="flex-1">
-        <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 md:px-8 lg:grid-cols-[1.05fr_1fr] lg:py-24">
-          <div className="flex flex-col gap-6">
+        <section className="mx-auto flex max-w-6xl flex-col gap-14 px-4 py-16 md:px-8 lg:py-24">
+          <div className="flex max-w-3xl flex-col gap-6">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Beta gratuita · Hecho en Argentina</p>
-            <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-6xl">
+            <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-7xl">
               Tu negocio responde a las 3 de la mañana.
               <span className="block italic text-muted-foreground">Vos dormís.</span>
             </h1>
@@ -56,7 +56,7 @@ export default function Home() {
               <span className="text-sm text-muted-foreground">Sin tarjeta. Se instala con una línea.</span>
             </div>
           </div>
-          <ChatDemo />
+          <ProductShot />
         </section>
 
         <section aria-label="Para quién es" className="border-t">

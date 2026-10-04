@@ -97,11 +97,9 @@ type Props = {
   config: WidgetConfig;
   /** Settings page preview: shows the look only, never reads or writes a conversation. */
   preview?: boolean;
-  /** Preview only: a scripted conversation to show (the landing's demo, spec 009). */
-  demoMessages?: { id: string; role: "user" | "assistant"; content: string }[];
 };
 
-export const WidgetChat = ({ domainId, config, preview = false, demoMessages }: Props) => {
+export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -174,7 +172,7 @@ export const WidgetChat = ({ domainId, config, preview = false, demoMessages }: 
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
-  }, [messages, demoMessages, showLeadCard, lead.thanks]);
+  }, [messages, showLeadCard, lead.thanks]);
 
   const submitLead = async (data: { email: string; answers: { questionId: string; answer: string }[] }) => {
     try {
@@ -306,7 +304,7 @@ export const WidgetChat = ({ domainId, config, preview = false, demoMessages }: 
         <Bubble role="assistant" accent={accent}>
           {config.welcomeMessage}
         </Bubble>
-        {(preview && demoMessages ? demoMessages : messages).map((m) =>
+        {messages.map((m) =>
           m.role === "system" ? (
             <p key={m.id} data-testid="widget-notice" className="self-center text-center text-xs text-gray-600 px-4">
               {m.content}

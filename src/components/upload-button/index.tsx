@@ -18,7 +18,7 @@ const UploadButton = ({ register, errors, label }: Props) => {
       <div className="flex gap-2 items-center">
         <Label
           htmlFor="upload-button"
-          className="flex gap-2 p-3 rounded-lg bg-cream text-gray-600 
+          className="flex gap-2 p-3 rounded-lg bg-muted text-muted-foreground 
         cursor-pointer font-semibold text-sm items-center"
         >
           <Input {...register("image")} className="hidden" type="file" id="upload-button" />

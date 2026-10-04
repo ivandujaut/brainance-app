@@ -60,7 +60,6 @@ src/server/     Adaptadores: repositorios (Prisma), IA, realtime, email, pagos.
 - Los avisos de "modelo sin precio" y "sitio cerca del tope" se deduplican en memoria por instancia: en Vercel pueden repetirse entre instancias.
 - `ModelCall` no se purga todavía (ADR 0008: a los 180 días).
 - Push con Pusher implementado pero sin probar contra Pusher real: verificar con claves antes de activarlo en producción (ADR 0007).
-- Colores sueltos de `tailwind.config.ts` (`orange`, `cream`, `gravel`, etc.) en pantallas viejas: se migran a tokens cuando se tocan (ADR 0005). Para ver lo que falta: `grep -rnE "(bg|text|border)-(orange|cream|gravel|iridium|peach|platinum|ghost|grandis|porcelain|ironside)" src`.
 - Tailwind 3 y zod 3: actualizar a Tailwind 4 y zod 4 en PRs separados.
 - Las reglas `eslint-config-next/typescript` todavía no están activas porque marcaban unos 90 problemas en el código heredado; después de la limpieza de la spec 008 conviene medir de nuevo y activarlas.
 - `Billings` y el enum `Plans` quedan para los límites por plan, aunque la beta solo tiene el plan gratuito.

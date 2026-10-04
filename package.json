@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "eval:rag": "tsx --env-file-if-exists=.env.local evals/rag-answers/run-eval.mjs",
-    "eval:rag:cases": "node evals/rag-answers/render-cases.mjs"
+    "eval:rag:cases": "node evals/rag-answers/render-cases.mjs",
+    "landing:screens": "vitest run -c scripts/landing-screens/vitest.config.ts && node scripts/landing-screens/shoot.mjs"
   },
   "dependencies": {
     "@clerk/localizations": "^4.21.1",
@@ -68,6 +69,7 @@
     "eslint-config-next": "^16.3.8",
     "postcss": "^8",
     "prisma": "^7.10.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",

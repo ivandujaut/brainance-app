@@ -25,25 +25,13 @@ for (const [path, title] of [
   });
 }
 
-// Spec 009: the hero shows the real widget playing a scripted conversation that ends in a lead or an alert.
-test("the landing demo plays a conversation in the real widget", async ({ page }) => {
+// Spec 009: the hero is a screenshot of the real inbox, one per theme, both loaded and described.
+test("the landing hero shows the real inbox", async ({ page }) => {
   await page.goto("/");
-  const demo = page.getByRole("tablist", { name: "Elegí un negocio de ejemplo" });
-  await expect(demo.getByRole("tab", { name: "Panadería" })).toHaveAttribute("aria-selected", "true");
-  await expect(page.getByText("¿Tienen algo sin TACC?")).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByTestId("demo-outcome")).toContainText("Nuevo contacto", { timeout: 20_000 });
-
-  await demo.getByRole("tab", { name: "Taller" }).click();
-  await expect(page.getByText(/freno de adelante/)).toBeVisible({ timeout: 10_000 });
-});
-
-test("with reduced motion the demo shows the whole conversation at once", async ({ browser }) => {
-  const context = await browser.newContext({ reducedMotion: "reduce" });
-  const page = await context.newPage();
-  await page.goto("/");
-  await expect(page.getByText(/Se encargan hasta el miércoles/)).toBeVisible();
-  await expect(page.getByTestId("demo-outcome")).toBeVisible();
-  await context.close();
+  const shot = page.getByRole("img", { name: /La bandeja de BrAInance/ }).first();
+  await expect(shot).toBeVisible();
+  expect(await shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+  await expect(page.getByText(/la conversación se marca sola/)).toBeVisible();
 });
 
 test("the privacy policy names the roles, the providers and the AAIP", async ({ page }) => {

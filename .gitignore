@@ -53,3 +53,6 @@ next-env.d.ts
 /evals/**/results/trajectory/
 /evals/**/sanity/
 /evals/**/pilot/
+
+# landing screenshot intermediates (spec 009)
+/scripts/landing-screens/out/

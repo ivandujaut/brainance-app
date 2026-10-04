@@ -1,6 +1,6 @@
 import { SIDE_BAR_MENU } from "@/constants/menu";
 import React from "react";
-import { ChevronRight, ChevronRightCircle, LogOut, Menu } from "lucide-react";
+import { ChevronRightCircle, LogOut } from "lucide-react";
 import MenuItem from "./menu-item";
 import DomainMenu from "./domain-menu";
 
@@ -22,7 +22,7 @@ export const MinMenu = ({ onShrink, current, onSignOut, domains }: MinMenuProps)
   return (
     <div className="p-3 flex flex-col items-center h-full">
       <span className="animate-fade-in opacity-0 delay-300 fill-mode-forwards cursor-pointer">
-        <ChevronRightCircle onClick={onShrink} className="text-gray-500" />
+        <ChevronRightCircle onClick={onShrink} className="text-muted-foreground hover:text-foreground" />
       </span>
       <div className="animate-fade-in opacity-0 delay-300 fill-mode-forwards flex flex-col justify-between h-full pt-10">
         <div className="flex flex-col">

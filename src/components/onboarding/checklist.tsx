@@ -76,7 +76,7 @@ export const OnboardingChecklist = ({ steps, site }: Props) => {
         {steps.map((step, index) => (
           <section key={step.id} data-testid={`step-${step.id}`} data-done={step.done} className="flex gap-3">
             {step.done ? (
-              <CheckCircle2 className="text-orange shrink-0" aria-label="Completo" />
+              <CheckCircle2 className="text-primary shrink-0" aria-label="Completo" />
             ) : (
               <Circle className="text-gray-300 shrink-0" aria-label="Pendiente" />
             )}
