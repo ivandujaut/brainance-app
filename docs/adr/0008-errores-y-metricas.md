@@ -1,6 +1,6 @@
 # 0008 — Errores con Sentry y uso de IA en Postgres
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado
 - **Fecha:** 2026-10-04
 
 ## Contexto
@@ -40,7 +40,7 @@ Son dos problemas distintos: **errores** (qué se rompió, dónde, con qué frec
 
 **`ModelCall`**
 - Columnas: sitio, conversación, propósito (`answer`), modelo pedido y servido, tokens (entrada, salida, cache de lectura y escritura), costo estimado en USD, latencia, motivo de fin, error y fecha.
-- Los precios están en `src/domain/model-prices.ts`, por modelo, con la fecha en que se verificaron. Un modelo sin precio se registra con costo `null` y avisa a Sentry, para no subestimar en silencio.
+- Los precios están en `src/domain/model-prices.ts`, por modelo, con la fecha en que se verificaron (2026-09-25: Haiku 4.5, Sonnet 5.5, Opus 5.5 y Fable 5.1; cache de escritura a 5 minutos = 1,25× la entrada). Un modelo sin precio se registra con costo `null` y avisa a Sentry, para no subestimar en silencio.
 - Se escribe en `onEnd` y en el error de `streamAnswer`, en segundo plano (`after()`). Si falla, la respuesta al visitante no se ve afectada.
 
 ## Consecuencias

@@ -1,6 +1,6 @@
 # 007 — Observabilidad: errores, costo de IA y métricas
 
-- **Estado:** Borrador
+- **Estado:** Aprobada (2026-10-04)
 - **ADRs relacionados:** [0001 — Estrategia de modelos de IA](../adr/0001-estrategia-de-modelos-de-ia.md), [0003 — Arquitectura y límites del widget](../adr/0003-arquitectura-del-widget.md), [0008 — Errores con Sentry y uso de IA en Postgres](../adr/0008-errores-y-metricas.md)
 
 ## Problema
@@ -82,7 +82,8 @@ La beta está casi lista para recibir usuarios, pero si algo se rompe en producc
 **Rutas**
 - El dashboard (`/dashboard`) suma las métricas debajo del onboarding (o en su lugar si está completo). Acciones `onGetOwnerMetrics({ siteId?, days })` sobre `tenancy.ts`, con su caso en `tenant-isolation.int.test.ts`.
 - `/admin` (Server Component): `isAdmin()` lee `ADMIN_CLERK_IDS` y, si no corresponde, `notFound()`. Las consultas de administración viven en `src/server/admin-metrics.ts` y nunca se exponen como server actions.
-- Los gráficos usan componentes propios con SVG y los tokens del ADR 0005, sin librería de gráficos nueva.
+- Los gráficos usan componentes propios con SVG y los tokens del ADR 0005, sin librería de gráficos nueva. Las dos series usan `--chart-1` (azul) y `--chart-2` (naranja), validadas para daltonismo y contraste 3:1 sobre la superficie en claro y oscuro. Tienen leyenda, etiquetas directas, tooltip con línea guía y vista de tabla.
+- "Necesitaron atención" cuenta las conversaciones con `attentionReason`: desde esta spec, tomar el control quita la marca activa (`needsAttention`) pero conserva el motivo como historial.
 
 **IA**
 - El prompt no cambia. Cambia solo el registro y el tope, así que no hace falta correr el eval.
@@ -100,10 +101,12 @@ La beta está casi lista para recibir usuarios, pero si algo se rompe en producc
 | 5, 6 | Unitario: costo estimado por modelo, cache y modelo sin precio | `src/domain/model-prices.test.ts` |
 | 8, 9 | Unitario: umbrales del tope de costo | `src/domain/cost-cap.test.ts` |
 | 11, 12, 14 | Unitario: tasa de captura, días vacíos y percentiles | `src/domain/metrics.test.ts` |
-| 3, 4 | Unitario: `beforeSend` borra los datos personales; sin DSN va a la consola | `src/server/observability.test.ts` |
+| 3 | Unitario: `beforeSend` borra cuerpos, cookies, headers sensibles y campos personales | `src/lib/sentry-scrub.test.ts` |
+| 2, 4 | Unitario: con Sentry, etiquetas y sitio; sin DSN, consola | `src/server/observability.test.ts` |
 | 5, 7 | Unitario: `streamAnswer` reporta uso y error con un modelo simulado | `src/server/ai/answer.test.ts` |
 | 5, 8, 9, 10 | Integración (Postgres): registro de llamadas, gasto por sitio y corte por costo | `src/server/ai/usage.int.test.ts` |
 | 11, 13 | Integración: métricas del dueño y aislamiento entre tenants | `src/actions/metrics/metrics.int.test.ts`, `src/actions/tenant-isolation.int.test.ts` |
-| 14, 15 | Integración: métricas de administración y acceso solo para ids admin | `src/server/admin-metrics.int.test.ts`, test de la página |
-| 9 | E2E del widget: con el gasto del día sembrado al tope, el bot deriva al contacto sin llamar al modelo | `e2e/widget.spec.ts` |
+| 14, 15 | Integración: métricas de administración y acceso solo para ids admin | `src/server/admin-metrics.int.test.ts`, `src/app/(site)/(dashboard)/admin/page.test.tsx` |
+| 11, 12 | Render del dashboard: tiles, gráfico, tabla y estado vacío | `src/app/(site)/(dashboard)/dashboard/page.test.tsx` |
+| 5, 9 | E2E del widget: cada respuesta queda registrada; con el gasto al tope, deriva sin llamar al modelo | `e2e/widget.spec.ts` |
 | 11 | E2E (requiere Clerk): el dashboard muestra conversaciones y leads sembrados | `e2e/dashboard.spec.ts` |
