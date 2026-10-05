@@ -25,8 +25,8 @@ const Layout = async ({ children }: Props) => {
         {children}
       </div>
       <div className="hidden lg:flex flex-1 w-full max-h-full overflow-hidden relative bg-muted flex-col pt-10 pl-24 gap-3 border-l">
-        <h2 className="font-display text-4xl leading-tight tracking-tight">
-          Tu negocio responde a las 3 de la mañana. <span className="italic text-muted-foreground">Vos dormís.</span>
+        <h2 className="text-4xl font-bold leading-tight tracking-tight">
+          Tu negocio responde a las 3 de la mañana. <span className="text-muted-foreground">Vos dormís.</span>
         </h2>
         <p className="text-sm text-muted-foreground mb-10 max-w-md">
           BrAInance responde las consultas de tus visitantes con la información de tu negocio y te deja sus datos de

@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 
-/** "BrAInance" set in the display serif, with the brand orange as an underline under "AI". */
+/** "BrAInance" in the brand typeface (Plus Jakarta Sans, bold), with the brand orange as an underline under "AI". */
 export const Wordmark = ({ className }: { className?: string }) => (
-  <span className={cn("font-display tracking-tight", className)}>
+  <span className={cn("font-bold tracking-tight", className)}>
     Br
     <span className="relative">
       AI

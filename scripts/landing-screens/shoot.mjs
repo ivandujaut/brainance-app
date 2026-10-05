@@ -15,8 +15,7 @@ const publicDir = path.join(root, "public/landing");
 const SHOTS = { inbox: ["light", "dark"], dashboard: ["light"] };
 
 const fonts =
-  "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700" +
-  "&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap";
 
 // A modern UA makes Google Fonts serve woff2.
 const USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36";
@@ -28,7 +27,6 @@ const page = (body, theme) => `<!doctype html>
 <link rel="stylesheet" href="${fonts}" />
 <link rel="stylesheet" href="screens.css" />
 <style>
-:root { --font-display: "Fraunces"; }
 body { font-family: "Plus Jakarta Sans", sans-serif; }
 /* A still frame: skip entry animations and land on their final state. */
 *, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition: none !important; }

@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "../globals.css";
 import { ThemeProvider } from "@/context/theme-provider";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
-// Display serif for the public pages' headlines (spec 009): gives the landing its own voice.
-const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-display", axes: ["SOFT", "opsz"] });
 
 export const metadata: Metadata = {
   title: "BrAInance",
@@ -16,7 +14,7 @@ export const metadata: Metadata = {
 export default function PublicLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${jakarta.className} ${fraunces.variable}`}>
+      <body className={jakarta.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>

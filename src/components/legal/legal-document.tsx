@@ -41,8 +41,8 @@ export const LegalDocument = ({ file }: { file: "terminos" | "privacidad" }) => 
             </p>
           )}
           {blocks.map((block, i) => {
-            if (block.type === "h1") return <h1 key={i} className="font-display text-4xl">{renderInline(block.text)}</h1>;
-            if (block.type === "h2") return <h2 key={i} className="font-display text-2xl mt-6">{renderInline(block.text)}</h2>;
+            if (block.type === "h1") return <h1 key={i} className="text-4xl font-bold tracking-tight">{renderInline(block.text)}</h1>;
+            if (block.type === "h2") return <h2 key={i} className="text-2xl font-bold mt-6">{renderInline(block.text)}</h2>;
             if (block.type === "h3") return <h3 key={i} className="font-semibold mt-2">{renderInline(block.text)}</h3>;
             if (block.type === "ul")
               return (

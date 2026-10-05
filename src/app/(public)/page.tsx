@@ -38,10 +38,10 @@ export default function Home() {
       <main className="flex-1">
         <section className="mx-auto flex max-w-7xl flex-col gap-10 px-4 pt-16 md:px-8 lg:pt-24">
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Beta gratuita · Hecho en Argentina</p>
-            <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-7xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Beta gratuita · Hecho en Argentina</p>
+            <h1 className="text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
               Tu negocio responde a las 3 de la mañana.
-              <span className="block italic text-muted-foreground">Vos dormís.</span>
+              <span className="block text-muted-foreground">Vos dormís.</span>
             </h1>
             <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
               BrAInance es un chat con IA para tu sitio. Contesta con la información de tu negocio, te pasa los contactos de
@@ -60,7 +60,7 @@ export default function Home() {
         </section>
 
         <section aria-label="Para quién es" className="border-t">
-          <p className="mx-auto max-w-6xl px-4 py-6 font-display text-lg italic text-muted-foreground md:px-8">
+          <p className="mx-auto max-w-6xl px-4 py-6 text-lg font-medium text-muted-foreground md:px-8">
             Para {BUSINESSES.slice(0, -1).join(", ")} y {BUSINESSES.at(-1)}. Para cualquiera que conteste la misma pregunta
             veinte veces por día.
           </p>
@@ -69,16 +69,16 @@ export default function Home() {
         <HowItWorks />
 
         <section aria-labelledby="que-hace" className="mx-auto max-w-6xl px-4 py-20 md:px-8">
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Qué hace por vos</p>
-          <h2 id="que-hace" className="mt-3 max-w-xl font-display text-3xl leading-tight md:text-4xl">
-            Atiende como alguien de tu equipo, <span className="italic text-muted-foreground">no como un contestador.</span>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Qué hace por vos</p>
+          <h2 id="que-hace" className="mt-3 max-w-xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+            Atiende como alguien de tu equipo, <span className="text-muted-foreground">no como un contestador.</span>
           </h2>
           <ul className="mt-12 grid gap-4 sm:grid-cols-2">
             {FEATURES.map((f, i) => (
               <li key={f.title}>
                 <SpotlightCard className="h-full">
-                  <span className="font-mono text-xs text-muted-foreground">0{i + 1}</span>
-                  <h3 className="mt-3 font-display text-xl">{f.title}</h3>
+                  <span className="text-xs font-semibold tabular-nums text-muted-foreground">0{i + 1}</span>
+                  <h3 className="mt-3 text-xl font-bold">{f.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
                 </SpotlightCard>
               </li>
@@ -88,8 +88,8 @@ export default function Home() {
 
         <section className="border-t">
           <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 md:flex-row md:items-end md:justify-between md:px-8">
-            <h2 className="max-w-2xl font-display text-4xl leading-tight md:text-5xl">
-              Probalo en tu sitio hoy. <span className="italic text-muted-foreground">Mañana ya responde.</span>
+            <h2 className="max-w-2xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+              Probalo en tu sitio hoy. <span className="text-muted-foreground">Mañana ya responde.</span>
             </h2>
             <Button asChild size="lg">
               <Link href="/auth/sign-up">

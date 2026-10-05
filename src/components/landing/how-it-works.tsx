@@ -35,9 +35,9 @@ const STEPS = [
 export const HowItWorks = () => (
   <section aria-labelledby="como-funciona" className="border-y bg-card/60" style={hairlineTheme}>
     <div className="mx-auto max-w-6xl px-4 py-20 md:px-8">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Cómo funciona</p>
-      <h2 id="como-funciona" className="mt-3 max-w-xl font-display text-3xl leading-tight md:text-4xl">
-        Tres pasos, una tarde. <span className="italic text-muted-foreground">Y después atiende solo.</span>
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Cómo funciona</p>
+      <h2 id="como-funciona" className="mt-3 max-w-xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+        Tres pasos, una tarde. <span className="text-muted-foreground">Y después atiende solo.</span>
       </h2>
       <ol className="mt-12 grid gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-3">
         {STEPS.map(({ Figure, label, title, text }, i) => (
@@ -46,8 +46,8 @@ export const HowItWorks = () => (
               <Figure label={label} intensity={0.6} className="w-full" />
             </div>
             <div className="flex flex-col gap-2 p-6">
-              <span className="font-mono text-xs text-muted-foreground">0{i + 1}</span>
-              <h3 className="font-display text-xl">{title}</h3>
+              <span className="text-xs font-semibold tabular-nums text-muted-foreground">0{i + 1}</span>
+              <h3 className="text-xl font-bold">{title}</h3>
               <p className="text-sm leading-relaxed text-muted-foreground">{text}</p>
             </div>
           </li>
