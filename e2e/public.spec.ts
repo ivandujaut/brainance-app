@@ -84,10 +84,23 @@ test("the privacy policy names the roles, the providers and the AAIP", async ({ 
   }
 });
 
+// Spec 009: the footer groups the links by topic and closes with the brand name, big and decorative.
+test("the footer groups the links and points to the landing sections", async ({ page }) => {
+  await page.goto("/terminos");
+  const footer = page.getByRole("contentinfo");
+  for (const group of ["Producto", "Cuenta", "Legal"]) {
+    await expect(footer.getByRole("navigation", { name: group })).toBeVisible();
+  }
+  await expect(footer.getByRole("link", { name: "Cómo funciona" })).toHaveAttribute("href", "/#como-funciona");
+  await expect(footer.getByRole("link", { name: "Crear cuenta" })).toHaveAttribute("href", "/auth/sign-up");
+  await footer.getByRole("link", { name: "Cómo funciona" }).click();
+  await expect(page.locator("#como-funciona")).toBeInViewport();
+});
+
 test("the landing footer links to both legal pages", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Privacidad" }).click();
+  await page.getByRole("contentinfo").getByRole("link", { name: "Privacidad" }).click();
   await expect(page).toHaveURL(/\/privacidad$/);
-  await page.getByRole("link", { name: "Términos" }).click();
+  await page.getByRole("contentinfo").getByRole("link", { name: "Términos" }).click();
   await expect(page).toHaveURL(/\/terminos$/);
 });

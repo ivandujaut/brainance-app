@@ -40,6 +40,11 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
     - cada columna se desplaza centrada en su lugar, así los primeros elementos arrancan a la vista;
     - no se mueve por debajo de `lg` ni con movimiento reducido. Lo resuelve CSS (`motion-reduce:`), que aplica desde el primer render; `useReducedMotion` llega tarde y motion ya dejó escrito un desplazamiento;
   - vuelve la dependencia `motion`, que trae el componente.
+- **Footer con el nombre grande**, con la idea del "Footer with big text" de Aceternity:
+  - logo y una frase, links agrupados en Producto, Cuenta y Legal, y el copyright;
+  - cierra con "BrAInance" enorme, decorativo y oculto para lectores de pantalla, en el degradé brasa que se desvanece hacia abajo;
+  - es el mismo footer de la portada y de las páginas legales, así que los links a secciones apuntan a la portada (`/#como-funciona`);
+  - los bloques de footer de Aceternity son de su plan pago (Pro): el registro pide un token. Se tomó la idea de la descripción pública del bloque; no se usó su código.
 - **El CLI de shadcn y los componentes de Aceternity.** El entorno de desarrollo en la nube bloqueaba `ui.aceternity.com` y `ui.shadcn.com`; con ambos habilitados en *Network access*, el CLI funciona. `components.json` registra `@aceternity`, así que los próximos se instalan con un solo comando.
 - **Hairline** (`@lucasmarkes/hairline`, MIT, sin dependencias) ilustra "Cómo funciona" con figuras de línea que responden al puntero: tarjetas (las preguntas frecuentes), ventana en capas (tu sitio con el chat) y cinta (los contactos que llegan). Se tematizan con los tokens.
 - **"Qué hace por vos" como bento, idea de las secciones de features de Aceternity:**
@@ -61,7 +66,7 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
 
 | Criterio | Tipo de test | Archivo |
 |---|---|---|
-| 1 | E2E sin Clerk: la captura carga y se describe; la pared muestra las preguntas y sus columnas se desplazan en sentidos opuestos, y no con movimiento reducido | `e2e/public.spec.ts` |
+| 1 | E2E sin Clerk: el footer agrupa los links y lleva a las secciones de la portada; la captura carga y se describe; la pared muestra las preguntas y sus columnas se desplazan en sentidos opuestos, y no con movimiento reducido | `e2e/public.spec.ts` |
 | 2 | E2E de la pared con movimiento reducido; el resto, revisión manual | `e2e/public.spec.ts` |
 | 3 | Unitario: contraste de `.theme-paper` y `.dark .theme-paper`, incluidos los extremos del degradé brasa | `src/styles/design-tokens.test.ts` |
 | 4, 5 | Revisión con capturas en escritorio, celular, claro y oscuro | — |
