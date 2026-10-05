@@ -25,12 +25,17 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
 - **Por qué una captura y no una demo animada.** La primera versión mostraba el widget conversando solo, con guiones. Se descartó porque el texto que aparece palabra por palabra es justo el recurso que hoy se asocia con "landing hecha con IA". Además, mostraba lo que ve el visitante. A quien decide le importa más lo que ve el dueño: los contactos y las conversaciones que lo necesitan.
 - **Las capturas salen del código, no de un recorte a mano.** `npm run landing:screens` renderiza el layout y las páginas reales de la bandeja y del dashboard con datos de ejemplo (`scripts/landing-screens/`). Las acciones del servidor, Clerk y la navegación se reemplazan por mocks. Después compila Tailwind solo para ese HTML y lo fotografía con Playwright en claro y en oscuro. Si cambia el panel, se regeneran con un comando y la portada nunca muestra una pantalla vieja. Para que la captura se viera como la portada, el menú lateral y el panel de ingreso pasaron a los tokens y usan el logotipo `Wordmark`.
 - **Hairline** (`@lucasmarkes/hairline`, MIT, sin dependencias) ilustra "Cómo funciona" con figuras de línea que responden al puntero: tarjetas (las preguntas frecuentes), ventana en capas (tu sitio con el chat) y cinta (los contactos que llegan). Se tematizan con los tokens.
-- **Aceternity, un solo efecto sutil, recreado con `motion`:** el borde que se ilumina bajo el puntero en las tarjetas. No se usó el registro de Aceternity: estaba bloqueado por la red del entorno de desarrollo. Además, sus efectos más conocidos (rayos, spotlight, gradientes animados) son justo lo que hoy hace que una landing parezca plantilla.
+- **"Qué hace por vos" como bento, idea de las secciones de features de Aceternity:**
+  - celdas anchas y angostas que se alternan, separadas por líneas finas;
+  - cada beneficio con una figura isométrica de Hairline: un rack de cajones (responde con tus datos), una rama que se separa y vuelve (deriva en lugar de inventar), una antena (los contactos que llegan) y un teléfono en capas (el aviso);
+  - al pasar el puntero, la barra junto al título crece y se pone naranja. Es CSS puro, sin `motion`, que se quitó de las dependencias.
+
+  No se usó el registro de Aceternity, porque estaba bloqueado por la red del entorno de desarrollo; se tomó la idea, no el código. Sus efectos más conocidos (rayos, spotlight, gradientes animados) quedaron afuera: son justo lo que hoy hace que una landing parezca plantilla.
 
 ## Criterios de aceptación
 
 1. **Dado** la portada, **entonces** el hero muestra las capturas del panel real y la de la bandeja tiene texto alternativo.
-2. **Dado** `prefers-reduced-motion`, **entonces** los planos del hero no se animan y las tarjetas no tienen el efecto de borde.
+2. **Dado** `prefers-reduced-motion`, **entonces** los planos del hero no se animan y la barra de los beneficios cambia sin transición.
 3. **Dado** la paleta "papel", **entonces** todos los pares fondo/texto cumplen AA en claro y en oscuro (test de tokens).
 4. **Dado** un celular de 390 px, **entonces** no hay desplazamiento horizontal.
 5. **Dado** las páginas legales, **entonces** usan la misma paleta y tipografía.

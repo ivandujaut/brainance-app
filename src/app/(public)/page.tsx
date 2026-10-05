@@ -1,8 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { FeatureBento } from "@/components/landing/feature-bento";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { ProductShot } from "@/components/landing/product-shot";
-import { SpotlightCard } from "@/components/landing/spotlight-card";
 import Navbar from "@/components/navbar";
 import { SiteFooter } from "@/components/site/footer";
 import { Button } from "@/components/ui/button";
@@ -10,25 +10,6 @@ import { Button } from "@/components/ui/button";
 export const dynamic = "force-static";
 
 const BUSINESSES = ["panaderías", "talleres", "inmobiliarias", "consultorios", "estudios contables", "tiendas de ropa", "gimnasios"];
-
-const FEATURES = [
-  {
-    title: "Responde con tus datos",
-    text: "Usa tu descripción y tus preguntas frecuentes. Habla como vos elegís: de vos o de usted.",
-  },
-  {
-    title: "No inventa",
-    text: "Si un precio o un horario no está cargado, lo dice y deriva a tu WhatsApp o a tu email.",
-  },
-  {
-    title: "Te trae los contactos",
-    text: "Después de ayudar, ofrece dejar el email y tus preguntas. Te llega un aviso y los tenés en tu panel.",
-  },
-  {
-    title: "Te avisa cuando hacés falta",
-    text: "Si alguien pide hablar con una persona, la conversación se marca y la tomás en el momento.",
-  },
-];
 
 // Public landing (spec 009): warm editorial look, the real inbox as the hero, Hairline figures.
 export default function Home() {
@@ -73,17 +54,7 @@ export default function Home() {
           <h2 id="que-hace" className="mt-3 max-w-xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
             Atiende como alguien de tu equipo, <span className="text-muted-foreground">no como un contestador.</span>
           </h2>
-          <ul className="mt-12 grid gap-4 sm:grid-cols-2">
-            {FEATURES.map((f, i) => (
-              <li key={f.title}>
-                <SpotlightCard className="h-full">
-                  <span className="text-xs font-semibold tabular-nums text-muted-foreground">0{i + 1}</span>
-                  <h3 className="mt-3 text-xl font-bold">{f.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
-                </SpotlightCard>
-              </li>
-            ))}
-          </ul>
+          <FeatureBento />
         </section>
 
         <section className="border-t">
