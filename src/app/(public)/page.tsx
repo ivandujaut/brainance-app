@@ -44,7 +44,7 @@ export default function Home() {
           <ProductShot />
         </section>
 
-        <section aria-labelledby="problema" className="border-t" data-testid="before-after">
+        <section aria-labelledby="problema" data-testid="before-after">
           <div className="mx-auto max-w-6xl px-4 py-20 md:px-8">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">A las 3:07 de la mañana</p>
             <h2 id="problema" className="mt-3 max-w-3xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
@@ -82,7 +82,7 @@ export default function Home() {
           <FeatureBento />
         </section>
 
-        <section className="relative isolate border-t">
+        <section className="relative isolate">
           <Glows layout="cta" />
           <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 md:flex-row md:items-end md:justify-between md:px-8">
             <h2 className="max-w-2xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
