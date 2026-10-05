@@ -14,18 +14,6 @@ const config = {
     },
     extend: {
       colors: {
-        // Deprecated (ADR 0005): legacy brand colors. New code uses the semantic tokens below; these
-        // go away once no component uses them.
-        cream: "#F5F5F5",
-        gravel: "#4E4E4E",
-        iridium: "#3F3F3F",
-        orange: "#FFA947",
-        peach: "#FFE0BD",
-        platinum: "#E6E6E6",
-        ghost: "#CDCDCD",
-        grandis: "#FFC989",
-        porcelain: "#F1F1F1",
-        ironside: "#636363",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -94,6 +82,10 @@ const config = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        "hero-rise": {
+          from: { opacity: "0", translate: "0 40px" },
+          to: { opacity: "1", translate: "0 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -102,6 +94,7 @@ const config = {
         "open-sidebar": "open-sidebar 0.2s ease-out",
         "close-sidebar": "close-sidebar 0.2s ease-out",
         "fade-in": "fade-in 0.2s ease-out",
+        "hero-rise": "hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both",
       },
     },
   },

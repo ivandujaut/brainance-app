@@ -31,7 +31,7 @@ const DomainMenu = ({ domains, min }: Props) => {
           description="Ingresá el dominio de tu sitio para conectar el chatbot"
           title="Agregá tu sitio"
           onOpen={
-            <div className="cursor-pointer text-gray-500 rounded-full border-2">
+            <div className="cursor-pointer text-muted-foreground rounded-full border-2 hover:text-foreground">
               <Plus />
             </div>
           }
@@ -39,22 +39,22 @@ const DomainMenu = ({ domains, min }: Props) => {
           <AddDomainForm />
         </AppDrawer>
       </div>
-      <div className="flex flex-col gap-1 text-ironside font-medium">
+      <div className="flex flex-col gap-1 text-muted-foreground font-medium">
         {domains &&
           domains.map((domain) => (
             <Link
               href={siteSettingsPath(domain.id)}
               key={domain.id}
               className={cn(
-                "flex gap-3 items-center justify-center hover:bg-white rounded-full transition duration-100 ease-in-out cursor-pointer ",
+                "flex gap-3 items-center justify-center hover:bg-background hover:text-foreground rounded-full transition duration-100 ease-in-out cursor-pointer ",
                 !min ? "p-2" : "py-2",
-                domain.id === isDomain && "bg-white"
+                domain.id === isDomain && "bg-background text-foreground"
               )}
             >
               {domain.icon ? (
                 <Image src={`https://ucarecdn.com/${domain.icon}/`} alt="logo" width={20} height={20} />
               ) : (
-                <span className="w-5 h-5 rounded-full bg-orange text-white text-xs flex items-center justify-center uppercase">
+                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center uppercase">
                   {domain.name[0]}
                 </span>
               )}

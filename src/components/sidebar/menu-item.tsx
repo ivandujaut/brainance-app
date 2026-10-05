@@ -19,11 +19,9 @@ const MenuItem = ({ size, icon, label, path, current, onSignOut }: Props) => {
           onClick={onSignOut}
           className={cn(
             "flex items-center gap-2 px-1 py-2 rounded-lg my-1",
-            !current 
-              ? "text-gray-500" 
-              : current === path 
-              ? "bg-white text-black font-bold" 
-              : "text-gray-500"
+            current && current === path
+              ? "bg-background text-foreground font-semibold shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
           href={path ? `/${path}` : "#"}
         >
@@ -36,11 +34,9 @@ const MenuItem = ({ size, icon, label, path, current, onSignOut }: Props) => {
           onClick={onSignOut}
           className={cn(
             "flex items-center gap-2 px-1 py-2 rounded-md my-1",
-            !current 
-              ? "text-gray-500" 
-              : current === path 
-              ? "bg-white text-black font-bold" 
-              : "text-gray-500"
+            current && current === path
+              ? "bg-background text-foreground font-semibold shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
           href={path ? `/${path}` : "#"}
         >

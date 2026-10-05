@@ -6,9 +6,9 @@ import { expect, test } from "@playwright/test";
 test("the landing explains BrAInance in Spanish, without paid plans or blog", async ({ page }) => {
   const response = await page.goto("/");
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Un chat con IA");
-  await expect(page.getByRole("heading", { name: "Cómo funciona" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Crear mi bot gratis" })).toHaveAttribute("href", "/auth/sign-up");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Tu negocio responde a las 3 de la mañana.");
+  await expect(page.getByRole("heading", { name: /Tres pasos, una tarde/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Crear mi bot gratis/ }).first()).toHaveAttribute("href", "/auth/sign-up");
   await expect(page.getByText(/Choose what fits|News Room|Unlimited|Free Trial/)).toHaveCount(0);
 });
 for (const [path, title] of [
@@ -24,6 +24,30 @@ for (const [path, title] of [
     await expect(page.getByRole("note")).toContainText("Borrador sujeto a revisión legal");
   });
 }
+
+// Spec 009: the hero shows screenshots of the real dashboard and inbox; the inbox one is described.
+test("the landing hero shows the real inbox", async ({ page }) => {
+  await page.goto("/");
+  const shot = page.getByRole("img", { name: /La bandeja de BrAInance/ });
+  await expect(shot).toBeVisible();
+  await expect.poll(() => shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+});
+
+// Spec 009: the problem block compares the bakery's site before and after, and the slider works by keyboard.
+test("the before/after slider compares the site without and with the chat", async ({ page }) => {
+  await page.goto("/");
+  const block = page.getByTestId("before-after");
+  await expect(block.getByRole("img", { name: /formulario de contacto/ })).toBeAttached();
+  await expect(block.getByRole("img", { name: /chat de BrAInance/ })).toBeAttached();
+
+  const slider = block.getByRole("slider", { name: "Comparar sin y con BrAInance" });
+  const start = Number(await slider.getAttribute("aria-valuenow"));
+  await slider.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(slider).toHaveAttribute("aria-valuenow", String(start - 5));
+  await page.keyboard.press("End");
+  await expect(slider).toHaveAttribute("aria-valuenow", "100");
+});
 
 test("the privacy policy names the roles, the providers and the AAIP", async ({ page }) => {
   await page.goto("/privacidad");

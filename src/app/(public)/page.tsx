@@ -1,75 +1,95 @@
-import { Bot, MessageSquareText, UserPlus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Compare } from "@/components/landing/compare";
+import { FeatureBento } from "@/components/landing/feature-bento";
+import { HowItWorks } from "@/components/landing/how-it-works";
+import { ProductShot } from "@/components/landing/product-shot";
 import Navbar from "@/components/navbar";
 import { SiteFooter } from "@/components/site/footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
-const STEPS = [
-  {
-    icon: Bot,
-    title: "Contale a tu bot sobre tu negocio",
-    text: "Cargá a qué te dedicás, tus preguntas frecuentes y a dónde derivar. Elegí los colores y el mensaje de bienvenida.",
-  },
-  {
-    icon: MessageSquareText,
-    title: "Pegá una línea en tu sitio",
-    text: "El chat aparece abajo a la derecha y responde las consultas de tus visitantes con la información de tu negocio.",
-  },
-  {
-    icon: UserPlus,
-    title: "Recibí los contactos",
-    text: "El bot les ofrece dejar su email y te avisa. Si hace falta, tomás la conversación y respondés vos.",
-  },
-];
-
-// Public landing (spec 008), static: what BrAInance is and how to start. The beta only has a free plan.
 export const dynamic = "force-static";
 
+const BUSINESSES = ["panaderías", "talleres", "inmobiliarias", "consultorios", "estudios contables", "tiendas de ropa", "gimnasios"];
+
+// Public landing (spec 009): warm editorial look, the real inbox as the hero, Hairline figures.
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="theme-paper min-h-screen flex flex-col overflow-x-clip bg-background text-foreground">
       <Navbar />
       <main className="flex-1">
-        <section className="px-4 py-16 md:py-24 text-center flex flex-col items-center gap-6 max-w-3xl mx-auto">
-          <span className="rounded-full border px-3 py-1 text-sm text-muted-foreground">Beta gratuita</span>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Un chat con IA que atiende tu sitio y te trae clientes</h1>
-          <p className="text-lg text-muted-foreground">
-            BrAInance responde las consultas de tus visitantes con la información de tu negocio, a cualquier hora, y te pasa los
-            contactos de los interesados.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/auth/sign-up">Crear mi bot gratis</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/auth/sign-in">Ya tengo cuenta</Link>
-            </Button>
+        <section className="mx-auto flex max-w-7xl flex-col gap-10 px-4 pt-16 md:px-8 lg:pt-24">
+          <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Beta gratuita · Hecho en Argentina</p>
+            <h1 className="text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
+              Tu negocio responde a las 3 de la mañana.
+              <span className="block text-muted-foreground">Vos dormís.</span>
+            </h1>
+            <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
+              BrAInance es un chat con IA para tu sitio. Contesta con la información de tu negocio, te pasa los contactos de
+              los interesados y te avisa cuando hace falta una persona.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Button asChild size="lg">
+                <Link href="/auth/sign-up">
+                  Crear mi bot gratis <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+              <span className="text-sm text-muted-foreground">Sin tarjeta. Se instala con una línea.</span>
+            </div>
+          </div>
+          <ProductShot />
+        </section>
+
+        <section aria-labelledby="problema" className="border-t" data-testid="before-after">
+          <div className="mx-auto max-w-6xl px-4 py-20 md:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">A las 3:07 de la mañana</p>
+            <h2 id="problema" className="mt-3 max-w-3xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+              Para cualquiera que conteste la misma pregunta <span className="text-muted-foreground">veinte veces por día.</span>
+            </h2>
+            <p className="mt-4 max-w-2xl text-muted-foreground">
+              Para {BUSINESSES.slice(0, -1).join(", ")} y {BUSINESSES.at(-1)}. Pasá el mouse o arrastrá sobre la imagen para
+              ver la diferencia.
+            </p>
+            <div className="mt-10 rounded-3xl border bg-muted/60 p-2 md:p-4">
+              <Compare
+                initial={84}
+                before={{
+                  src: "/landing/site-before.webp",
+                  alt: "El sitio de la panadería La Espiga con un formulario de contacto: la consulta se envió a las 3:07 y espera al horario de atención.",
+                  label: "Sin BrAInance",
+                }}
+                after={{
+                  src: "/landing/site-after.webp",
+                  alt: "El mismo sitio con el chat de BrAInance abierto: el bot responde la consulta sobre tortas sin TACC y deriva el precio a la dueña.",
+                  label: "Con BrAInance",
+                }}
+              />
+            </div>
           </div>
         </section>
 
-        <section aria-labelledby="como-funciona" className="px-4 pb-20 max-w-5xl mx-auto">
-          <h2 id="como-funciona" className="text-2xl font-bold text-center mb-8">
-            Cómo funciona
+        <HowItWorks />
+
+        <section aria-labelledby="que-hace" className="mx-auto max-w-6xl px-4 py-20 md:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Qué hace por vos</p>
+          <h2 id="que-hace" className="mt-3 max-w-xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+            Atiende como alguien de tu equipo, <span className="text-muted-foreground">no como un contestador.</span>
           </h2>
-          <ol className="grid gap-4 md:grid-cols-3">
-            {STEPS.map(({ icon: Icon, title, text }, i) => (
-              <li key={title}>
-                <Card className="h-full">
-                  <CardContent className="p-6 flex flex-col gap-3">
-                    <span className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold">
-                        {i + 1}
-                      </span>
-                      <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-                    </span>
-                    <h3 className="font-semibold">{title}</h3>
-                    <p className="text-sm text-muted-foreground">{text}</p>
-                  </CardContent>
-                </Card>
-              </li>
-            ))}
-          </ol>
+          <FeatureBento />
+        </section>
+
+        <section className="border-t">
+          <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 md:flex-row md:items-end md:justify-between md:px-8">
+            <h2 className="max-w-2xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+              Probalo en tu sitio hoy. <span className="text-muted-foreground">Mañana ya responde.</span>
+            </h2>
+            <Button asChild size="lg">
+              <Link href="/auth/sign-up">
+                Crear mi bot gratis <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </section>
       </main>
       <SiteFooter />

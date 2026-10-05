@@ -31,7 +31,7 @@ export const LegalDocument = ({ file }: { file: "terminos" | "privacidad" }) => 
   const reviewed = process.env.LEGAL_REVIEWED === "true";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="theme-paper min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
       <main className="flex-1 px-4 py-10">
         <article className="mx-auto max-w-3xl flex flex-col gap-4 leading-relaxed" data-testid={`legal-${file}`}>
@@ -41,8 +41,8 @@ export const LegalDocument = ({ file }: { file: "terminos" | "privacidad" }) => 
             </p>
           )}
           {blocks.map((block, i) => {
-            if (block.type === "h1") return <h1 key={i} className="text-3xl font-bold">{renderInline(block.text)}</h1>;
-            if (block.type === "h2") return <h2 key={i} className="text-xl font-semibold mt-4">{renderInline(block.text)}</h2>;
+            if (block.type === "h1") return <h1 key={i} className="text-4xl font-bold tracking-tight">{renderInline(block.text)}</h1>;
+            if (block.type === "h2") return <h2 key={i} className="text-2xl font-bold mt-6">{renderInline(block.text)}</h2>;
             if (block.type === "h3") return <h3 key={i} className="font-semibold mt-2">{renderInline(block.text)}</h3>;
             if (block.type === "ul")
               return (

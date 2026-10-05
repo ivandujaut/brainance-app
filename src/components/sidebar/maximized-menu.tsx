@@ -1,6 +1,6 @@
 import { SIDE_BAR_MENU } from "@/constants/menu";
-import { ChevronLeft, ChevronLeftCircle, LogOut, Menu } from "lucide-react";
-import Image from "next/image";
+import { ChevronLeftCircle, LogOut } from "lucide-react";
+import { Wordmark } from "@/components/brand/wordmark";
 import React from "react";
 import MenuItem from "./menu-item";
 import DomainMenu from "./domain-menu";
@@ -23,23 +23,9 @@ const MaxMenu = ({ current, domains, onExpand, onSignOut }: Props) => {
   return (
     <div className="py-3 px-4 flex flex-col h-full">
       <div className="flex justify-between items-center">
-        {/* <Image
-          src="/images/logo.png"
-          alt="LOGO"
-          sizes="100vw"
-          className="animate-fade-in opacity-0 delay-300 fill-mode-forwards"
-          style={{
-            width: "50%",
-            height: "auto",
-          }}
-          width={0}
-          height={0}
-        /> */}
-        <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange to-grandis">
-          BrAInance
-        </h1>
+        <Wordmark className="text-2xl" />
         <ChevronLeftCircle
-          className="cursor-pointer animate-fade-in opacity-0 delay-300 fill-mode-forwards text-gray-500"
+          className="cursor-pointer animate-fade-in opacity-0 delay-300 fill-mode-forwards text-muted-foreground hover:text-foreground"
           onClick={onExpand}
         />
       </div>
