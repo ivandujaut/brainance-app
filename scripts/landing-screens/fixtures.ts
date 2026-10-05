@@ -104,3 +104,22 @@ export const CONVERSATION = {
     },
   ],
 };
+
+// Thirty days of a bakery that gets busier on weekends.
+const SERIES = Array.from({ length: 30 }, (_, i) => {
+  const day = new Date(Date.UTC(2026, 8, 4 + i));
+  const weekend = [0, 6].includes(day.getUTCDay()) ? 6 : 0;
+  const conversations = 9 + weekend + ((i * 7) % 5) + Math.floor(i / 6);
+  return { day: day.toISOString().slice(0, 10), conversations, leads: Math.round(conversations * 0.3) + (i % 3 === 0 ? 1 : 0) };
+});
+
+export const METRICS = {
+  days: 30 as const,
+  conversations: SERIES.reduce((n, d) => n + d.conversations, 0),
+  answeredConversations: SERIES.reduce((n, d) => n + d.conversations, 0) - 9,
+  leads: SERIES.reduce((n, d) => n + d.leads, 0),
+  captureRate: 0,
+  needingAttention: 14,
+  series: SERIES,
+};
+METRICS.captureRate = METRICS.leads / METRICS.answeredConversations;

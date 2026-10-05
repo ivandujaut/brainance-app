@@ -25,13 +25,12 @@ for (const [path, title] of [
   });
 }
 
-// Spec 009: the hero is a screenshot of the real inbox, one per theme, both loaded and described.
+// Spec 009: the hero shows screenshots of the real dashboard and inbox; the inbox one is described.
 test("the landing hero shows the real inbox", async ({ page }) => {
   await page.goto("/");
-  const shot = page.getByRole("img", { name: /La bandeja de BrAInance/ }).first();
+  const shot = page.getByRole("img", { name: /La bandeja de BrAInance/ });
   await expect(shot).toBeVisible();
-  expect(await shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
-  await expect(page.getByText(/la conversación se marca sola/)).toBeVisible();
+  await expect.poll(() => shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
 });
 
 test("the privacy policy names the roles, the providers and the AAIP", async ({ page }) => {

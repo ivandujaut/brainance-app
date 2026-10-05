@@ -36,18 +36,18 @@ export default function Home() {
     <div className="theme-paper min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
       <main className="flex-1">
-        <section className="mx-auto flex max-w-6xl flex-col gap-14 px-4 py-16 md:px-8 lg:py-24">
-          <div className="flex max-w-3xl flex-col gap-6">
+        <section className="mx-auto flex max-w-7xl flex-col gap-10 px-4 pt-16 md:px-8 lg:pt-24">
+          <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Beta gratuita · Hecho en Argentina</p>
             <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-7xl">
               Tu negocio responde a las 3 de la mañana.
               <span className="block italic text-muted-foreground">Vos dormís.</span>
             </h1>
-            <p className="max-w-lg text-lg leading-relaxed text-muted-foreground">
+            <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
               BrAInance es un chat con IA para tu sitio. Contesta con la información de tu negocio, te pasa los contactos de
               los interesados y te avisa cuando hace falta una persona.
             </p>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg">
                 <Link href="/auth/sign-up">
                   Crear mi bot gratis <ArrowRight className="ml-1 h-4 w-4" />
