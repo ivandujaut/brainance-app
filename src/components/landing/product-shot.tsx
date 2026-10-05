@@ -3,8 +3,7 @@ import type { CSSProperties } from "react";
 
 // Hero product shot (spec 009), after Aceternity's product hero: the real dashboard and inbox
 // (`npm run landing:screens`) as two screens at the same isometric-like tilt, the front one shifted
-// up and to the right, each fading out toward its right and bottom edges. The light screens are used
-// in both themes: on the dark page they are what catches the eye.
+// up and to the right, each fading out toward its right and bottom edges.
 
 const shot = { width: 2400, height: 1500, sizes: "(min-width: 1280px) 1216px, 100vw" };
 const alt =

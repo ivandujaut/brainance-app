@@ -60,6 +60,7 @@ src/server/     Adaptadores: repositorios (Prisma), IA, realtime, email, pagos.
 - Los avisos de "modelo sin precio" y "sitio cerca del tope" se deduplican en memoria por instancia: en Vercel pueden repetirse entre instancias.
 - `ModelCall` no se purga todavía (ADR 0008: a los 180 días).
 - Push con Pusher implementado pero sin probar contra Pusher real: verificar con claves antes de activarlo en producción (ADR 0007).
+- Modo oscuro desactivado (spec 009): la app fuerza el tema claro. Los tokens oscuros siguen en `globals.css`, con su test de contraste; para reactivarlo, quitar `forcedTheme` de los layouts y restaurar los selectores (`mode-toggle.tsx`, `settings/dark-mode.tsx`) desde el historial.
 - Tailwind 3 y zod 3: actualizar a Tailwind 4 y zod 4 en PRs separados.
 - Las reglas `eslint-config-next/typescript` todavía no están activas porque marcaban unos 90 problemas en el código heredado; después de la limpieza de la spec 008 conviene medir de nuevo y activarlas.
 - `Billings` y el enum `Plans` quedan para los límites por plan, aunque la beta solo tiene el plan gratuito.

@@ -33,8 +33,7 @@ const Layout = async ({ children }: Props) => {
           contacto, sin formularios.
         </p>
         <div className="absolute top-60 left-24 w-[1100px] overflow-hidden rounded-tl-xl border-l border-t shadow-2xl">
-          <Image src="/landing/inbox-light.webp" alt={alt} {...shot} className="h-auto w-full dark:hidden" />
-          <Image src="/landing/inbox-dark.webp" alt={alt} {...shot} className="hidden h-auto w-full dark:block" />
+          <Image src="/landing/inbox-light.webp" alt={alt} {...shot} className="h-auto w-full" />
         </div>
       </div>
     </div>

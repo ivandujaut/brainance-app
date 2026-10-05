@@ -22,7 +22,8 @@ export default function RootLayout({
     <ClerkProvider localization={esUY} appearance={{ variables: { colorPrimary: "#FFA947" } }}>
       <html lang="es">
         <body className={jakarta.className}>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          {/* Light theme only for now: the dark tokens stay in globals.css to turn it back on later. */}
+          <ThemeProvider attribute="class" forcedTheme="light" disableTransitionOnChange>
             {children}
             <Toaster />
           </ThemeProvider>

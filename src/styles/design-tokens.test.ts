@@ -43,3 +43,18 @@ describe.each([":root", ".dark", ".theme-paper", ".dark .theme-paper"])("design 
     expect(tokens.ring).toBe(tokens.primary);
   });
 });
+
+// Spec 009, "Brasa" palette: the headline's closing words are a gradient between two ember tones.
+// The words are large display text (48px and up, bold), so each stop must reach WCAG AA for large
+// text (3:1) against the page.
+const AA_LARGE_TEXT = 3;
+
+describe.each([".theme-paper", ".dark .theme-paper"])("ember gradient in %s", (selector) => {
+  const tokens = tokensIn(selector);
+
+  it.each(["ember-from", "ember-to"])("%s reads on the page background", (stop) => {
+    expect(tokens[stop], `--${stop} is missing`).toBeDefined();
+    const ratio = contrastRatio(hslToHex(tokens.background), hslToHex(tokens[stop]));
+    expect(ratio, `background / ${stop}: ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(AA_LARGE_TEXT);
+  });
+});

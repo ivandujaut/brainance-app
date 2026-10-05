@@ -13,6 +13,12 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
   - paleta "papel" (crema, tinta y el naranja de marca), sobre los mismos tokens semánticos y con una variante oscura;
   - la tipografía original de la marca (Plus Jakarta Sans) en todo el sitio: titulares en negrita con el remate en color atenuado. Se probó una serif de titulares (Fraunces) y se descartó para respetar la identidad original;
   - textos con voz argentina ("Tu negocio responde a las 3 de la mañana. Vos dormís.").
+- **Solo tema claro, por ahora.** Se quitan los selectores de tema de la portada y de la cuenta, y la app fuerza el tema claro: una preferencia oscura guardada antes se ignora. Los tokens oscuros (`.dark`, `.dark .theme-paper`) y su test de contraste se mantienen, así que reactivarlo es quitar `forcedTheme` y volver a poner el selector.
+- **Paleta "Brasa" en el hero y el cierre.** Se compararon tres direcciones con degradé (Amanecer, Brasa y Atardecer pastel) sobre maquetas del hero, y se eligió Brasa:
+  - resplandores difuminados naranja de marca, coral y ámbar detrás del hero y del bloque final; el resto de las secciones queda neutro para que se lea bien;
+  - el remate del titular ("Vos dormís.", "Mañana ya responde.") va en un degradé brasa (`text-ember`);
+  - el naranja de marca no alcanza contraste como texto sobre el papel, así que el degradé usa tonos más oscuros en claro y más claros en oscuro (`--ember-from` y `--ember-to`). El test de tokens exige 3:1, el mínimo AA para texto grande;
+  - los resplandores (`--glow-1/2/3`, `--glow-opacity`) bajan de intensidad en oscuro y se desvanecen en los bordes de su sección.
 - **El producto es el protagonista:**
   - el hero muestra **capturas del panel real** de una panadería ficticia: el dashboard con sus métricas y, delante, la bandeja con una charla donde el bot respondió y la dueña tomó el control;
   - la composición replica el hero de producto de Aceternity (plantilla Agenforce):
@@ -52,5 +58,5 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
 |---|---|---|
 | 1 | E2E sin Clerk: la captura carga y se describe; el comparador muestra las dos imágenes y responde al teclado | `e2e/public.spec.ts` |
 | 2 | Revisión manual con movimiento reducido | — |
-| 3 | Unitario: contraste de `.theme-paper` y `.dark .theme-paper` | `src/styles/design-tokens.test.ts` |
+| 3 | Unitario: contraste de `.theme-paper` y `.dark .theme-paper`, incluidos los extremos del degradé brasa | `src/styles/design-tokens.test.ts` |
 | 4, 5 | Revisión con capturas en escritorio, celular, claro y oscuro | — |
