@@ -33,20 +33,23 @@ test("the landing hero shows the real inbox", async ({ page }) => {
   await expect.poll(() => shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
 });
 
-// Spec 009: the problem block compares the bakery's site before and after, and the slider works by keyboard.
-test("the before/after slider compares the site without and with the chat", async ({ page }) => {
+// Spec 009: the problem block is a wall of everyday questions, answered at night.
+test("the question wall shows real questions answered after hours", async ({ page }) => {
   await page.goto("/");
-  const block = page.getByTestId("before-after");
-  await expect(block.getByRole("img", { name: /formulario de contacto/ })).toBeAttached();
-  await expect(block.getByRole("img", { name: /chat de BrAInance/ })).toBeAttached();
+  const block = page.getByTestId("question-wall");
+  await expect(block.getByRole("heading", { name: /quiere la respuesta ahora/ })).toBeVisible();
+  const questions = block.getByRole("list", { name: "Preguntas respondidas por el bot" }).getByRole("listitem");
+  await expect(questions.first()).toContainText("¿");
+  expect(await questions.count()).toBeGreaterThanOrEqual(12);
+});
 
-  const slider = block.getByRole("slider", { name: "Comparar sin y con BrAInance" });
-  const start = Number(await slider.getAttribute("aria-valuenow"));
-  await slider.focus();
-  await page.keyboard.press("ArrowLeft");
-  await expect(slider).toHaveAttribute("aria-valuenow", String(start - 5));
-  await page.keyboard.press("End");
-  await expect(slider).toHaveAttribute("aria-valuenow", "100");
+test("with reduced motion the question wall stays still", async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: "reduce" });
+  const page = await context.newPage();
+  await page.goto("/");
+  const track = page.getByTestId("question-wall-track");
+  await expect(track).toHaveCSS("animation-name", "none");
+  await context.close();
 });
 
 // Light theme only for now: no theme picker, and a dark preference saved earlier is ignored.

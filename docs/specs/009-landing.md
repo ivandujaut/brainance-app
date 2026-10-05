@@ -30,12 +30,10 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
   - al cargar, las capturas suben y aparecen una vez. Con movimiento reducido no se animan.
 - **Cómo se armó con Tailwind 3.** El proyecto no tiene las utilidades `mask-*` ni `perspective-*` de Tailwind 4, así que se escriben como estilos equivalentes. La animación de entrada usa la propiedad `translate`, separada de `transform`, para no pisar la inclinación ni los desplazamientos. La composición se recorta en vertical y se funde con el fondo antes de la sección siguiente; en horizontal la recorta la página, para que llegue al borde de la ventana sin generar scroll.
 - **Las capturas salen del código, no de un recorte a mano.** `npm run landing:screens` renderiza el layout y las páginas reales de la bandeja y del dashboard con datos de ejemplo (`scripts/landing-screens/`). Las acciones del servidor, Clerk y la navegación se reemplazan por mocks. Después compila Tailwind solo para ese HTML y lo fotografía con Playwright en claro y en oscuro. Si cambia el panel, se regeneran con un comando y la portada nunca muestra una pantalla vieja. Para que la captura se viera como la portada, el menú lateral y el panel de ingreso pasaron a los tokens y usan el logotipo `Wordmark`.
-- **Antes y después en la franja del problema**, con la idea del componente Compare de Aceternity:
-  - el título pasa a ser "Para cualquiera que conteste la misma pregunta veinte veces por día", y la lista de rubros queda debajo;
-  - debajo, un comparador sobre el sitio ficticio de La Espiga. Sin BrAInance, un formulario de contacto enviado a las 3:07 que espera al horario de atención. Con BrAInance, el mismo sitio con el widget real abierto, que responde y deriva el precio a la dueña;
-  - el divisor sigue al mouse; en pantallas táctiles se arrastra, y con el teclado es un control deslizante accesible (`role="slider"`, flechas, Inicio y Fin). Arranca sobre el chat, así la diferencia se ve sin tocar nada.
-- **El componente se reimplementó, no se instaló.** El registro de Aceternity estaba bloqueado por la red. Además, el original suma `motion` y unas "chispas" con `tsparticles` sobre el divisor: dos dependencias pesadas y justo la estética de "landing hecha con IA". El nuestro es CSS (`clip-path`) y estado de React.
-- **Las capturas del antes y después también salen del código.** `npm run landing:screens:site`, con la app levantada como para los E2E del widget, sirve la página de la panadería en su dominio, carga `widget.js` y abre el chat real. Solo la conversación viene de datos de ejemplo, así que no hace falta un modelo de IA.
+- **La franja del problema es una pared de preguntas.** Se probó un antes y después con el widget real sobre el sitio de una panadería, y se descartó: repetía lo que ya muestra el hero y el bloque no convencía. Se compararon dos maquetas (el comparador rediseñado y una pared de preguntas) y quedó la pared:
+  - a la izquierda, "El que pregunta quiere la respuesta ahora, no el lunes." con el remate en degradé brasa, y dos datos: 24 h respondiendo y 1 línea para instalarlo;
+  - a la derecha, preguntas reales de distintos rubros ("¿Hacen envíos?", "¿Atienden por obra social?", "¿Hacen factura A?"), cada una con un tilde naranja y la hora de la madrugada en que se respondió;
+  - la pared sube lenta y en loop, se detiene al pasar el mouse y queda quieta con movimiento reducido. Una segunda copia de la lista, oculta para lectores de pantalla, hace que el loop no tenga salto.
 - **Hairline** (`@lucasmarkes/hairline`, MIT, sin dependencias) ilustra "Cómo funciona" con figuras de línea que responden al puntero: tarjetas (las preguntas frecuentes), ventana en capas (tu sitio con el chat) y cinta (los contactos que llegan). Se tematizan con los tokens.
 - **"Qué hace por vos" como bento, idea de las secciones de features de Aceternity:**
   - celdas anchas y angostas que se alternan, separadas por líneas finas;
@@ -47,7 +45,7 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
 ## Criterios de aceptación
 
 1. **Dado** la portada, **entonces** el hero muestra las capturas del panel real y la de la bandeja tiene texto alternativo.
-2. **Dado** `prefers-reduced-motion`, **entonces** los planos del hero no se animan y la barra de los beneficios cambia sin transición.
+2. **Dado** `prefers-reduced-motion`, **entonces** los planos del hero no se animan, la pared de preguntas queda quieta y la barra de los beneficios cambia sin transición.
 3. **Dado** la paleta "papel", **entonces** todos los pares fondo/texto cumplen AA en claro y en oscuro (test de tokens).
 4. **Dado** un celular de 390 px, **entonces** no hay desplazamiento horizontal.
 5. **Dado** las páginas legales, **entonces** usan la misma paleta y tipografía.
@@ -56,7 +54,7 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
 
 | Criterio | Tipo de test | Archivo |
 |---|---|---|
-| 1 | E2E sin Clerk: la captura carga y se describe; el comparador muestra las dos imágenes y responde al teclado | `e2e/public.spec.ts` |
-| 2 | Revisión manual con movimiento reducido | — |
+| 1 | E2E sin Clerk: la captura carga y se describe; la pared muestra las preguntas y queda quieta con movimiento reducido | `e2e/public.spec.ts` |
+| 2 | E2E de la pared con movimiento reducido; el resto, revisión manual | `e2e/public.spec.ts` |
 | 3 | Unitario: contraste de `.theme-paper` y `.dark .theme-paper`, incluidos los extremos del degradé brasa | `src/styles/design-tokens.test.ts` |
 | 4, 5 | Revisión con capturas en escritorio, celular, claro y oscuro | — |

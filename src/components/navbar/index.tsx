@@ -3,7 +3,7 @@ import { Wordmark } from "@/components/brand/wordmark";
 import { Button } from "@/components/ui/button";
 
 const NavBar = () => (
-  <header className="flex items-center justify-between gap-4 border-b px-4 py-3 md:px-8">
+  <header className="flex items-center justify-between gap-4 px-4 py-3 md:px-8">
     <Link href="/" aria-label="BrAInance, inicio">
       <Wordmark className="text-2xl" />
     </Link>

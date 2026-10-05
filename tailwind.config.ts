@@ -82,6 +82,11 @@ const config = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        // Spec 009: the question wall drifts up by one copy of its list, then loops.
+        "drift-up": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(-50%)" },
+        },
         "hero-rise": {
           from: { opacity: "0", translate: "0 40px" },
           to: { opacity: "1", translate: "0 0" },
@@ -94,6 +99,7 @@ const config = {
         "open-sidebar": "open-sidebar 0.2s ease-out",
         "close-sidebar": "close-sidebar 0.2s ease-out",
         "fade-in": "fade-in 0.2s ease-out",
+        "drift-up": "drift-up 60s linear infinite",
         "hero-rise": "hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both",
       },
     },
