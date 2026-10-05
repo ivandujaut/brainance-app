@@ -33,9 +33,14 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
 - **La franja del problema es una pared de preguntas.** Se probó un antes y después con el widget real sobre el sitio de una panadería, y se descartó: repetía lo que ya muestra el hero y el bloque no convencía. Se compararon dos maquetas (el comparador rediseñado y una pared de preguntas) y quedó la pared:
   - arriba, "El que pregunta quiere la respuesta ahora, no el lunes." con el remate en degradé brasa;
   - debajo, tarjetas con preguntas reales de distintos rubros y la respuesta del bot, incluidas las que deriva porque no tiene el dato. Cada una lleva el rubro y la hora de la madrugada en que se respondió;
-  - las tarjetas van en tres columnas con la idea del ParallaxScroll de Aceternity: mientras la sección pasa por la pantalla, la del medio se desplaza en sentido contrario a las de los costados;
-  - a diferencia del original, el efecto sigue el scroll de la página y no el de una caja con scroll propio, que atrapa la rueda del mouse y el dedo en el celular. Un solo listener, sincronizado con el refresco de pantalla, escribe una variable CSS, sin re-renders de React;
-  - solo en pantallas grandes: en celular y tablet las columnas se apilan quietas, y con movimiento reducido no se mueven.
+  - las tarjetas van en tres columnas con el ParallaxScroll de Aceternity, instalado con `npx shadcn@latest add @aceternity/parallax-scroll` en `src/components/ui/parallax-scroll.tsx`. Mientras la sección pasa por la pantalla, la columna del medio se desplaza en sentido contrario a las de los costados;
+  - el componente se adaptó para la landing; el primer commit de la rama guarda la versión original, así el cambio queda a la vista:
+    - recibe tarjetas en lugar de URLs de imágenes y las expone como una sola lista para lectores de pantalla;
+    - sigue el scroll de la página, no el de una caja de altura fija con scroll propio, que atrapa la rueda del mouse y el dedo en el celular;
+    - cada columna se desplaza centrada en su lugar, así las primeras tarjetas arrancan a la vista;
+    - no se mueve por debajo de `lg` ni con movimiento reducido. Lo resuelve CSS (`motion-reduce:`), que aplica desde el primer render; `useReducedMotion` llega tarde y motion ya dejó escrito un desplazamiento;
+  - vuelve la dependencia `motion`, que trae el componente.
+- **El CLI de shadcn y los componentes de Aceternity.** El entorno de desarrollo en la nube bloqueaba `ui.aceternity.com` y `ui.shadcn.com`; con ambos habilitados en *Network access*, el CLI funciona. `components.json` registra `@aceternity`, así que los próximos se instalan con un solo comando.
 - **Hairline** (`@lucasmarkes/hairline`, MIT, sin dependencias) ilustra "Cómo funciona" con figuras de línea que responden al puntero: tarjetas (las preguntas frecuentes), ventana en capas (tu sitio con el chat) y cinta (los contactos que llegan). Se tematizan con los tokens.
 - **"Qué hace por vos" como bento, idea de las secciones de features de Aceternity:**
   - celdas anchas y angostas que se alternan, separadas por líneas finas;

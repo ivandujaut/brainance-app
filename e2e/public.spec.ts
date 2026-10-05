@@ -45,11 +45,14 @@ test("the question wall shows real questions with the bot's answers", async ({ p
 
 test("the question columns move in opposite directions while the page scrolls", async ({ page }) => {
   await page.goto("/");
-  const columns = page.getByTestId("question-column");
+  const columns = page.getByTestId("parallax-column");
+  const offsets = () =>
+    Promise.all([0, 1].map((i) => columns.nth(i).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42)));
   await page.getByTestId("question-wall").scrollIntoViewIfNeeded();
+  const [firstBefore, secondBefore] = await offsets();
   await page.mouse.wheel(0, 400);
-  await expect.poll(async () => (await columns.nth(0).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42)) < 0).toBe(true);
-  expect(await columns.nth(1).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42)).toBeGreaterThan(0);
+  await expect.poll(async () => (await offsets())[0]).toBeLessThan(firstBefore);
+  expect((await offsets())[1]).toBeGreaterThan(secondBefore);
 });
 
 test("with reduced motion the question columns stay still", async ({ browser }) => {
@@ -59,7 +62,7 @@ test("with reduced motion the question columns stay still", async ({ browser }) 
   await page.getByTestId("question-wall").scrollIntoViewIfNeeded();
   await page.mouse.wheel(0, 400);
   await page.waitForTimeout(300);
-  for (const column of await page.getByTestId("question-column").all()) {
+  for (const column of await page.getByTestId("parallax-column").all()) {
     expect(await column.evaluate((el) => getComputedStyle(el).transform)).toBe("none");
   }
   await context.close();

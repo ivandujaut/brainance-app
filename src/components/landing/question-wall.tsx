@@ -1,11 +1,8 @@
-"use client";
 import { Check } from "lucide-react";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { ParallaxScroll } from "@/components/ui/parallax-scroll";
 
-// Spec 009: the problem block, after Aceternity's ParallaxScroll. Everyday questions from different
-// trades with the bot's answer, in three columns that drift in opposite directions while the section
-// crosses the screen. Driven by the page's own scroll (no inner scroll box that traps the wheel), one
-// rAF-throttled listener writing a CSS variable, and no movement at all with reduced motion.
+// Spec 009: the problem block. Everyday questions from different trades with the bot's answer, in the
+// parallax columns of Aceternity's ParallaxScroll (adapted in components/ui/parallax-scroll.tsx).
 const QUESTIONS = [
   [
     "¿Hacen envíos?",
@@ -59,13 +56,8 @@ const QUESTIONS = [
   ],
 ] as const;
 
-// How far each column travels across the section's pass, in px, centered on its resting place: the middle
-// one goes against the others.
-// Large screens only; on phones and tablets the columns stack and stay still.
-const TRAVEL = [-200, 200, -200];
-
-const Card = ([question, answer, trade, hour]: (typeof QUESTIONS)[number]) => (
-  <div key={question} role="listitem" className="flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-sm">
+const Card = ({ question, answer, trade, hour }: { question: string; answer: string; trade: string; hour: string }) => (
+  <div className="flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-sm">
     <p className="font-semibold">{question}</p>
     <p className="text-sm leading-relaxed text-muted-foreground">{answer}</p>
     <p className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -81,74 +73,29 @@ const Card = ([question, answer, trade, hour]: (typeof QUESTIONS)[number]) => (
   </div>
 );
 
-export const QuestionWall = () => {
-  const section = useRef<HTMLElement>(null);
+export const QuestionWall = () => (
+  <section aria-labelledby="problema" data-testid="question-wall" className="mx-auto max-w-6xl px-4 py-20 md:px-8">
+    <div className="mx-auto max-w-2xl text-center">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        Las mismas preguntas, todos los días
+      </p>
+      <h2 id="problema" className="mt-3 text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+        El que pregunta quiere la respuesta <span className="text-ember">ahora, no el lunes.</span>
+      </h2>
+      <p className="mt-4 leading-relaxed text-muted-foreground">
+        Precios, horarios, envíos, turnos. Tu bot las contesta con tus datos a cualquier hora, y lo que no sabe te lo
+        pasa a vos.
+      </p>
+    </div>
 
-  useEffect(() => {
-    const element = section.current;
-    if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const { top, height } = element.getBoundingClientRect();
-      // 0 when the section enters from below, 1 when it leaves at the top.
-      const progress = Math.min(1, Math.max(0, (window.innerHeight - top) / (window.innerHeight + height)));
-      element.style.setProperty("--parallax", progress.toFixed(4));
-    };
-    const onScroll = () => {
-      frame ||= requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
-
-  const columns = [0, 1, 2].map((c) => QUESTIONS.filter((_, i) => i % 3 === c));
-
-  return (
-    <section
-      ref={section}
-      aria-labelledby="problema"
-      data-testid="question-wall"
-      className="mx-auto max-w-6xl px-4 py-20 md:px-8"
-    >
-      <div className="mx-auto max-w-2xl text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Las mismas preguntas, todos los días
-        </p>
-        <h2 id="problema" className="mt-3 text-3xl font-bold leading-tight tracking-tight md:text-4xl">
-          El que pregunta quiere la respuesta <span className="text-ember">ahora, no el lunes.</span>
-        </h2>
-        <p className="mt-4 leading-relaxed text-muted-foreground">
-          Precios, horarios, envíos, turnos. Tu bot las contesta con tus datos a cualquier hora, y lo que no sabe te lo
-          pasa a vos.
-        </p>
-      </div>
-
-      <div className="relative mt-12 h-[640px] overflow-hidden lg:pt-24 [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]">
-        {/* One list for screen readers; the columns are only layout. */}
-        <div
-          role="list"
-          aria-label="Preguntas respondidas por el bot"
-          className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {columns.map((cards, c) => (
-            <div
-              key={c}
-              data-testid="question-column"
-              className="flex flex-col gap-4 motion-safe:lg:[transform:translateY(calc((var(--parallax,0.5)-0.5)*var(--travel)))]"
-              style={{ "--travel": `${TRAVEL[c]}px` } as CSSProperties}
-            >
-              {cards.map(Card)}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+    <div className="relative mt-12 h-[640px] overflow-hidden lg:pt-24 [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]">
+      <ParallaxScroll
+        label="Preguntas respondidas por el bot"
+        items={QUESTIONS.map(([question, answer, trade, hour]) => ({
+          key: question,
+          content: <Card question={question} answer={answer} trade={trade} hour={hour} />,
+        }))}
+      />
+    </div>
+  </section>
+);

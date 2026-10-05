@@ -1,85 +1,63 @@
 "use client";
-import { useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
+import { useRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Aceternity's ParallaxScroll (`npx shadcn@latest add @aceternity/parallax-scroll`), adapted for the
+ * landing (spec 009):
+ * - takes any items (our question cards), not only image URLs, as one list for screen readers;
+ * - follows the page's scroll while the grid crosses the screen, instead of an inner fixed-height
+ *   scroll box that would trap the wheel and the finger;
+ * - each column travels centered on its resting place, so the first items start in view;
+ * - still with reduced motion, and on screens below `lg`, where the columns stack.
+ */
 export const ParallaxScroll = ({
-  images,
+  items,
+  label,
   className,
 }: {
-  images: string[];
+  items: { key: string; content: ReactNode }[];
+  label: string;
   className?: string;
 }) => {
-  const gridRef = useRef<any>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    container: gridRef, // remove this if your container is not fixed height
-    offset: ["start start", "end start"], // remove this if your container is not fixed height
+    target: gridRef,
+    offset: ["start end", "end start"],
   });
 
-  const translateFirst = useTransform(scrollYProgress, [0, 1], [0, -200]);
-  const translateSecond = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const translateThird = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const translateFirst = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const translateSecond = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+  const translateThird = useTransform(scrollYProgress, [0, 1], [100, -100]);
 
-  const third = Math.ceil(images.length / 3);
-
-  const firstPart = images.slice(0, third);
-  const secondPart = images.slice(third, 2 * third);
-  const thirdPart = images.slice(2 * third);
+  const third = Math.ceil(items.length / 3);
+  const parts = [items.slice(0, third), items.slice(third, 2 * third), items.slice(2 * third)];
+  const translates = [translateFirst, translateSecond, translateThird];
 
   return (
     <div
-      className={cn("h-[40rem] items-start overflow-y-auto w-full", className)}
       ref={gridRef}
+      role="list"
+      aria-label={label}
+      className={cn("grid grid-cols-1 items-start gap-4 md:grid-cols-2 lg:grid-cols-3", className)}
     >
-      <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start  max-w-5xl mx-auto gap-10 py-40 px-10"
-        ref={gridRef}
-      >
-        <div className="grid gap-10">
-          {firstPart.map((el, idx) => (
-            <motion.div
-              style={{ y: translateFirst }} // Apply the translateY motion value here
-              key={"grid-1" + idx}
-            >
-              <img
-                src={el}
-                className="h-80 w-full object-cover object-left-top rounded-lg gap-10 !m-0 !p-0"
-                height="400"
-                width="400"
-                alt="thumbnail"
-              />
-            </motion.div>
+      {parts.map((part, column) => (
+        <motion.div
+          key={column}
+          data-testid="parallax-column"
+          // CSS, not useReducedMotion: it applies from the first paint, before motion writes any offset.
+          className="grid gap-4 max-lg:![transform:none] motion-reduce:![transform:none]"
+          style={{ y: translates[column] }}
+        >
+          {part.map((item) => (
+            <div key={item.key} role="listitem">
+              {item.content}
+            </div>
           ))}
-        </div>
-        <div className="grid gap-10">
-          {secondPart.map((el, idx) => (
-            <motion.div style={{ y: translateSecond }} key={"grid-2" + idx}>
-              <img
-                src={el}
-                className="h-80 w-full object-cover object-left-top rounded-lg gap-10 !m-0 !p-0"
-                height="400"
-                width="400"
-                alt="thumbnail"
-              />
-            </motion.div>
-          ))}
-        </div>
-        <div className="grid gap-10">
-          {thirdPart.map((el, idx) => (
-            <motion.div style={{ y: translateThird }} key={"grid-3" + idx}>
-              <img
-                src={el}
-                className="h-80 w-full object-cover object-left-top rounded-lg gap-10 !m-0 !p-0"
-                height="400"
-                width="400"
-                alt="thumbnail"
-              />
-            </motion.div>
-          ))}
-        </div>
-      </div>
+        </motion.div>
+      ))}
     </div>
   );
 };
