@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "eval:rag": "tsx --env-file-if-exists=.env.local evals/rag-answers/run-eval.mjs",
     "eval:rag:cases": "node evals/rag-answers/render-cases.mjs",
-    "landing:screens": "vitest run -c scripts/landing-screens/vitest.config.ts && node scripts/landing-screens/shoot.mjs"
+    "landing:screens": "vitest run -c scripts/landing-screens/vitest.config.ts && node scripts/landing-screens/shoot.mjs",
+    "landing:screens:site": "playwright test -c scripts/landing-screens/playwright.config.ts"
   },
   "dependencies": {
     "@clerk/localizations": "^4.21.1",

@@ -33,6 +33,22 @@ test("the landing hero shows the real inbox", async ({ page }) => {
   await expect.poll(() => shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
 });
 
+// Spec 009: the problem block compares the bakery's site before and after, and the slider works by keyboard.
+test("the before/after slider compares the site without and with the chat", async ({ page }) => {
+  await page.goto("/");
+  const block = page.getByTestId("before-after");
+  await expect(block.getByRole("img", { name: /formulario de contacto/ })).toBeAttached();
+  await expect(block.getByRole("img", { name: /chat de BrAInance/ })).toBeAttached();
+
+  const slider = block.getByRole("slider", { name: "Comparar sin y con BrAInance" });
+  const start = Number(await slider.getAttribute("aria-valuenow"));
+  await slider.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(slider).toHaveAttribute("aria-valuenow", String(start - 5));
+  await page.keyboard.press("End");
+  await expect(slider).toHaveAttribute("aria-valuenow", "100");
+});
+
 test("the privacy policy names the roles, the providers and the AAIP", async ({ page }) => {
   await page.goto("/privacidad");
   const policy = page.getByTestId("legal-privacidad");

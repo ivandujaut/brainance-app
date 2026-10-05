@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Compare } from "@/components/landing/compare";
 import { FeatureBento } from "@/components/landing/feature-bento";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { ProductShot } from "@/components/landing/product-shot";
@@ -40,11 +41,32 @@ export default function Home() {
           <ProductShot />
         </section>
 
-        <section aria-label="Para quién es" className="border-t">
-          <p className="mx-auto max-w-6xl px-4 py-6 text-lg font-medium text-muted-foreground md:px-8">
-            Para {BUSINESSES.slice(0, -1).join(", ")} y {BUSINESSES.at(-1)}. Para cualquiera que conteste la misma pregunta
-            veinte veces por día.
-          </p>
+        <section aria-labelledby="problema" className="border-t" data-testid="before-after">
+          <div className="mx-auto max-w-6xl px-4 py-20 md:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">A las 3:07 de la mañana</p>
+            <h2 id="problema" className="mt-3 max-w-3xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+              Para cualquiera que conteste la misma pregunta <span className="text-muted-foreground">veinte veces por día.</span>
+            </h2>
+            <p className="mt-4 max-w-2xl text-muted-foreground">
+              Para {BUSINESSES.slice(0, -1).join(", ")} y {BUSINESSES.at(-1)}. Pasá el mouse o arrastrá sobre la imagen para
+              ver la diferencia.
+            </p>
+            <div className="mt-10 rounded-3xl border bg-muted/60 p-2 md:p-4">
+              <Compare
+                initial={84}
+                before={{
+                  src: "/landing/site-before.webp",
+                  alt: "El sitio de la panadería La Espiga con un formulario de contacto: la consulta se envió a las 3:07 y espera al horario de atención.",
+                  label: "Sin BrAInance",
+                }}
+                after={{
+                  src: "/landing/site-after.webp",
+                  alt: "El mismo sitio con el chat de BrAInance abierto: el bot responde la consulta sobre tortas sin TACC y deriva el precio a la dueña.",
+                  label: "Con BrAInance",
+                }}
+              />
+            </div>
+          </div>
         </section>
 
         <HowItWorks />

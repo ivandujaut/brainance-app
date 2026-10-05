@@ -24,6 +24,12 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
   - al cargar, las capturas suben y aparecen una vez. Con movimiento reducido no se animan.
 - **Cómo se armó con Tailwind 3.** El proyecto no tiene las utilidades `mask-*` ni `perspective-*` de Tailwind 4, así que se escriben como estilos equivalentes. La animación de entrada usa la propiedad `translate`, separada de `transform`, para no pisar la inclinación ni los desplazamientos. La composición se recorta en vertical y se funde con el fondo antes de la sección siguiente; en horizontal la recorta la página, para que llegue al borde de la ventana sin generar scroll.
 - **Las capturas salen del código, no de un recorte a mano.** `npm run landing:screens` renderiza el layout y las páginas reales de la bandeja y del dashboard con datos de ejemplo (`scripts/landing-screens/`). Las acciones del servidor, Clerk y la navegación se reemplazan por mocks. Después compila Tailwind solo para ese HTML y lo fotografía con Playwright en claro y en oscuro. Si cambia el panel, se regeneran con un comando y la portada nunca muestra una pantalla vieja. Para que la captura se viera como la portada, el menú lateral y el panel de ingreso pasaron a los tokens y usan el logotipo `Wordmark`.
+- **Antes y después en la franja del problema**, con la idea del componente Compare de Aceternity:
+  - el título pasa a ser "Para cualquiera que conteste la misma pregunta veinte veces por día", y la lista de rubros queda debajo;
+  - debajo, un comparador sobre el sitio ficticio de La Espiga. Sin BrAInance, un formulario de contacto enviado a las 3:07 que espera al horario de atención. Con BrAInance, el mismo sitio con el widget real abierto, que responde y deriva el precio a la dueña;
+  - el divisor sigue al mouse; en pantallas táctiles se arrastra, y con el teclado es un control deslizante accesible (`role="slider"`, flechas, Inicio y Fin). Arranca sobre el chat, así la diferencia se ve sin tocar nada.
+- **El componente se reimplementó, no se instaló.** El registro de Aceternity estaba bloqueado por la red. Además, el original suma `motion` y unas "chispas" con `tsparticles` sobre el divisor: dos dependencias pesadas y justo la estética de "landing hecha con IA". El nuestro es CSS (`clip-path`) y estado de React.
+- **Las capturas del antes y después también salen del código.** `npm run landing:screens:site`, con la app levantada como para los E2E del widget, sirve la página de la panadería en su dominio, carga `widget.js` y abre el chat real. Solo la conversación viene de datos de ejemplo, así que no hace falta un modelo de IA.
 - **Hairline** (`@lucasmarkes/hairline`, MIT, sin dependencias) ilustra "Cómo funciona" con figuras de línea que responden al puntero: tarjetas (las preguntas frecuentes), ventana en capas (tu sitio con el chat) y cinta (los contactos que llegan). Se tematizan con los tokens.
 - **"Qué hace por vos" como bento, idea de las secciones de features de Aceternity:**
   - celdas anchas y angostas que se alternan, separadas por líneas finas;
@@ -44,7 +50,7 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
 
 | Criterio | Tipo de test | Archivo |
 |---|---|---|
-| 1 | E2E sin Clerk: la captura carga y se describe | `e2e/public.spec.ts` |
+| 1 | E2E sin Clerk: la captura carga y se describe; el comparador muestra las dos imágenes y responde al teclado | `e2e/public.spec.ts` |
 | 2 | Revisión manual con movimiento reducido | — |
 | 3 | Unitario: contraste de `.theme-paper` y `.dark .theme-paper` | `src/styles/design-tokens.test.ts` |
 | 4, 5 | Revisión con capturas en escritorio, celular, claro y oscuro | — |
