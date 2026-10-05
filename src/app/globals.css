@@ -107,6 +107,14 @@ body {
     --secondary-foreground: 24.0 9.8% 10.0%;
     --border: 36.4 32.6% 83.1%;
     --input: 36.4 32.6% 83.1%;
+    /* "Brasa" (spec 009): ember stops for the headline gradient, dark enough to read as large text. */
+    --ember-from: 17 87% 45%;
+    --ember-to: 0 65% 48%;
+    /* Blurred glows behind the hero and the closing call to action: brand orange, coral and amber. */
+    --glow-1: 32 100% 64%;
+    --glow-2: 6 100% 68%;
+    --glow-3: 36 100% 77%;
+    --glow-opacity: 0.55;
   }
 
   .dark .theme-paper {
@@ -124,6 +132,12 @@ body {
     --secondary-foreground: 37.5 42.1% 92.5%;
     --border: 33.8 16.0% 19.6%;
     --input: 33.8 16.0% 19.6%;
+    --ember-from: 29 100% 71%;
+    --ember-to: 12 100% 67%;
+    --glow-1: 32 100% 64%;
+    --glow-2: 6 100% 68%;
+    --glow-3: 36 100% 77%;
+    --glow-opacity: 0.22;
   }
 }
 
@@ -209,4 +223,22 @@ body {
 .parsed-container img {
   width: 100% !important;
   border-radius: 20px;
+}
+@layer utilities {
+  /* Spec 009, "Brasa": headline words in an ember gradient (stops checked by design-tokens.test.ts). */
+  .text-ember {
+    background-image: linear-gradient(90deg, hsl(var(--ember-from)), hsl(var(--ember-to)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* High-contrast modes drop backgrounds; the words fall back to plain text. */
+  @media (forced-colors: active) {
+    .text-ember {
+      color: CanvasText;
+    }
+  }
 }
