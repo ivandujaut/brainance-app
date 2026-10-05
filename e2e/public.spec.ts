@@ -49,6 +49,14 @@ test("the before/after slider compares the site without and with the chat", asyn
   await expect(slider).toHaveAttribute("aria-valuenow", "100");
 });
 
+// Light theme only for now: no theme picker, and a dark preference saved earlier is ignored.
+test("the landing stays light even with a saved dark preference", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("theme", "dark"));
+  await page.goto("/");
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await expect(page.getByRole("button", { name: /tema|theme/i })).toHaveCount(0);
+});
+
 test("the privacy policy names the roles, the providers and the AAIP", async ({ page }) => {
   await page.goto("/privacidad");
   const policy = page.getByTestId("legal-privacidad");

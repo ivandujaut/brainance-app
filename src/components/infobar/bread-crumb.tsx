@@ -3,7 +3,7 @@ import useSideBar from "@/context/use-sidebar";
 
 const PAGES: Record<string, { title: string; description: string }> = {
   dashboard: { title: "Dashboard", description: "Lo que trajo tu bot: conversaciones, leads y lo que necesitó tu atención." },
-  settings: { title: "Cuenta", description: "Tu contraseña y el tema de la interfaz." },
+  settings: { title: "Cuenta", description: "Tu contraseña." },
 };
 
 const BreadCrumb = () => {

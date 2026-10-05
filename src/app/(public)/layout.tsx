@@ -15,7 +15,8 @@ export default function PublicLayout({ children }: Readonly<{ children: React.Re
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={jakarta.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        {/* Light theme only for now: the dark tokens stay in globals.css to turn it back on later. */}
+        <ThemeProvider attribute="class" forcedTheme="light" disableTransitionOnChange>
           {children}
         </ThemeProvider>
       </body>

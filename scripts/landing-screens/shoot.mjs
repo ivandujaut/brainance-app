@@ -1,5 +1,5 @@
 // Turns the statically rendered owner screens (see owner.render.tsx) into the
-// landing screenshots: public/landing/{inbox,dashboard}-{light,dark}.webp.
+// landing screenshots: public/landing/{inbox,dashboard}-light.webp.
 // Usage: npm run landing:screens
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -11,8 +11,8 @@ const root = path.resolve(import.meta.dirname, "../..");
 const outDir = path.join(root, "scripts/landing-screens/out");
 const publicDir = path.join(root, "public/landing");
 
-// The hero uses the light shots in both themes; the sign-in panel also uses the dark inbox.
-const SHOTS = { inbox: ["light", "dark"], dashboard: ["light"] };
+// Light theme only for now (the app forces it); add "dark" here when it comes back.
+const SHOTS = { inbox: ["light"], dashboard: ["light"] };
 
 const fonts =
   "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap";

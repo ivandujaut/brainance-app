@@ -13,6 +13,7 @@ La portada de la spec 008 cumplía (español, sin planes ni blog), pero se veía
   - paleta "papel" (crema, tinta y el naranja de marca), sobre los mismos tokens semánticos y con una variante oscura;
   - la tipografía original de la marca (Plus Jakarta Sans) en todo el sitio: titulares en negrita con el remate en color atenuado. Se probó una serif de titulares (Fraunces) y se descartó para respetar la identidad original;
   - textos con voz argentina ("Tu negocio responde a las 3 de la mañana. Vos dormís.").
+- **Solo tema claro, por ahora.** Se quitan los selectores de tema de la portada y de la cuenta, y la app fuerza el tema claro: una preferencia oscura guardada antes se ignora. Los tokens oscuros (`.dark`, `.dark .theme-paper`) y su test de contraste se mantienen, así que reactivarlo es quitar `forcedTheme` y volver a poner el selector.
 - **Paleta "Brasa" en el hero y el cierre.** Se compararon tres direcciones con degradé (Amanecer, Brasa y Atardecer pastel) sobre maquetas del hero, y se eligió Brasa:
   - resplandores difuminados naranja de marca, coral y ámbar detrás del hero y del bloque final; el resto de las secciones queda neutro para que se lea bien;
   - el remate del titular ("Vos dormís.", "Mañana ya responde.") va en un degradé brasa (`text-ember`);
