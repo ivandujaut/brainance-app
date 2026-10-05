@@ -33,22 +33,35 @@ test("the landing hero shows the real inbox", async ({ page }) => {
   await expect.poll(() => shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
 });
 
-// Spec 009: the problem block is a wall of everyday questions, answered at night.
-test("the question wall shows real questions answered after hours", async ({ page }) => {
+// Spec 009: the problem block shows everyday questions with the bot's answer, in parallax columns.
+test("the question wall shows real questions with the bot's answers", async ({ page }) => {
   await page.goto("/");
   const block = page.getByTestId("question-wall");
   await expect(block.getByRole("heading", { name: /quiere la respuesta ahora/ })).toBeVisible();
-  const questions = block.getByRole("list", { name: "Preguntas respondidas por el bot" }).getByRole("listitem");
-  await expect(questions.first()).toContainText("¿");
-  expect(await questions.count()).toBeGreaterThanOrEqual(12);
+  const cards = block.getByRole("list", { name: "Preguntas respondidas por el bot" }).getByRole("listitem");
+  expect(await cards.count()).toBeGreaterThanOrEqual(12);
+  await expect(cards.first()).toContainText("¿");
 });
 
-test("with reduced motion the question wall stays still", async ({ browser }) => {
+test("the question columns move in opposite directions while the page scrolls", async ({ page }) => {
+  await page.goto("/");
+  const columns = page.getByTestId("question-column");
+  await page.getByTestId("question-wall").scrollIntoViewIfNeeded();
+  await page.mouse.wheel(0, 400);
+  await expect.poll(async () => (await columns.nth(0).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42)) < 0).toBe(true);
+  expect(await columns.nth(1).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42)).toBeGreaterThan(0);
+});
+
+test("with reduced motion the question columns stay still", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce" });
   const page = await context.newPage();
   await page.goto("/");
-  const track = page.getByTestId("question-wall-track");
-  await expect(track).toHaveCSS("animation-name", "none");
+  await page.getByTestId("question-wall").scrollIntoViewIfNeeded();
+  await page.mouse.wheel(0, 400);
+  await page.waitForTimeout(300);
+  for (const column of await page.getByTestId("question-column").all()) {
+    expect(await column.evaluate((el) => getComputedStyle(el).transform)).toBe("none");
+  }
   await context.close();
 });
 
