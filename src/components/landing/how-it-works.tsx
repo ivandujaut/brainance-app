@@ -23,7 +23,7 @@ const STEPS = [
 ];
 
 export const HowItWorks = () => (
-  <section aria-labelledby="como-funciona" className="border-y bg-card/60" style={hairlineTheme}>
+  <section aria-labelledby="como-funciona" className="bg-card/60" style={hairlineTheme}>
     <div className="mx-auto max-w-6xl px-4 py-20 md:px-8">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Cómo funciona</p>
       <h2 id="como-funciona" className="mt-3 max-w-xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">

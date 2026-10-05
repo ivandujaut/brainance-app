@@ -4,23 +4,11 @@ import { Pool } from "pg";
 // Plain SQL instead of the generated Prisma client, which is ESM-only.
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-type SiteOptions = {
-  background?: string;
-  contact?: string;
-  leadCapture?: boolean;
-  leadQuestion?: string;
-  welcomeMessage?: string;
-};
+type SiteOptions = { background?: string; contact?: string; leadCapture?: boolean; leadQuestion?: string };
 
 export const createSite = async (
   name: string,
-  {
-    background = "#123456",
-    contact,
-    leadCapture = true,
-    leadQuestion,
-    welcomeMessage = "¡Hola! Soy el asistente de prueba.",
-  }: SiteOptions = {},
+  { background = "#123456", contact, leadCapture = true, leadQuestion }: SiteOptions = {},
 ) => {
   const {
     rows: [user],
@@ -36,7 +24,7 @@ export const createSite = async (
   );
   await pool.query(
     `INSERT INTO "ChatBot" ("welcomeMessage", background, contact, "leadCapture", "domainId") VALUES ($1, $2, $3, $4, $5)`,
-    [welcomeMessage, background, contact ?? null, leadCapture, domain.id],
+    ["¡Hola! Soy el asistente de prueba.", background, contact ?? null, leadCapture, domain.id],
   );
   await pool.query(`INSERT INTO "HelpDesk" (question, answer, "domainId") VALUES ($1, $2, $3)`, [
     "¿Hacen envíos?",
