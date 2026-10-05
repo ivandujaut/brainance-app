@@ -1,60 +1,54 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 
-// Hero product shot (spec 009): the real dashboard and inbox, rendered from the app's own components
-// (`npm run landing:screens`), laid out as two tilted planes. The light
-// screens are used in both themes: on the dark page they are what catches the eye.
+// Hero product shot (spec 009), after Aceternity's product hero: the real dashboard and inbox
+// (`npm run landing:screens`) as two screens at the same isometric-like tilt, the front one shifted
+// up and to the right, each fading out toward its right and bottom edges. The light screens are used
+// in both themes: on the dark page they are what catches the eye.
 
-const shot = { width: 2400, height: 1500, sizes: "(min-width: 1280px) 1000px, 80vw" };
+const shot = { width: 2400, height: 1500, sizes: "(min-width: 1280px) 1216px, 100vw" };
 const alt =
   "La bandeja de BrAInance: la lista de conversaciones de una panadería y, abierta, una charla donde el bot respondió y después la dueña tomó el control.";
 
-const plane =
-  "absolute overflow-hidden rounded-xl border border-black/10 bg-white shadow-[0_50px_100px_-30px_rgb(0_0_0/0.45)]";
-
-// Each plane carries the whole tilt, pivoting on the stage's center (600×360), instead of sharing
-// a preserve-3d context: browsers then still apply the mask below, which they skip over 3D layers.
-const tilt = ({ left, top, width, depth }: { left: number; top: number; width: number; depth: number }) => ({
-  left,
-  top,
-  width,
-  transformOrigin: `${600 - left}px ${360 - top}px`,
-  transform: `perspective(2400px) rotateX(34deg) rotateY(6deg) rotateZ(-18deg) translateZ(${depth}px)`,
-});
-
-// A soft diagonal highlight, as if light fell on the screens from the top left.
-const Sheen = () => (
-  <span
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgb(255_255_255/0.5)_0%,transparent_35%,transparent_60%,rgb(0_0_0/0.12)_100%)]"
-  />
-);
-
-// The edges dissolve into the page: an ellipse around the planes, intersected with fades at the top and bottom.
-const fade = {
-  maskImage:
-    "linear-gradient(to bottom, transparent, black 18%, black 70%, transparent), radial-gradient(ellipse 55% 80% at 50% 55%, black 40%, transparent 85%)",
-  maskComposite: "intersect",
-  WebkitMaskComposite: "source-in",
+// `shift` runs before the tilt, like Tailwind 4's `translate` utilities beside an inline transform.
+const screen = ({ fadeFrom, shift = "" }: { fadeFrom: number; shift?: string }): CSSProperties => {
+  const mask = `linear-gradient(to right, black ${fadeFrom}%, transparent), linear-gradient(to bottom, black ${fadeFrom}%, transparent)`;
+  return {
+    transform: `${shift} rotateY(20deg) rotateX(40deg) rotateZ(-20deg)`.trim(),
+    maskImage: mask,
+    WebkitMaskImage: mask,
+    maskComposite: "intersect",
+    WebkitMaskComposite: "source-in",
+  };
 };
+
+const image = "absolute inset-0 h-auto w-full rounded-lg shadow-xl";
 
 export const ProductShot = () => (
   <div
-    className="relative h-[300px] overflow-hidden sm:h-[460px] lg:h-[620px]"
-    style={fade}
+    className="relative min-h-72 w-full overflow-y-clip pt-16 [perspective:1200px] sm:min-h-80 sm:pt-28 md:min-h-[25rem] md:pt-36 lg:min-h-[50rem] lg:pt-52"
     data-testid="product-shot"
   >
-    {/* A fixed-size stage, scaled down on small screens, so the tilt looks the same everywhere. */}
-    <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] origin-top -translate-x-1/2 scale-[0.42] sm:scale-[0.66] lg:scale-[0.86] xl:scale-100">
-      <div className="relative h-full w-full animate-hero-rise motion-reduce:animate-none">
-        <div className={plane} style={tilt({ left: 420, top: -150, width: 900, depth: -120 })}>
-          <Image src="/landing/dashboard-light.webp" alt="" {...shot} className="h-auto w-full" />
-          <Sheen />
-        </div>
-        <div className={plane} style={tilt({ left: -40, top: 150, width: 1000, depth: 0 })}>
-          <Image src="/landing/inbox-light.webp" alt={alt} {...shot} priority className="h-auto w-full" />
-          <Sheen />
-        </div>
+    <div className="animate-hero-rise [perspective:4000px] motion-reduce:animate-none">
+      <Image src="/landing/dashboard-light.webp" alt="" {...shot} className={image} style={screen({ fadeFrom: 20 })} />
+    </div>
+    <div className="translate-x-20 -translate-y-10 md:-translate-y-20 lg:-translate-y-40">
+      {/* `perspective` reaches direct children only, so it sits on the image's parent. */}
+      <div className="animate-hero-rise [animation-delay:150ms] [perspective:4000px] motion-reduce:animate-none">
+        <Image
+          src="/landing/inbox-light.webp"
+          alt={alt}
+          {...shot}
+          priority
+          className={image}
+          style={screen({ fadeFrom: 50, shift: "translateX(-2.5rem)" })}
+        />
       </div>
     </div>
+    {/* The screens run past the section; they fade out across the whole viewport before the next one. */}
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute bottom-0 left-1/2 h-1/3 w-screen -translate-x-1/2 bg-gradient-to-b from-transparent to-background"
+    />
   </div>
 );

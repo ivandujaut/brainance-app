@@ -14,7 +14,7 @@ const BUSINESSES = ["panaderías", "talleres", "inmobiliarias", "consultorios", 
 // Public landing (spec 009): warm editorial look, the real inbox as the hero, Hairline figures.
 export default function Home() {
   return (
-    <div className="theme-paper min-h-screen flex flex-col bg-background text-foreground">
+    <div className="theme-paper min-h-screen flex flex-col overflow-x-clip bg-background text-foreground">
       <Navbar />
       <main className="flex-1">
         <section className="mx-auto flex max-w-7xl flex-col gap-10 px-4 pt-16 md:px-8 lg:pt-24">

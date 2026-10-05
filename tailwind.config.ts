@@ -83,8 +83,8 @@ const config = {
           to: { opacity: "1" },
         },
         "hero-rise": {
-          from: { opacity: "0", transform: "translateY(40px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+          from: { opacity: "0", translate: "0 40px" },
+          to: { opacity: "1", translate: "0 0" },
         },
       },
       animation: {
