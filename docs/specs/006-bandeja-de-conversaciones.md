@@ -24,7 +24,7 @@ Las conversaciones del widget se guardan, pero el dueño no puede verlas: el ít
 
 ### Necesita atención
 
-5. **Dado** una respuesta del bot que deriva al contacto del negocio (incluye el contacto configurado) o la respuesta fija del tope diario, **entonces** la conversación queda marcada como **Necesita atención**.
+5. **Dado** una respuesta del bot que deriva al contacto del negocio (repite alguno de sus datos: teléfono, email, link o usuario, aunque cambie el resto del texto) o la respuesta fija del tope diario, **entonces** la conversación queda marcada como **Necesita atención**.
 6. **Dado** un mensaje del visitante que pide hablar con una persona ("quiero hablar con alguien", "¿me atiende un humano?", "pasame con un asesor", y variantes), **entonces** la conversación queda marcada como **Necesita atención**.
 7. **Dado** una conversación marcada, **cuando** el dueño toma el control o responde, **entonces** la marca se quita.
 
@@ -66,7 +66,7 @@ Las conversaciones del widget se guardan, pero el dueño no puede verlas: el ít
 - Índices: `ChatRoom(lastMessageAt)` y `ChatMessage(chatRoomId, seen)`.
 
 **Dominio (`src/domain/`)**
-- `attention.ts`: `detectAttention({ visitorText, reply, contact })` devuelve un motivo o null. Busca el contacto configurado en la respuesta y usa expresiones para pedidos de persona en español rioplatense y neutro, normalizando tildes y mayúsculas.
+- `attention.ts`: `detectAttention({ visitorText, reply, contact })` devuelve un motivo o null. Busca en la respuesta los datos del contacto configurado y usa expresiones para pedidos de persona en español rioplatense y neutro, normalizando tildes y mayúsculas.
 - `takeover.ts`:
   - `shouldBotAnswer({ live, liveSince, lastOwnerMessageAt, now })` decide si el bot responde o si corresponde devolverle el control automáticamente (30 minutos, criterio 12);
   - `toModelHistory(messages)` aplica el mapeo de roles.
@@ -92,7 +92,12 @@ Las conversaciones del widget se guardan, pero el dueño no puede verlas: el ít
 
 ## Riesgos y preguntas abiertas
 
-- **Falsos positivos o negativos de "Necesita atención":** la regla depende de que la respuesta incluya el contacto, como pide el prompt. Se mide en la beta y, si no alcanza, se reemplaza por un clasificador (el ADR 0001 ya contempla uno).
+- **Falsos positivos o negativos de "Necesita atención":** la regla depende de que la respuesta repita el contacto, como pide el prompt. Se mide en la beta y, si no alcanza, se reemplaza por un clasificador (el ADR 0001 ya contempla uno).
+  - *QA en la preview (2026-10-06):* el modelo reformula el contacto ("WhatsApp +54 9 11 5555-0000 (prueba)" volvió sin la nota), así que buscar el texto completo no detectaba derivaciones reales. Desde entonces se buscan sus datos:
+    - **teléfonos:** comparando solo los dígitos, con 8 o más, y aceptando que falten el código de país o de área;
+    - **emails, links y usuarios:** comparados tal cual.
+  - Si el contacto no tiene ninguno de esos datos, por ejemplo una dirección, se sigue buscando el texto completo.
+  - **Falso positivo aceptado:** una respuesta que contesta y además ofrece el contacto ("para pedir, escribinos al…") también se marca. Una falsa alarma en la bandeja cuesta menos que un cliente perdido.
 - **Polling y cuota de Neon:** ver las consecuencias del ADR 0007. El push activado lo reduce.
 - **El visitante cierra el chat mientras lo atiende una persona:** el mensaje del dueño queda guardado y lo ve al volver a abrir el chat. Notificarlo fuera del sitio queda fuera de alcance.
 

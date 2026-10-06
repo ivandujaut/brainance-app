@@ -15,12 +15,12 @@
 
 ## 1. Base de datos (Neon, ADR 0002)
 
-- [ ] Crear el proyecto `brainance` en Neon: AWS São Paulo (`aws-sa-east-1`), Postgres 16 (el mismo que CI), base `brainance`. Branches: `production` y `development` (para las previews, sin vencimiento).
-- [ ] Cada branch tiene dos cadenas de conexión (*Connect*): la **pooled**, con `-pooler` en el host (`DATABASE_URL` en Vercel), y la **directa** (`DIRECT_URL`, para migrar).
-- [ ] *GitHub → Settings → Secrets and variables → Actions:* cargar las cadenas **directas**:
+- [x] Crear el proyecto `brainance` en Neon: AWS São Paulo (`aws-sa-east-1`), Postgres 16 (el mismo que CI), base `brainance`. Branches: `production` y `development` (para las previews, sin vencimiento).
+- [x] Cada branch tiene dos cadenas de conexión (*Connect*): la **pooled**, con `-pooler` en el host (`DATABASE_URL` en Vercel), y la **directa** (`DIRECT_URL`, para migrar).
+- [x] *GitHub → Settings → Secrets and variables → Actions:* cargar las cadenas **directas**:
   - `NEON_DIRECT_URL`: branch `production`.
   - `NEON_DEV_DIRECT_URL`: branch `development`.
-- [ ] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
+- [ ] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` (hecho el 2026-10-06) y después con `production`. El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
   - Alternativa desde tu máquina: `DIRECT_URL="<directa>" npx prisma migrate deploy`.
   - Si la base se creó antes con `db push`, primero: `npx prisma migrate resolve --applied 20261001000000_init`.
   - La migración `20261007120000_remove_legacy` se frena sola si `Bookings`, `Campaign` o `Product` tienen filas. En ese caso, exportalas y vaciá las tablas antes.
@@ -36,10 +36,10 @@
 
 ## 3. GitHub (CI)
 
-- [ ] *Repo → Settings → Secrets and variables → Actions → New repository secret:*
+- [x] *Repo → Settings → Secrets and variables → Actions → New repository secret:*
   - `E2E_CLERK_PUBLISHABLE_KEY` y `E2E_CLERK_SECRET_KEY`, de la instancia de **desarrollo** de Clerk (no la de producción). Los tests crean y borran usuarios `+clerk_test`.
-- [ ] *Actions → CI → Run workflow* sobre `develop` (o avisame y lo relanzo).
-- [ ] *Verificar:* el job E2E ya no saltea las suites de registro, onboarding, configuración, leads, bandeja y dashboard, y pasan.
+- [x] *Actions → CI → Run workflow* sobre `develop` (o avisame y lo relanzo).
+- [x] *Verificar:* el job E2E ya no saltea las suites de registro, onboarding, configuración, leads, bandeja y dashboard, y pasan.
 
 ## 4. Email (Resend, ADR 0006)
 
@@ -53,19 +53,40 @@
 - [ ] Opcional, para ver los errores con el código fuente: *Settings → Auth Tokens →* crear un token con permiso de releases.
 - [ ] *Alerts →* una regla de "nuevo issue" que mande email.
 
-## 6. Variables en Vercel
+## 6. Vercel: proyecto, IA y variables
 
-*Project → Settings → Environment Variables.* **P** = Production, **V** = Preview.
+### Proyecto
+
+- [x] Proyecto `brainance-app`, importado de GitHub con el preset de Next.js.
+- [x] *Settings → Environments → Production → Branch Tracking:* `main`.
+  - `main` es producción y todo lo demás, `develop` incluida, sale como preview (`docs/workflow.md`).
+  - Para una preview de `develop` sin push: *Deployments → … → Create Deployment →* `develop`.
+- [x] *Settings → Functions → Function Region:* São Paulo (`gru1`), la misma región que Neon. El plan Hobby admite una sola.
+
+### IA (Vercel AI Gateway, ADR 0001)
+
+- [x] *Settings → Security → OIDC Federation:* modo "Team".
+  - Cada deploy recibe un `VERCEL_OIDC_TOKEN` temporal que AI Gateway acepta solo.
+  - Por eso **no se carga `AI_GATEWAY_API_KEY` en Vercel**: la key queda solo para el eval local (paso 8).
+- [x] *AI Gateway → Credits:* crédito pago cargado. Haiku 4.5 no entra en el crédito gratuito mensual. Es una compra única, sin recarga automática, y vence al año.
+- [x] *AI Gateway → Budgets & Spend → Spend Limit:* 20 USD por mes, con emails al 50 % y al 100 %.
+  - El email al 50 % funciona como aviso; AI Gateway no ofrece alertas sin corte.
+  - Además, cada sitio tiene su propio tope diario (`AI_SITE_DAILY_COST_USD`, ADR 0008).
+
+### Variables
+
+*Project → Settings → Environment Variables.* **P** = Production, **V** = Preview. Las que empiezan con `NEXT_PUBLIC_` llegan al navegador y van como *Config*; las claves y contraseñas, como *Secret*. Para elegir el entorno: *Environments → Environments* (no "Preview Branches", que es para ramas puntuales).
 
 | Variable | P | V | Valor |
 |---|---|---|---|
-| `DATABASE_URL`, `DIRECT_URL` | ✓ | ✓ | Neon (para Preview, idealmente una branch de Neon aparte) |
+| `DATABASE_URL`, `DIRECT_URL` | ✓ | ✓ | Neon: branch `production` en P y `development` en V; `DATABASE_URL` con pooling (`-pooler`), `DIRECT_URL` sin pooling |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | ✓ | ✓ | Clerk: producción en P y desarrollo en V |
 | `NEXT_PUBLIC_CLERK_SIGN_IN_URL`, `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | ✓ | ✓ | `/auth/sign-in`, `/auth/sign-up` |
 | `NEXT_PUBLIC_APP_URL` | ✓ |   | URL pública de producción (en Preview se usa la propia) |
 | `NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY` | ✓ | ✓ | Uploadcare (la clave nueva del paso 0) |
-| `AI_GATEWAY_API_KEY` | ✓ | ✓ | Vercel AI Gateway |
+| `AI_GATEWAY_API_KEY` |   |   | No hace falta en Vercel (OIDC). Solo en `.env.local` para el eval |
 | `RESEND_API_KEY`, `EMAIL_FROM` | ✓ | ✓ | Resend; `EMAIL_FROM` del dominio verificado |
+| `EMAIL_PROVIDER` |   | ✓ | `log` en V hasta conectar Resend (los emails van al log del deploy) |
 | `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` | ✓ | ✓ | El mismo DSN en las dos |
 | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | ✓ |   | Opcional (source maps) |
 | `ADMIN_CLERK_IDS` | ✓ | ✓ | Tu `user_…` |
@@ -76,17 +97,29 @@
 
 No cargar nunca `AI_ALLOW_MOCK_MODEL` ni `WIDGET_ALLOW_HTTP` en P.
 
+Estado al 2026-10-06: cargadas en V las de Neon, Clerk (desarrollo) y `EMAIL_PROVIDER`. P sigue sin variables hasta tener dominio, Clerk de producción y Resend.
+
 - [ ] *Verificar:* *Deployments →* un redeploy termina sin errores.
 
 ## 7. QA en la preview (criterios 3 y 4)
 
 Usar una preview con las variables de V y un **sitio de prueba real con HTTPS** (por ejemplo, una página estática en Vercel o Netlify en un dominio propio).
 
+**Probar el bot sin dominio:**
+- La vista previa del chat en la configuración del sitio es solo visual.
+- El chat real se abre directo en `<URL de la preview>/widget/<id del sitio>`. El id es el final de `/settings/<id>`.
+- La restricción de dominio solo aplica cuando el chat se embebe en otra página.
+- Así no se marca "Instalado", y el dashboard no muestra métricas hasta completar el checklist.
+
+**Cuenta de prueba sin email real:** registrarse con `<algo>+clerk_test@example.com`. La instancia de desarrollo de Clerk acepta siempre el código `424242`.
+
 - [ ] Registro con email; aparece el aviso de términos con enlaces. Registro con Google.
 - [ ] Onboarding: agregar el sitio del dominio de prueba; el dominio inválido se rechaza en español.
 - [ ] Configuración: negocio (descripción, trato, contacto), color, ícono (sube a Uploadcare), bienvenida y tres preguntas frecuentes; la vista previa cambia antes de guardar.
 - [ ] Pegar el snippet en el sitio de prueba: aparece el chat y el onboarding marca "Instalado".
 - [ ] Conversar: el bot responde con el modelo real usando las FAQ y deriva al contacto ante algo desconocido; la conversación queda "Necesita atención".
+  - 2026-10-06: el bot respondió bien, en unos 2 s, y derivó al WhatsApp. La conversación **no** quedó marcada porque el modelo reformuló el contacto.
+  - Corregido en la detección (spec 006). Falta repetir la prueba con ese arreglo.
 - [ ] Dejar un lead: llega el email al dueño (Resend) y responderlo le escribe al email del lead. El enlace "Más información" abre `/privacidad`.
 - [ ] Bandeja: tomar el control, responder; el visitante ve el aviso y el mensaje sin recargar. Devolver al bot.
 - [ ] Leads: exportar CSV (se abre bien en Excel o Sheets) y borrar el lead.
@@ -99,7 +132,7 @@ Abrir un issue por cada falla y enlazarlo acá.
 
 ## 8. Eval de respuestas (ADR 0001)
 
-- [ ] Con `AI_GATEWAY_API_KEY` en `.env.local`: `npm run eval:rag -- --variant beta --model anthropic/claude-haiku-4.5` (ver `evals/rag-answers/README.md`). Incluye el caso con historial del dueño (`cd-takeover-01`).
+- [ ] Crear una key aparte para el eval (*AI Gateway → API Keys*, por ejemplo `brainance-eval`) y ponerla como `AI_GATEWAY_API_KEY` en `.env.local`: `npm run eval:rag -- --variant beta --model anthropic/claude-haiku-4.5` (ver `evals/rag-answers/README.md`). Incluye el caso con historial del dueño (`cd-takeover-01`).
 - [ ] *Verificar:* el resumen cumple los umbrales del ADR 0001. Guardar el resultado en `evals/rag-answers/results/`.
 
 ## 9. Legal (bloquea la apertura)
