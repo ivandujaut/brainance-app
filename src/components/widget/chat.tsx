@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent } from "react";
 import { MAX_MESSAGE_LENGTH } from "@/domain/widget-limits";
 import { useLiveUpdates, type RealtimeClientConfig } from "@/hooks/use-live-updates";
+import { uploadcareUrl } from "@/lib/uploadcare";
 import { cn } from "@/lib/utils";
 import { LeadCard, type LeadQuestion } from "./lead-card";
 
@@ -280,7 +281,7 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
     >
       <header className="flex items-center gap-3 px-4 py-3" style={accent}>
         {config.icon ? (
-          <Image src={`https://ucarecdn.com/${config.icon}/`} alt="" width={32} height={32} className="rounded-full" />
+          <Image src={uploadcareUrl(config.icon)} alt="" width={32} height={32} className="rounded-full" />
         ) : (
           <span className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center font-bold uppercase">
             {config.name[0]}

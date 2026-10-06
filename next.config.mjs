@@ -8,7 +8,12 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'ucarecdn.com',
-            }
+            },
+            // New Uploadcare projects serve from their own subdomain (NEXT_PUBLIC_UPLOAD_CARE_CDN_URL).
+            {
+                protocol: 'https',
+                hostname: '*.ucarecd.net',
+            },
         ]
     }
 };
