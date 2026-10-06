@@ -1,6 +1,6 @@
-import { clerk, setupClerkTestingToken } from "@clerk/testing/playwright";
+import { setupClerkTestingToken } from "@clerk/testing/playwright";
 import { expect, test } from "@playwright/test";
-import { createTestUser, deleteTestUsers, TEST_PASSWORD, testEmail, VERIFICATION_CODE } from "./support/users";
+import { createTestUser, deleteTestUsers, signInAs, TEST_PASSWORD, testEmail, VERIFICATION_CODE } from "./support/users";
 
 test.skip(!process.env.CLERK_SECRET_KEY, "Needs Clerk test keys (E2E_CLERK_* secrets in CI)");
 
@@ -22,7 +22,11 @@ test("signs up with email and a verification code, in Spanish, and lands on the 
   await page.getByRole("button", { name: "Continuar", exact: true }).click();
 
   await expect(page).toHaveURL(/verify-email-address/);
-  await page.keyboard.type(VERIFICATION_CODE);
+  // Typing before the code field is ready loses digits (flaky in CI): wait for it and focus it.
+  const code = page.locator('input[autocomplete="one-time-code"]').first();
+  await expect(code).toBeAttached();
+  await code.focus();
+  await page.keyboard.type(VERIFICATION_CODE, { delay: 100 });
 
   await expect(page).toHaveURL(/\/dashboard$/);
   // First visit provisions the database user: the onboarding checklist renders instead of an error.
@@ -46,8 +50,7 @@ test("signs in with email and password and lands on the dashboard", async ({ pag
 test("redirects signed-in users away from the auth pages", async ({ page }) => {
   const email = await createTestUser("redirect");
   created.push(email);
-  await page.goto("/");
-  await clerk.signIn({ page, emailAddress: email });
+  await signInAs(page, email);
 
   for (const path of ["/auth/sign-in", "/auth/sign-up"]) {
     await page.goto(path);

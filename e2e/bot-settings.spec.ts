@@ -1,6 +1,5 @@
-import { clerk } from "@clerk/testing/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { createTestUser, deleteTestUsers } from "./support/users";
+import { createTestUser, deleteTestUsers, signInAs } from "./support/users";
 
 test.skip(!process.env.CLERK_SECRET_KEY, "Needs Clerk test keys (E2E_CLERK_* secrets in CI)");
 
@@ -11,8 +10,7 @@ test.afterAll(() => deleteTestUsers(created));
 const signUpWithSite = async (page: Page) => {
   const email = await createTestUser("bot-settings");
   created.push(email);
-  await page.goto("/");
-  await clerk.signIn({ page, emailAddress: email });
+  await signInAs(page, email);
   await page.goto("/dashboard");
   const domain = `e2e-${Date.now()}.com.ar`;
   const addSite = page.getByTestId("onboarding-checklist").getByTestId("step-add-site");

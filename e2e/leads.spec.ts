@@ -1,8 +1,7 @@
-import { clerk } from "@clerk/testing/playwright";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { seedLead, siteIdByName } from "./support/db";
-import { createTestUser, deleteTestUsers } from "./support/users";
+import { createTestUser, deleteTestUsers, signInAs } from "./support/users";
 
 test.skip(!process.env.CLERK_SECRET_KEY, "Needs Clerk test keys (E2E_CLERK_* secrets in CI)");
 
@@ -13,8 +12,7 @@ test.afterAll(() => deleteTestUsers(created));
 test("the owner lists, exports and deletes leads", async ({ page }) => {
   const email = await createTestUser("leads");
   created.push(email);
-  await page.goto("/");
-  await clerk.signIn({ page, emailAddress: email });
+  await signInAs(page, email);
   await page.goto("/dashboard");
   const domain = `e2e-leads-${Date.now()}.com.ar`;
   const addSite = page.getByTestId("onboarding-checklist").getByTestId("step-add-site");
