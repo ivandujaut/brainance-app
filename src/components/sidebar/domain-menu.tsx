@@ -45,6 +45,9 @@ const DomainMenu = ({ domains, min }: Props) => {
             <Link
               href={siteSettingsPath(domain.id)}
               key={domain.id}
+              // Minimized, only the initial or the icon shows: the domain names the link.
+              aria-label={min ? domain.name : undefined}
+              title={min ? domain.name : undefined}
               className={cn(
                 "flex gap-3 items-center justify-center hover:bg-background hover:text-foreground rounded-full transition duration-100 ease-in-out cursor-pointer ",
                 !min ? "p-2" : "py-2",

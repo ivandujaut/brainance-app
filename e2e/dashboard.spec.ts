@@ -1,7 +1,6 @@
-import { clerk } from "@clerk/testing/playwright";
 import { expect, test } from "@playwright/test";
 import { completeOnboarding, seedConversation, seedLead, siteIdByName } from "./support/db";
-import { createTestUser, deleteTestUsers } from "./support/users";
+import { createTestUser, deleteTestUsers, signInAs } from "./support/users";
 
 test.skip(!process.env.CLERK_SECRET_KEY, "Needs Clerk test keys (E2E_CLERK_* secrets in CI)");
 
@@ -12,8 +11,7 @@ test.afterAll(() => deleteTestUsers(created));
 test("the dashboard shows conversations and leads", async ({ page }) => {
   const email = await createTestUser("dashboard");
   created.push(email);
-  await page.goto("/");
-  await clerk.signIn({ page, emailAddress: email });
+  await signInAs(page, email);
   await page.goto("/dashboard");
   const domain = `e2e-dash-${Date.now()}.com.ar`;
   const checklist = page.getByTestId("onboarding-checklist");

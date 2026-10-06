@@ -29,8 +29,11 @@ const MenuItem = ({ size, icon, label, path, current, onSignOut }: Props) => {
         </Link>
       );
     case "min":
+      // Icon only: the label names the link for screen readers and shows as a tooltip.
       return (
         <Link
+          aria-label={label}
+          title={label}
           onClick={onSignOut}
           className={cn(
             "flex items-center gap-2 px-1 py-2 rounded-md my-1",
