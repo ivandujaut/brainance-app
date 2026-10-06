@@ -1,0 +1,63 @@
+name: Migrar base
+
+# Applies the Prisma migrations to a Neon branch, launched by hand from Actions → Migrar base →
+# Run workflow (docs/lanzamiento.md, step 1). The connection strings live only in repository
+# secrets: GitHub masks them, and the host is masked too because Prisma prints it.
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch de Neon
+        type: choice
+        options: [development, production]
+        default: development
+
+# One migration per Neon branch at a time; never cancel one halfway.
+concurrency:
+  group: migrate-${{ inputs.branch }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    name: Migrar ${{ inputs.branch }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      # Migrations need the direct (non-pooled) connection, read by prisma.config.ts.
+      DIRECT_URL: ${{ inputs.branch == 'production' && secrets.NEON_DIRECT_URL || secrets.NEON_DEV_DIRECT_URL }}
+      SECRET_NAME: ${{ inputs.branch == 'production' && 'NEON_DIRECT_URL' || 'NEON_DEV_DIRECT_URL' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Check the connection string
+        run: |
+          if [ -z "$DIRECT_URL" ]; then
+            echo "::error::Falta el secret $SECRET_NAME (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          host=$(node -e 'console.log(new URL(process.env.DIRECT_URL).hostname)') || {
+            echo "::error::El secret $SECRET_NAME no es una URL de Postgres válida."
+            exit 1
+          }
+          echo "::add-mask::$host"
+          case "$host" in
+            *-pooler*)
+              echo "::error::$SECRET_NAME usa el pooler. Las migraciones necesitan la cadena directa (sin -pooler)."
+              exit 1
+              ;;
+          esac
+      - name: Pending migrations
+        # Exits non-zero while migrations are pending: that is the expected state here.
+        run: npx prisma migrate status || true
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+      - name: Check the schema is up to date
+        run: npx prisma migrate status
