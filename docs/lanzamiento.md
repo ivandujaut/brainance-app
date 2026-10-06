@@ -15,12 +15,16 @@
 
 ## 1. Base de datos (Neon, ADR 0002)
 
-- [ ] Crear el proyecto en Neon, en la región más cercana a Argentina que ofrezca.
-- [ ] Copiar las dos cadenas de conexión: la **pooled** (`DATABASE_URL`) y la **directa** (`DIRECT_URL`).
-- [ ] Aplicar las migraciones desde tu máquina: `DATABASE_URL="<directa>" npx prisma migrate deploy`.
+- [ ] Crear el proyecto `brainance` en Neon: AWS São Paulo (`aws-sa-east-1`), Postgres 16 (el mismo que CI), base `brainance`. Branches: `production` y `development` (para las previews, sin vencimiento).
+- [ ] Cada branch tiene dos cadenas de conexión (*Connect*): la **pooled**, con `-pooler` en el host (`DATABASE_URL` en Vercel), y la **directa** (`DIRECT_URL`, para migrar).
+- [ ] *GitHub → Settings → Secrets and variables → Actions:* cargar las cadenas **directas**:
+  - `NEON_DIRECT_URL`: branch `production`.
+  - `NEON_DEV_DIRECT_URL`: branch `development`.
+- [ ] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
+  - Alternativa desde tu máquina: `DIRECT_URL="<directa>" npx prisma migrate deploy`.
   - Si la base se creó antes con `db push`, primero: `npx prisma migrate resolve --applied 20261001000000_init`.
   - La migración `20261007120000_remove_legacy` se frena sola si `Bookings`, `Campaign` o `Product` tienen filas. En ese caso, exportalas y vaciá las tablas antes.
-- [ ] *Verificar:* `npx prisma migrate status` dice "Database schema is up to date".
+- [ ] *Verificar:* el último paso del workflow ("Check the schema is up to date") dice "Database schema is up to date!".
 
 ## 2. Clerk (cuentas)
 
