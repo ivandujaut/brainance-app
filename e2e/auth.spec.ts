@@ -1,6 +1,6 @@
-import { clerk, setupClerkTestingToken } from "@clerk/testing/playwright";
+import { setupClerkTestingToken } from "@clerk/testing/playwright";
 import { expect, test } from "@playwright/test";
-import { createTestUser, deleteTestUsers, TEST_PASSWORD, testEmail, VERIFICATION_CODE } from "./support/users";
+import { createTestUser, deleteTestUsers, signInAs, TEST_PASSWORD, testEmail, VERIFICATION_CODE } from "./support/users";
 
 test.skip(!process.env.CLERK_SECRET_KEY, "Needs Clerk test keys (E2E_CLERK_* secrets in CI)");
 
@@ -46,8 +46,7 @@ test("signs in with email and password and lands on the dashboard", async ({ pag
 test("redirects signed-in users away from the auth pages", async ({ page }) => {
   const email = await createTestUser("redirect");
   created.push(email);
-  await page.goto("/");
-  await clerk.signIn({ page, emailAddress: email });
+  await signInAs(page, email);
 
   for (const path of ["/auth/sign-in", "/auth/sign-up"]) {
     await page.goto(path);
