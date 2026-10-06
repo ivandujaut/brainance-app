@@ -22,7 +22,11 @@ test("signs up with email and a verification code, in Spanish, and lands on the 
   await page.getByRole("button", { name: "Continuar", exact: true }).click();
 
   await expect(page).toHaveURL(/verify-email-address/);
-  await page.keyboard.type(VERIFICATION_CODE);
+  // Typing before the code field is ready loses digits (flaky in CI): wait for it and focus it.
+  const code = page.locator('input[autocomplete="one-time-code"]').first();
+  await expect(code).toBeAttached();
+  await code.focus();
+  await page.keyboard.type(VERIFICATION_CODE, { delay: 100 });
 
   await expect(page).toHaveURL(/\/dashboard$/);
   // First visit provisions the database user: the onboarding checklist renders instead of an error.
