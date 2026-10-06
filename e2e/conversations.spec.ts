@@ -26,7 +26,7 @@ test("the owner opens a conversation, takes over, replies and hands it back", as
   await expect(item).toContainText("Necesita atención");
   await expect(item.getByTestId("inbox-unread")).toHaveText("1");
 
-  await page.getByRole("link", { name: "Necesita atención" }).click();
+  await page.getByRole("link", { name: "Necesita atención", exact: true }).click();
   await expect(item).toHaveCount(1);
   await item.click();
   const pane = page.getByTestId("conversation-pane");
