@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { siteSettingsPath } from "@/lib/routes";
+import { uploadcareUrl } from "@/lib/uploadcare";
 
 type Props = {
   min?: boolean;
@@ -55,7 +56,7 @@ const DomainMenu = ({ domains, min }: Props) => {
               )}
             >
               {domain.icon ? (
-                <Image src={`https://ucarecdn.com/${domain.icon}/`} alt="logo" width={20} height={20} />
+                <Image src={uploadcareUrl(domain.icon)} alt="logo" width={20} height={20} />
               ) : (
                 <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center uppercase">
                   {domain.name[0]}

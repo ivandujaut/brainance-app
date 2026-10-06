@@ -9,6 +9,7 @@
 - [ ] **Rotar las credenciales que quedaron en el historial de git** (el `.env` original se commiteó en el repo heredado):
   - Clerk: *Dashboard → API Keys →* regenerar la secret key de la instancia vieja (o borrar esa instancia).
   - Uploadcare: *Dashboard → API keys →* crear un par nuevo y revocar el viejo.
+    - 2026-10-06: la cuenta actual se abrió ese día y no tiene el proyecto viejo. Las claves publicadas son de **otra cuenta**: hay que entrar a esa y borrar el proyecto.
   - Base de datos vieja: cambiar la contraseña o borrar esa base.
   - *Verificar:* las claves viejas dejan de funcionar.
 - [ ] **Tag del código heredado.** El tag `legado-corinna` existe en el entorno de desarrollo, pero el push no pasó por el proxy. Crearlo desde tu máquina: `git fetch origin && git tag legado-corinna a423390 && git push origin legado-corinna` (a423390 es `develop` antes de la limpieza). *Verificar:* aparece en *GitHub → Tags*.
@@ -83,7 +84,8 @@
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | ✓ | ✓ | Clerk: producción en P y desarrollo en V |
 | `NEXT_PUBLIC_CLERK_SIGN_IN_URL`, `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | ✓ | ✓ | `/auth/sign-in`, `/auth/sign-up` |
 | `NEXT_PUBLIC_APP_URL` | ✓ |   | URL pública de producción (en Preview se usa la propia) |
-| `NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY` | ✓ | ✓ | Uploadcare (la clave nueva del paso 0) |
+| `NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY` | ✓ | ✓ | Uploadcare, proyecto `brainance` → API keys → Public key (*Config*: no es secreta) |
+| `NEXT_PUBLIC_UPLOAD_CARE_CDN_URL` | ✓ | ✓ | Uploadcare → Delivery: el dominio propio del proyecto (`https://4gj75fw3od.ucarecd.net`) |
 | `AI_GATEWAY_API_KEY` |   |   | No hace falta en Vercel (OIDC). Solo en `.env.local` para el eval |
 | `RESEND_API_KEY`, `EMAIL_FROM` | ✓ | ✓ | Resend; `EMAIL_FROM` del dominio verificado |
 | `EMAIL_PROVIDER` |   | ✓ | `log` en V hasta conectar Resend (los emails van al log del deploy) |
@@ -97,7 +99,14 @@
 
 No cargar nunca `AI_ALLOW_MOCK_MODEL` ni `WIDGET_ALLOW_HTTP` en P.
 
-Estado al 2026-10-06: cargadas en V las de Neon, Clerk (desarrollo) y `EMAIL_PROVIDER`. P sigue sin variables hasta tener dominio, Clerk de producción y Resend.
+**Uploadcare:**
+- Proyecto `brainance`:
+  - guardado automático activado;
+  - subidas sin firma;
+  - solo imágenes, hasta 2 MB.
+- La cuenta está en una **prueba Pro hasta el 20/10**. Antes de esa fecha hay que revisar qué pasa sin tarjeta: si se agrega una, cobra Pro automáticamente.
+
+Estado al 2026-10-06: cargadas en V las de Neon, Clerk (desarrollo), Uploadcare y `EMAIL_PROVIDER`. P sigue sin variables hasta tener dominio, Clerk de producción y Resend.
 
 - [ ] *Verificar:* *Deployments →* un redeploy termina sin errores.
 
