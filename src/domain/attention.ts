@@ -25,7 +25,48 @@ export const asksForHuman = (text: string) => {
   return HUMAN_REQUESTS.some((pattern) => pattern.test(normalized));
 };
 
-/** Why this exchange needs the owner, or null. A reply quoting the business contact is a derivation. */
+// The model rewords the contact ("WhatsApp +54 9 11 5555-0000 (prueba)" comes back without the note),
+// so a derivation is a reply that repeats one of its details: a phone, an email, a link or a handle.
+const MIN_PHONE_DIGITS = 8;
+const PHONE = /\+?\(?\d[\d\s().-]*\d/g;
+const EMAIL = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/g;
+const HANDLE = /(?<![\w.])@[a-z0-9_.]*[a-z0-9_]/g;
+const LINK = /(?:https?:\/\/)?(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}(?:\/[^\s,;)]*)?/g;
+
+const phones = (text: string) =>
+  (text.match(PHONE) ?? [])
+    .map((match) => match.replace(/\D/g, ""))
+    .filter((digits) => digits.length >= MIN_PHONE_DIGITS);
+
+const links = (text: string) =>
+  (text.match(LINK) ?? []).map((match) =>
+    match
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .replace(/[.,;:!?]+$/, ""),
+  );
+
+/** The contact's details, normalized: phone digits, and emails, handles and links as written. */
+const contactDetails = (contact: string) => ({
+  phones: phones(contact),
+  words: [...(contact.match(EMAIL) ?? []), ...(contact.match(HANDLE) ?? []), ...links(contact)],
+});
+
+// A phone may come back with or without the country and area codes: one number ends with the other.
+const samePhone = (a: string, b: string) => a.endsWith(b) || b.endsWith(a);
+
+const repeatsContact = (reply: string, contact: string) => {
+  if (reply.includes(contact)) return true;
+  const details = contactDetails(contact);
+  if (!details.phones.length && !details.words.length) return false;
+  const replyPhones = phones(reply);
+  return (
+    details.phones.some((phone) => replyPhones.some((other) => samePhone(phone, other))) ||
+    details.words.some((word) => reply.includes(word))
+  );
+};
+
+/** Why this exchange needs the owner, or null. A reply repeating the business contact is a derivation. */
 export const detectAttention = ({
   visitorText,
   reply,
@@ -37,6 +78,6 @@ export const detectAttention = ({
 }): AttentionReason | null => {
   if (asksForHuman(visitorText)) return "human_request";
   const needle = contact ? normalize(contact) : "";
-  if (needle && normalize(reply).includes(needle)) return "derivation";
+  if (needle && repeatsContact(normalize(reply), needle)) return "derivation";
   return null;
 };
