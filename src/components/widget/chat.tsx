@@ -3,28 +3,11 @@ import { Send, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type KeyboardEvent } from "react";
 import { MAX_MESSAGE_LENGTH } from "@/domain/widget-limits";
+import { LOCAL_ID_PREFIX as LOCAL, mergeMessages, type WidgetMessage as Message } from "@/domain/widget-messages";
 import { useLiveUpdates, type RealtimeClientConfig } from "@/hooks/use-live-updates";
 import { uploadcareUrl } from "@/lib/uploadcare";
 import { cn } from "@/lib/utils";
 import { LeadCard, type LeadQuestion } from "./lead-card";
-
-type Role = "user" | "assistant" | "owner" | "system";
-type Message = { id: string; role: Role; content: string };
-
-/** Messages not yet confirmed by the server carry a local id until polling brings the stored copy. */
-const LOCAL = "local-";
-
-/** Adds the server's messages, replacing the local copy of each one and skipping those already shown. */
-const mergeMessages = (current: Message[], incoming: Message[]) => {
-  const next = [...current];
-  for (const message of incoming) {
-    if (next.some((m) => m.id === message.id)) continue;
-    const local = next.findIndex((m) => m.id.startsWith(LOCAL) && m.role === message.role && m.content === message.content);
-    if (local === -1) next.push(message);
-    else next[local] = message;
-  }
-  return next;
-};
 
 export type WidgetConfig = {
   name: string;
@@ -113,10 +96,16 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
   const cursor = useRef<string | null>(null);
   const sendingRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   // Typing before hydration would be wiped out by React, so the controls wait for it.
   const hydrated = useHydrated() && !preview;
   const api = `/api/widget/${domainId}`;
   const tooLong = input.trim().length > MAX_MESSAGE_LENGTH;
+
+  // The iframe is created when the visitor opens the chat, so the cursor goes to the input once it works.
+  useEffect(() => {
+    if (hydrated) inputRef.current?.focus();
+  }, [hydrated]);
 
   useEffect(() => {
     if (preview) return;
@@ -359,13 +348,14 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
         <textarea
           data-testid="widget-input"
           aria-label="Escribí tu consulta"
-          placeholder={preview ? "Así lo ven tus visitantes" : "Escribí tu consulta…"}
+          ref={inputRef}
+          placeholder={preview ? "Así lo ven tus visitantes" : hydrated ? "Escribí tu consulta…" : "Cargando el chat…"}
           rows={1}
           disabled={!hydrated}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
-          className="flex-1 resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+          className="flex-1 resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
         />
         <button
           type="submit"
@@ -388,7 +378,7 @@ const Bubble = ({
   label,
   children,
 }: {
-  role: Exclude<Role, "system">;
+  role: Exclude<Message["role"], "system">;
   accent: { backgroundColor: string; color: string };
   /** Shown above the owner's messages, so the visitor tells a person from the bot. */
   label?: string;

@@ -55,7 +55,16 @@ describe("dashboard page", () => {
     expect(html).toMatch(/25\s?% de las respuestas/);
     expect(html).toContain('data-testid="metric-human-requests">3<');
     expect(html).toContain('data-testid="metric-response-time">2 h 15 min<');
-    expect(html).toContain("sobre 3 conversaciones");
+    expect(html).toContain("sobre 3 conversaciones que te necesitaron");
+  });
+
+  it("speaks in singular with a single case", async () => {
+    mocks.onGetOwnerMetrics.mockResolvedValue({
+      days: 7, conversations: 1, answeredConversations: 1, leads: 0, captureRate: 0, needingAttention: 1,
+      answers: 2, derived: 1, derivationRate: 0.5, humanRequests: 0, responseTime: { medianMinutes: 1, cases: 1 },
+      series: series([[1, 0]]),
+    });
+    expect(await render()).toContain("Mediana sobre 1 conversación que te necesitó");
   });
 
   it("shows a dash and 'Sin datos todavía' instead of NaN when there were no answers", async () => {

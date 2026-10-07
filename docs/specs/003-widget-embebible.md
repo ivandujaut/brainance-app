@@ -73,6 +73,8 @@ El onboarding le pide al dueño que pegue `<script src=".../widget.js">` en su s
 - **Sitios que no usan HTTPS** quedan fuera de `frame-ancestors` (se exige `https://`). Para probar en local, en desarrollo se permite también `http://localhost`.
 - **El tope por sitio es global**: un abusador puede agotar el cupo diario de un negocio. El límite por visitante lo mitiga; si pasa en la beta, se agrega límite por IP.
 
+- **Campo deshabilitado mientras carga** (QA de la spec 011, 2026-10-07): el campo de texto espera a que el chat termine de cargar, porque lo que se escribe antes se borraría. Como no se veía deshabilitado, el visitante escribía y el texto se perdía. Desde entonces muestra "Cargando el chat…" con el estilo de deshabilitado, y el cursor pasa al campo apenas funciona. El iframe se crea cuando el visitante abre el chat, así que eso no le quita el foco al sitio.
+
 ## Plan de tests
 
 | Criterio | Tipo de test | Archivo |

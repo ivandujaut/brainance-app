@@ -133,6 +133,15 @@ export const ownerTakesOver = async (roomId: string, businessName: string) => {
   );
 };
 
+/** Simulates the owner handing the conversation back to the bot from the inbox (same rows as releaseToBot). */
+export const ownerReleases = async (roomId: string) => {
+  await pool.query(`UPDATE "ChatRoom" SET "liveSince" = NULL, "lastMessageAt" = now() WHERE id = $1`, [roomId]);
+  await pool.query(
+    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", seen, "updatedAt") VALUES ('Te vuelve a atender el asistente virtual.', 'system', $1, true, now())`,
+    [roomId],
+  );
+};
+
 export const ownerSays = async (roomId: string, text: string) => {
   await pool.query(`INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt") VALUES ($1, 'owner', $2, now())`, [
     text,
