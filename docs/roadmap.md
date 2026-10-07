@@ -29,6 +29,7 @@ Cada ítem va a tener su spec en `docs/specs/`.
 - **Aviso al dueño** ([spec 010](specs/010-aviso-al-dueno.md)): email con motivo, últimos intercambios y link a la conversación cuando el bot deriva, el visitante pide una persona o el sitio llega al tope; un recordatorio si el visitante sigue esperando. Primera prueba del posicionamiento.
 - **Tope visible y métricas de honestidad** ([spec 011](specs/011-tope-visible-y-metricas-de-honestidad.md)): el dashboard muestra cuántas respuestas dio el bot, cuántas derivó y cuánto tarda el dueño en atender; la configuración muestra el uso del día y deja fijar un tope diario de respuestas. Segunda y tercera prueba del posicionamiento.
 - **Marcar como atendida** ([spec 012](specs/012-marcar-como-atendida.md)): saca la marca "Necesita atención" sin escribirle al visitante, para cuando el dueño ya respondió por email o WhatsApp, o fue un falso positivo.
+- **Portada con la promesa** ([spec 013](specs/013-portada-con-la-promesa.md)): titular "Ningún cliente sin respuesta", las tres pruebas con ejemplos del producto, el eval publicado en `/como-medimos` y qué pasa cuando termina la beta.
 
 ## Posicionamiento
 
