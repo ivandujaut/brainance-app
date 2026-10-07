@@ -17,6 +17,9 @@ model User {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   fullname  String
   clerkId   String   @unique
+  // The owner's primary email, copied from Clerk at sign-in so notices (specs 005 and 010) do not
+  // depend on Clerk being up. Null for accounts provisioned before it was stored.
+  email     String?
   // Terms and privacy policy accepted at sign-up or later (spec 008).
   termsAcceptedAt DateTime?
   termsVersion    String?
@@ -56,6 +59,8 @@ model ChatBot {
   // Lead capture (spec 005): show the lead card in the widget, and email the owner on new leads.
   leadCapture    Boolean @default(true)
   leadEmail      Boolean @default(true)
+  // Email the owner when a conversation needs attention (spec 010).
+  attentionEmail Boolean @default(true)
   // Set when the owner confirms the snippet is on their site (later: first widget load).
   installedAt    DateTime?
   Domain         Domain? @relation(fields: [domainId], references: [id], onDelete: Cascade)
@@ -134,6 +139,11 @@ model ChatRoom {
   needsAttention  Boolean   @default(false)
   // "derivation" | "human_request" | "site_cap"
   attentionReason String?
+  // Owner notices (spec 010): when the current episode started, when the owner was last emailed
+  // and how many notices went out in the episode (first notice + reminder).
+  attentionAt         DateTime?
+  attentionNotifiedAt DateTime?
+  attentionNotices    Int       @default(0)
   lastMessageAt   DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt

@@ -50,6 +50,17 @@ describe.skipIf(!url)("ensureUser", () => {
     expect(second.fullname).toBe("Ana Pérez");
   });
 
+  // Spec 010: owner notices read the email from the database, so it is stored and kept fresh.
+  it("stores the owner's email and refreshes it on later visits", async () => {
+    const first = await ensureUser(db, { clerkId, fullname: "Ana Pérez", email: "ana@example.com" });
+    expect(first.email).toBe("ana@example.com");
+    const second = await ensureUser(db, { clerkId, fullname: "Ana Pérez", email: "ana.nueva@example.com" });
+    expect(second.email).toBe("ana.nueva@example.com");
+    // A visit without an email (Clerk did not return one) keeps the stored address.
+    const third = await ensureUser(db, { clerkId, fullname: "Ana Pérez" });
+    expect(third.email).toBe("ana.nueva@example.com");
+  });
+
   it("creates exactly one user and one billing under concurrent first visits", async () => {
     const users = await Promise.all(
       Array.from({ length: 8 }, () => ensureUser(db, { clerkId, fullname: "Ana Pérez" })),
