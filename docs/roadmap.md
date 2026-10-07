@@ -26,6 +26,7 @@ Cada ítem va a tener su spec en `docs/specs/`.
 
 - **Lanzamiento de la beta** ([spec 008](specs/008-lanzamiento-de-la-beta.md)): checklist de despliegue y QA, términos y privacidad, limpieza del código heredado.
 - **Landing con personalidad** ([spec 009](specs/009-landing.md)): dirección editorial, demo con el widget real y figuras de Hairline.
+- **Aviso al dueño** ([spec 010](specs/010-aviso-al-dueno.md)): email con motivo, últimos intercambios y link a la conversación cuando el bot deriva, el visitante pide una persona o el sitio llega al tope; un recordatorio si el visitante sigue esperando. Primera prueba del posicionamiento.
 
 ## Posicionamiento
 
