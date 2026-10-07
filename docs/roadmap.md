@@ -29,6 +29,7 @@ Cada ítem va a tener su spec en `docs/specs/`.
 
 ## Posicionamiento
 
+- **[Posicionamiento](posicionamiento.md):** para quién es, el problema en palabras del dueño, la promesa ("Ningún cliente sin respuesta. Y vos te enterás solo cuando hace falta.") y las tres pruebas que la sostienen. Cada spec y titular se contrasta contra esa página.
 - **Mercado de chat con IA para pymes** ([análisis 2026-10](mercado/2026-10-chat-ia-pymes.md)): qué tienen en común los competidores, dónde no competir y seis huecos verificados. Propone como próximos pasos el aviso al dueño cuando una conversación necesita atención, un titular centrado en la honestidad y un tope de gasto visible.
 
 ## v1: después de la beta
