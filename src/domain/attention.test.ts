@@ -65,15 +65,15 @@ describe("detectAttention", () => {
     });
 
     it.each([
-      ["without the country code", "Escribinos al 11 5555-0000."],
-      ["with other separators", "Escribinos al (11) 5555 0000."],
-      ["as plain digits", "Escribinos al 5491155550000."],
+      ["without the country code", "No tengo ese dato. Escribinos al 11 5555-0000."],
+      ["with other separators", "No tengo ese dato. Escribinos al (11) 5555 0000."],
+      ["as plain digits", "No tengo ese dato. Escribinos al 5491155550000."],
     ])("flags the phone %s", (_, reply) => {
       expect(detectAttention({ visitorText: "x", reply, contact: configured })).toBe("derivation");
     });
 
     it("flags an email in any case", () => {
-      const reply = "Mandanos un mail a Ventas@Panaderia.com.ar y te respondemos.";
+      const reply = "No tengo esa información. Mandanos un mail a Ventas@Panaderia.com.ar y te respondemos.";
       expect(detectAttention({ visitorText: "x", reply, contact: "Email: ventas@panaderia.com.ar" })).toBe(
         "derivation",
       );
@@ -82,22 +82,46 @@ describe("detectAttention", () => {
     it("flags a link or a handle", () => {
       const contactWithLinks = "Instagram @panaderia.palermo o el formulario en panaderia.com.ar/contacto";
       expect(
-        detectAttention({ visitorText: "x", reply: "Escribinos a @panaderia.palermo.", contact: contactWithLinks }),
+        detectAttention({
+          visitorText: "x",
+          reply: "No tengo ese dato. Escribinos a @panaderia.palermo.",
+          contact: contactWithLinks,
+        }),
       ).toBe("derivation");
       expect(
         detectAttention({
           visitorText: "x",
-          reply: "Completá https://panaderia.com.ar/contacto",
+          reply: "No puedo confirmarlo desde acá. Completá https://panaderia.com.ar/contacto",
           contact: contactWithLinks,
         }),
       ).toBe("derivation");
     });
 
-    // Deliberate: a false alarm in the inbox costs less than a missed customer (spec 006, risks).
-    it("flags an answer that also offers the contact", () => {
-      const reply =
-        "Sí, hacemos tortas por encargo con 48 horas de anticipación. Para pedir, escribinos al WhatsApp +54 9 11 5555-0000.";
-      expect(detectAttention({ visitorText: "¿Hacen tortas?", reply, contact: configured })).toBe("derivation");
+    // QA of spec 011: an answer that also offers the contact is not a derivation. Flagging it filled
+    // "Derivadas", marked the inbox and emailed the owner for questions the bot had answered.
+    it.each([
+      "Sí, hacemos tortas por encargo con 48 horas de anticipación. Para pedir, escribinos al WhatsApp +54 9 11 5555-0000.",
+      "Sí, hacemos envíos en CABA. Para más detalles sobre zonas de cobertura, costos o tiempos de entrega, podés contactarnos por WhatsApp al +54 9 11 5555-0000 (de lunes a sábado de 8 a 20).",
+    ])("does not flag an answer that also offers the contact: %j", (reply) => {
+      expect(detectAttention({ visitorText: "¿Hacen tortas?", reply, contact: configured })).toBeNull();
+    });
+
+    // The prompt asks the bot to say it does not have the information and offer the contact
+    // (src/domain/answer-prompt.ts); these are the ways it says so in the eval cases and the QA.
+    it.each([
+      "No tengo esa información en mis datos. Te recomiendo que nos consultes por WhatsApp al +54 9 11 5555-0000 (de lunes a sábado de 8 a 20) para preguntarle directamente al equipo sobre opciones sin TACC.",
+      "No cuento con ese dato. Consultanos al WhatsApp +54 9 11 5555-0000.",
+      "No te puedo confirmar el stock: escribinos al 11 5555-0000.",
+      "IOMA no figura entre las coberturas que tengo cargadas. Consultá al 11 5555-0000.",
+      "La limpieza cuesta $45.000. Sobre carillas no tengo información: escribinos al 11 5555-0000.",
+      "Esa información no la tengo, pero podés escribirnos al 11 5555-0000.",
+      "No sabría decirte. Escribinos al 11 5555-0000.",
+    ])("flags a reply that says it lacks the data and offers the contact: %j", (reply) => {
+      expect(detectAttention({ visitorText: "x", reply, contact: configured })).toBe("derivation");
+    });
+
+    it("does not flag a reply that lacks the data but does not offer the contact", () => {
+      expect(detectAttention({ visitorText: "x", reply: "No tengo esa información.", contact: configured })).toBeNull();
     });
 
     it("does not flag other numbers, like hours, prices or a different phone", () => {
@@ -116,7 +140,7 @@ describe("detectAttention", () => {
       expect(
         detectAttention({
           visitorText: "x",
-          reply: "Te esperamos: pasá por el local de av. Corrientes 1234.",
+          reply: "No tengo ese dato; te esperamos: pasá por el local de av. Corrientes 1234.",
           contact: address,
         }),
       ).toBe("derivation");
@@ -125,7 +149,7 @@ describe("detectAttention", () => {
   });
 
   it("matches the contact regardless of case and spacing", () => {
-    expect(detectAttention({ visitorText: "x", reply: "escribinos por whatsapp  +54 9 341 555-0101", contact })).toBe(
+    expect(detectAttention({ visitorText: "x", reply: "NO TENGO ESE DATO, escribinos por whatsapp  +54 9 341 555-0101", contact })).toBe(
       "derivation",
     );
   });

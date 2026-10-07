@@ -63,6 +63,33 @@ describe.skipIf(!url)("human takeover", () => {
     expect((await room()).lastMessageAt!.getTime()).toBeGreaterThanOrEqual(before.getTime());
   });
 
+  // Spec 011, criterion 3 (QA): the owner's response time is kept on their first message after each
+  // flag, so a later episode in the same conversation does not erase it.
+  it("stamps the owner's first reply after a flag with the flag's time, once per episode", async () => {
+    const answered = (id: string) =>
+      db.chatMessage.findUniqueOrThrow({ where: { id }, select: { answersAttentionAt: true } });
+
+    const unflagged = await ownerReply(db, roomId, "Hola, ¿en qué te ayudo?", NAME);
+    expect((await answered(unflagged!.id)).answersAttentionAt).toBeNull();
+    await releaseToBot(db, roomId);
+
+    await flagAttention(db, roomId, "derivation");
+    const { attentionAt: first } = await room();
+    const reply = await ownerReply(db, roomId, "Te atiendo yo.", NAME);
+    expect((await answered(reply!.id)).answersAttentionAt).toEqual(first);
+    const second = await ownerReply(db, roomId, "¿Algo más?", NAME);
+    expect((await answered(second!.id)).answersAttentionAt).toBeNull();
+
+    // The bot gets the conversation back and derives again: a new episode, a new stamp.
+    await releaseToBot(db, roomId);
+    await flagAttention(db, roomId, "derivation");
+    const { attentionAt: next } = await room();
+    expect(next!.getTime()).toBeGreaterThan(first!.getTime());
+    const later = await ownerReply(db, roomId, "Volví.", NAME);
+    expect((await answered(later!.id)).answersAttentionAt).toEqual(next);
+    expect((await answered(reply!.id)).answersAttentionAt).toEqual(first);
+  });
+
   it("rejects empty or overlong owner replies", async () => {
     expect(await ownerReply(db, roomId, "  ", NAME)).toBeNull();
     expect(await ownerReply(db, roomId, "a".repeat(2001), NAME)).toBeNull();

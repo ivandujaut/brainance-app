@@ -20,10 +20,17 @@ test("the dashboard shows conversations and leads", async ({ page }) => {
   await expect(checklist.getByTestId("step-add-site")).toHaveAttribute("data-done", "true");
 
   const siteId = await siteIdByName(domain);
-  await completeOnboarding(siteId);
   await seedConversation(siteId);
   await seedLead(siteId, "ana@example.com", { question: "¿Qué buscás?", answered: "Tortas" });
+
+  // QA of spec 011: a bot that already answers shows its metrics under the unfinished checklist.
   await page.reload();
+  await expect(checklist).toBeVisible();
+  await expect(page.getByTestId("owner-metrics")).toBeVisible();
+
+  await completeOnboarding(siteId);
+  await page.reload();
+  await expect(checklist).toBeHidden();
 
   await expect(page.getByTestId("owner-metrics")).toBeVisible();
   await expect(page.getByTestId("metric-conversations")).toHaveText("1");

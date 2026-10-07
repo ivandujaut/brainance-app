@@ -168,6 +168,9 @@ model ChatMessage {
   seen       Boolean   @default(false)
   // Spec 011: a bot answer that referred the visitor to the business instead of answering.
   derivation Boolean   @default(false)
+  // Spec 011: on the owner's first message after the room was flagged, when that flag started.
+  // Keeps each response time even after a later episode moves ChatRoom.attentionAt.
+  answersAttentionAt DateTime?
 
   @@index([chatRoomId, createdAt])
   @@index([chatRoomId, seen])

@@ -50,7 +50,15 @@ describe.skipIf(!url)("owner metrics", async () => {
                   : []),
                 ...(live ? [{ role: "owner" as const, message: "Te atiendo yo.", createdAt: answerAt }] : []),
                 ...(attendedAfter
-                  ? [{ role: "owner" as const, message: "Acá estoy.", createdAt: new Date(answerAt.getTime() + attendedAfter * 60_000) }]
+                  ? [
+                      {
+                        role: "owner" as const,
+                        message: "Acá estoy.",
+                        createdAt: new Date(answerAt.getTime() + attendedAfter * 60_000),
+                        // What ownerReply stamps on the owner's first message after the flag.
+                        answersAttentionAt: answerAt,
+                      },
+                    ]
                   : []),
               ],
             },
@@ -103,6 +111,17 @@ describe.skipIf(!url)("owner metrics", async () => {
     expect(metrics!.derivationRate).toBeCloseTo(2 / 5);
     expect(metrics!.responseTime).toEqual({ medianMinutes: 10, cases: 2 });
     expect(await onGetOwnerMetrics({ days: 7, siteId: taller })).toMatchObject({ answers: 1, derived: 0, humanRequests: 0, responseTime: null });
+  });
+
+  // QA of spec 011: the bot got the conversation back and derived again, which moved the room's
+  // attentionAt past the owner's reply. The response time of the first episode must stay.
+  it("keeps the owner's response time after a later episode in the same conversation", async () => {
+    const [room] = await db.chatRoom.findMany({
+      where: { attentionReason: "derivation", Customer: { domainId: panaderia } },
+      select: { id: true },
+    });
+    await db.chatRoom.update({ where: { id: room.id }, data: { attentionAt: new Date(), needsAttention: true } });
+    expect((await onGetOwnerMetrics({ days: 7 }))!.responseTime).toEqual({ medianMinutes: 10, cases: 1 });
   });
 
   it("widens to 30 days and filters by site", async () => {

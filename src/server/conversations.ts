@@ -40,11 +40,14 @@ export const addMessage = async (
   chatRoomId: string,
   role: WidgetRole,
   content: string,
-  { derivation = false }: { derivation?: boolean } = {},
+  {
+    derivation = false,
+    answersAttentionAt = null,
+  }: { derivation?: boolean; answersAttentionAt?: Date | null } = {},
 ) => {
   const [message] = await db.$transaction([
     db.chatMessage.create({
-      data: { chatRoomId, role, message: content, derivation },
+      data: { chatRoomId, role, message: content, derivation, answersAttentionAt },
       select: { id: true, createdAt: true },
     }),
     db.chatRoom.update({ where: { id: chatRoomId }, data: { lastMessageAt: new Date() } }),

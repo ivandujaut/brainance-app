@@ -21,7 +21,7 @@
 - [x] *GitHub → Settings → Secrets and variables → Actions:* cargar las cadenas **directas**:
   - `NEON_DIRECT_URL`: branch `production`.
   - `NEON_DEV_DIRECT_URL`: branch `development`.
-- [x] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. Se repite con cada migración nueva (última: 2026-10-07, `answer_cap_and_derivation` de la spec 011). El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
+- [x] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. Se repite con cada migración nueva (última: 2026-10-07, `owner_response_time` del QA de la spec 011). El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
   - Alternativa desde tu máquina: `DIRECT_URL="<directa>" npx prisma migrate deploy`.
   - Si la base se creó antes con `db push`, primero: `npx prisma migrate resolve --applied 20261001000000_init`.
   - La migración `20261007120000_remove_legacy` se frena sola si `Bookings`, `Campaign` o `Product` tienen filas. En ese caso, exportalas y vaciá las tablas antes.

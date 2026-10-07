@@ -58,17 +58,17 @@ export const onGetOwnerMetrics = async ({ siteId, days }: { siteId?: string; day
       JOIN "Domain" d ON d.id = c."domainId"
       JOIN "User" u ON u.id = d."userId"
       WHERE ${scope} AND m.role = 'assistant' AND m."createdAt" >= ${since}`,
-    // Spec 011, criterion 3: minutes from the flag to the owner's first message after it.
+    // Spec 011, criterion 3: minutes from each flag to the owner's first message after it, stamped
+    // on that message by ownerReply so a later episode in the same room does not erase it.
     client.$queryRaw<{ day: string; minutes: number }[]>`
-      SELECT ${day(Prisma.sql`r."attentionAt"`)} AS day,
-             extract(epoch FROM (min(m."createdAt") - r."attentionAt")) / 60 AS minutes
-      FROM "ChatRoom" r
-      JOIN "ChatMessage" m ON m."chatRoomId" = r.id AND m.role = 'owner' AND m."createdAt" >= r."attentionAt"
+      SELECT ${day(Prisma.sql`m."answersAttentionAt"`)} AS day,
+             extract(epoch FROM (m."createdAt" - m."answersAttentionAt")) / 60 AS minutes
+      FROM "ChatMessage" m
+      JOIN "ChatRoom" r ON r.id = m."chatRoomId"
       JOIN "Customer" c ON c.id = r."customerId"
       JOIN "Domain" d ON d.id = c."domainId"
       JOIN "User" u ON u.id = d."userId"
-      WHERE ${scope} AND r."attentionAt" >= ${since}
-      GROUP BY r.id`,
+      WHERE ${scope} AND m.role = 'owner' AND m."answersAttentionAt" >= ${since}`,
   ]);
 
   // Keep only the calendar days of the period (the query window starts a day early for time zones).

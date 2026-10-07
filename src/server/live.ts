@@ -47,13 +47,28 @@ export const releaseToBot = (db: PrismaClient, roomId: string) =>
     return true;
   });
 
+/**
+ * The flag this owner message answers, if it is the owner's first message since the room was
+ * flagged (spec 011, criterion 3): the dashboard measures the response time from it.
+ */
+const pendingAttention = async (db: PrismaClient, roomId: string) => {
+  const { attentionAt } = await db.chatRoom.findUniqueOrThrow({ where: { id: roomId }, select: { attentionAt: true } });
+  if (!attentionAt) return null;
+  const answered = await db.chatMessage.findFirst({
+    where: { chatRoomId: roomId, role: "owner", createdAt: { gte: attentionAt } },
+    select: { id: true },
+  });
+  return answered ? null : attentionAt;
+};
+
 /** Stores the owner's reply, taking over first if the bot had the conversation. Null if invalid. */
 export const ownerReply = async (db: PrismaClient, roomId: string, raw: string, businessName: string) => {
   const text = raw.trim();
   if (!text || text.length > OWNER_MESSAGE_MAX) return null;
   await takeOver(db, roomId, businessName);
   await db.chatRoom.update({ where: { id: roomId }, data: { needsAttention: false } });
-  return { id: await addMessage(db, roomId, "owner", text) };
+  const answersAttentionAt = await pendingAttention(db, roomId);
+  return { id: await addMessage(db, roomId, "owner", text, { answersAttentionAt }) };
 };
 
 /**
