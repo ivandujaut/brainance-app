@@ -1,7 +1,14 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PrismaClient } from "@/generated/prisma/client";
-import { addMessage, countSiteMessagesSince, countVisitorMessagesSince, getOrCreateRoom, listMessages } from "./conversations";
+import {
+  addMessage,
+  countSiteAnswersSince,
+  countVisitorMessagesSince,
+  getOrCreateRoom,
+  listMessages,
+  markDerivation,
+} from "./conversations";
 
 // Integration test: needs a migrated Postgres in TEST_DATABASE_URL (CI provides one).
 const url = process.env.TEST_DATABASE_URL;
@@ -74,17 +81,35 @@ describe.skipIf(!url)("widget conversations", () => {
     expect(await countVisitorMessagesSince(db, room, hourAgo())).toBe(2);
   });
 
-  it("counts visitor messages per site, across visitors, and never another site's", async () => {
-    const before = await countSiteMessagesSince(db, siteB, hourAgo());
+  // Spec 011, criteria 4, 9 and 10: the cap counts the bot's answers, never a person's, per site.
+  it("counts the bot's answers per site, across visitors, and never another site's or the owner's", async () => {
+    const before = await countSiteAnswersSince(db, siteB, hourAgo());
     for (const v of [visitor(), visitor()]) {
       const room = await getOrCreateRoom(db, { domainId: siteB, visitorId: v });
       await addMessage(db, room, "user", "hola");
       await addMessage(db, room, "assistant", "¡Hola!");
     }
-    expect(await countSiteMessagesSince(db, siteB, hourAgo())).toBe(before + 2);
+    expect(await countSiteAnswersSince(db, siteB, hourAgo())).toBe(before + 2);
+
+    // A conversation attended by a person: the visitor's and the owner's messages do not count.
+    const live = await getOrCreateRoom(db, { domainId: siteB, visitorId: visitor() });
+    await addMessage(db, live, "user", "¿Hay stock?");
+    await addMessage(db, live, "owner", "Sí, te lo reservo.");
+    expect(await countSiteAnswersSince(db, siteB, hourAgo())).toBe(before + 2);
 
     const siteAOnly = await getOrCreateRoom(db, { domainId: siteA, visitorId: visitor() });
     await addMessage(db, siteAOnly, "user", "otro sitio");
-    expect(await countSiteMessagesSince(db, siteB, hourAgo())).toBe(before + 2);
+    await addMessage(db, siteAOnly, "assistant", "otra respuesta");
+    expect(await countSiteAnswersSince(db, siteB, hourAgo())).toBe(before + 2);
+  });
+
+  // Spec 011, criterion 13: a derivation is recorded on the bot's answer itself.
+  it("marks an answer as a derivation, at creation or afterwards", async () => {
+    const room = await getOrCreateRoom(db, { domainId: siteA, visitorId: visitor() });
+    const plain = await addMessage(db, room, "assistant", "Sí, hacemos envíos.");
+    const capped = await addMessage(db, room, "assistant", "No puedo responder más consultas.", { derivation: true });
+    await markDerivation(db, plain);
+    const rows = await db.chatMessage.findMany({ where: { id: { in: [plain, capped] } }, select: { id: true, derivation: true } });
+    expect(rows.map((r) => r.derivation)).toEqual([true, true]);
   });
 });

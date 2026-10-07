@@ -85,3 +85,27 @@ test("another tenant's or an unknown site id is not found", async ({ page }) => 
   expect(response?.status()).toBe(404);
   expect((await page.goto("/settings/no-es-un-id"))?.status()).toBe(404);
 });
+
+// Spec 011, criteria 7, 8 and 12: the owner sees today's usage and sets a lower daily cap.
+test("the owner sees today's usage and sets a daily answer cap", async ({ page }) => {
+  const domain = await signUpWithSite(page);
+  await page.getByRole("link", { name: domain }).first().click();
+  await expect(page).toHaveURL(/\/settings\/[0-9a-f-]{36}$/);
+
+  const usage = page.getByTestId("section-uso");
+  await expect(usage.getByTestId("usage-today")).toHaveText("Hoy: 0 de 300 respuestas");
+  await expect(usage.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
+  await expect(usage.getByText("Cuando se llega al tope, el bot deja de responder con IA y deriva a tu contacto. No se apaga.")).toBeVisible();
+
+  const cap = usage.getByLabel("Tope diario de respuestas");
+  await cap.fill("19");
+  await cap.blur();
+  await expect(usage.getByRole("alert")).toHaveText("El tope tiene que ser un número entero entre 20 y 300.");
+
+  await cap.fill("20");
+  await cap.blur();
+  await expect(page.getByText("Tope guardado").first()).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId("section-uso").getByLabel("Tope diario de respuestas")).toHaveValue("20");
+  await expect(page.getByTestId("section-uso").getByTestId("usage-today")).toHaveText("Hoy: 0 de 20 respuestas");
+});

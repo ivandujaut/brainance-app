@@ -1,7 +1,10 @@
+import { BETA_DAILY_ANSWER_MAX } from "./answer-cap";
+
 // Cost and abuse limits for the public widget endpoint (ADR 0003).
 export const MAX_MESSAGE_LENGTH = 1000;
 export const VISITOR_LIMIT = { messages: 20, windowMs: 10 * 60 * 1000 };
-export const SITE_DAILY_LIMIT = { messages: 300, windowMs: 24 * 60 * 60 * 1000 };
+/** Bot answers per site in a rolling day (spec 011: the owner may set a lower cap). */
+export const SITE_DAILY_LIMIT = { messages: BETA_DAILY_ANSWER_MAX, windowMs: 24 * 60 * 60 * 1000 };
 /** Messages of context sent to the model with each new question. */
 export const HISTORY_WINDOW = 10;
 
@@ -9,16 +12,20 @@ export type RejectReason = "empty" | "too_long" | "visitor_rate" | "site_cap";
 
 export type IncomingCheck = { ok: true; text: string } | { ok: false; reason: RejectReason };
 
-/** Decides whether a visitor message may be answered by the model, given recent usage counts. */
+/**
+ * Decides whether a visitor message may be answered by the model, given recent usage counts.
+ * `siteDaily` is the site's bot answers in the last 24 hours and `siteCap` its cap in force
+ * (the beta maximum unless the owner set a lower one).
+ */
 export const checkIncomingMessage = (
   raw: string,
-  usage: { visitorRecent: number; siteDaily: number },
+  usage: { visitorRecent: number; siteDaily: number; siteCap?: number },
 ): IncomingCheck => {
   const text = raw.trim();
   if (!text) return { ok: false, reason: "empty" };
   if (text.length > MAX_MESSAGE_LENGTH) return { ok: false, reason: "too_long" };
   if (usage.visitorRecent >= VISITOR_LIMIT.messages) return { ok: false, reason: "visitor_rate" };
-  if (usage.siteDaily >= SITE_DAILY_LIMIT.messages) return { ok: false, reason: "site_cap" };
+  if (usage.siteDaily >= (usage.siteCap ?? SITE_DAILY_LIMIT.messages)) return { ok: false, reason: "site_cap" };
   return { ok: true, text };
 };
 

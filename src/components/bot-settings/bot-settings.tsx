@@ -1,7 +1,7 @@
 "use client";
 import { Eye } from "lucide-react";
 import { useState } from "react";
-import type { SiteSettings } from "@/actions/settings/bot";
+import type { SiteSettings, SiteUsage } from "@/actions/settings/bot";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { WIDGET_DEFAULT_COLOR, WIDGET_DEFAULT_WELCOME } from "@/domain/bot-settings";
@@ -12,6 +12,7 @@ import { FilterQuestionsSection } from "./filter-questions-section";
 import { InstallSection } from "./install-section";
 import { LeadSettingsSection } from "./lead-settings-section";
 import { Preview } from "./preview";
+import { UsageSection } from "./usage-section";
 
 const SECTIONS = [
   { id: "negocio", label: "Negocio" },
@@ -19,11 +20,12 @@ const SECTIONS = [
   { id: "preguntas-frecuentes", label: "Preguntas frecuentes" },
   { id: "calificacion", label: "Calificación" },
   { id: "captura", label: "Captura de datos" },
+  { id: "uso", label: "Uso y tope" },
   { id: "instalacion", label: "Instalación" },
 ];
 
 /** Settings page of one site (spec 004): sections on the left, the real widget as a live preview on the right. */
-export const BotSettings = ({ settings }: { settings: SiteSettings }) => {
+export const BotSettings = ({ settings, usage }: { settings: SiteSettings; usage: SiteUsage }) => {
   const bot = settings.chatBot;
   // Unsaved appearance changes, so the preview reflects them before saving.
   const [look, setLook] = useState<Look>({
@@ -79,6 +81,7 @@ export const BotSettings = ({ settings }: { settings: SiteSettings }) => {
             leadEmail={bot?.leadEmail ?? true}
             attentionEmail={bot?.attentionEmail ?? true}
           />
+          <UsageSection siteId={settings.id} usage={usage} dailyAnswerCap={bot?.dailyAnswerCap ?? null} />
           <InstallSection siteId={settings.id} name={settings.name} installedAt={bot?.installedAt ?? null} />
         </div>
         <aside className="hidden lg:block sticky top-0 h-[600px]" aria-label="Vista previa">

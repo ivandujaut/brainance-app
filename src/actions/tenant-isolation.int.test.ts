@@ -222,6 +222,18 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
       expect((await site()).chatBot).toMatchObject({ leadCapture: false, leadEmail: true, attentionEmail: false });
     });
 
+    it("onUpdateDailyAnswerCap and onGetSiteUsage: only the owner sets and sees the cap", async () => {
+      as(INTRUDER);
+      expect((await bot.onUpdateDailyAnswerCap(siteId, { dailyAnswerCap: 20 })).status).toBe(404);
+      expect((await site()).chatBot?.dailyAnswerCap).toBeNull();
+      expect(await bot.onGetSiteUsage(siteId)).toBeNull();
+
+      as(OWNER);
+      expect((await bot.onUpdateDailyAnswerCap(siteId, { dailyAnswerCap: 20 })).status).toBe(200);
+      expect((await site()).chatBot?.dailyAnswerCap).toBe(20);
+      expect(await bot.onGetSiteUsage(siteId)).toMatchObject({ cap: 20 });
+    });
+
     it("leads: only the owner lists, exports and deletes them", async () => {
       as(INTRUDER);
       expect(JSON.stringify(await leads.onListLeads())).not.toContain("visitante@example.com");
@@ -248,6 +260,12 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
 
       as(OWNER);
       expect(await metrics.onGetOwnerMetrics({ days: 7, siteId })).toMatchObject({ conversations: 1, leads: 1 });
+
+      // Spec 011, criterion 6: the honesty metrics are scoped the same way.
+      await db.chatMessage.create({ data: { chatRoomId: roomId, role: "assistant", message: "Llamanos.", derivation: true } });
+      expect(await metrics.onGetOwnerMetrics({ days: 7, siteId })).toMatchObject({ answers: 1, derived: 1 });
+      as(INTRUDER);
+      expect(await metrics.onGetOwnerMetrics({ days: 7 })).toMatchObject({ answers: 0, derived: 0, humanRequests: 0 });
     });
 
     it("onDeleteUserDomain: only the owner deletes the site", async () => {

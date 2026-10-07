@@ -9,6 +9,7 @@ import {
   VISITOR_LIMIT,
   type RejectReason,
 } from "@/domain/widget-limits";
+import { effectiveAnswerCap } from "@/domain/answer-cap";
 import { getAppUrl } from "@/lib/app-url";
 import { client } from "@/lib/prisma";
 import { streamAnswer } from "@/server/ai/answer";
@@ -18,10 +19,11 @@ import { dailyCostCapUsd } from "@/domain/cost-cap";
 import { captureError } from "@/server/observability";
 import {
   addMessage,
-  countSiteMessagesSince,
+  countSiteAnswersSince,
   countVisitorMessagesSince,
   getOrCreateRoom,
   listMessages,
+  markDerivation,
 } from "@/server/conversations";
 import { detectAttention, type AttentionReason } from "@/domain/attention";
 import { toModelHistory } from "@/domain/takeover";
@@ -63,9 +65,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const [visitorRecent, siteDaily] = await Promise.all([
     countVisitorMessagesSince(client, room, new Date(now - VISITOR_LIMIT.windowMs)),
     // The site's daily cap only protects the model's cost: it does not apply to a person's conversation.
-    turn === "owner" ? 0 : countSiteMessagesSince(client, domainId, new Date(now - SITE_DAILY_LIMIT.windowMs)),
+    turn === "owner" ? 0 : countSiteAnswersSince(client, domainId, new Date(now - SITE_DAILY_LIMIT.windowMs)),
   ]);
-  const check = checkIncomingMessage(parsed.data.text, { visitorRecent, siteDaily });
+  // Spec 011, criterion 9: the owner's cap, when lower than the beta maximum.
+  const siteCap = effectiveAnswerCap(site.chatBot?.dailyAnswerCap);
+  const check = checkIncomingMessage(parsed.data.text, { visitorRecent, siteDaily, siteCap });
 
   if (!check.ok && check.reason !== "site_cap") {
     const { status, message } = REJECTIONS[check.reason];
@@ -89,7 +93,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!check.ok || overCost) {
     // Over the site's daily cap (messages or cost): answer without calling the model.
     const reply = siteCapReply(site);
-    await addMessage(client, room, "assistant", reply);
+    await addMessage(client, room, "assistant", reply, { derivation: true });
     const flagged = await flagAttention(client, room, "site_cap");
     after(() => Promise.all([notifyRoomChanged(client, room), notifyOwner(room, "site_cap", flagged)]));
     return NextResponse.json({ reply });
@@ -103,9 +107,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     onSettled: (report) =>
       recordModelCall(client, { domainId, chatRoomId: room, purpose: "answer", requestedModel: answerModelId(), report }),
     onEnd: async ({ text }) => {
-      if (text.trim()) await addMessage(client, room, "assistant", text);
+      const answerId = text.trim() ? await addMessage(client, room, "assistant", text) : null;
       const reason = detectAttention({ visitorText: question, reply: text, contact: site.chatBot?.contact ?? null });
       if (reason) {
+        // Spec 011, criterion 2: the answer that derived counts as such, not the whole conversation.
+        if (reason === "derivation" && answerId) await markDerivation(client, answerId);
         const flagged = await flagAttention(client, room, reason);
         await notifyRoomChanged(client, room);
         await notifyOwner(room, reason, flagged);

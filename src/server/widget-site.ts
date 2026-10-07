@@ -22,6 +22,7 @@ export const getWidgetSite = (db: PrismaClient, domainId: string) =>
           addressing: true,
           contact: true,
           leadCapture: true,
+          dailyAnswerCap: true,
         },
       },
       helpdesk: { select: { question: true, answer: true } },

@@ -34,12 +34,18 @@ describe("checkIncomingMessage", () => {
     });
   });
 
-  it(`stops answering with the model after ${SITE_DAILY_LIMIT.messages} messages per site per day`, () => {
+  it(`stops answering with the model after ${SITE_DAILY_LIMIT.messages} answers per site per day`, () => {
     expect(checkIncomingMessage("hola", { ...usage, siteDaily: SITE_DAILY_LIMIT.messages - 1 }).ok).toBe(true);
     expect(checkIncomingMessage("hola", { ...usage, siteDaily: SITE_DAILY_LIMIT.messages })).toEqual({
       ok: false,
       reason: "site_cap",
     });
+  });
+
+  // Spec 011, criterion 9: the owner's lower cap applies instead of the beta maximum.
+  it("stops at the site's own cap when the owner set a lower one", () => {
+    expect(checkIncomingMessage("hola", { ...usage, siteDaily: 19, siteCap: 20 }).ok).toBe(true);
+    expect(checkIncomingMessage("hola", { ...usage, siteDaily: 20, siteCap: 20 })).toEqual({ ok: false, reason: "site_cap" });
   });
 
   it("checks the visitor limit before the site cap", () => {

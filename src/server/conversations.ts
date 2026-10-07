@@ -31,10 +31,22 @@ export const getOrCreateRoom = async (
   });
 };
 
-/** Stores a message and moves the conversation to the top of the owner's inbox. */
-export const addMessage = async (db: PrismaClient, chatRoomId: string, role: WidgetRole, content: string) => {
+/**
+ * Stores a message and moves the conversation to the top of the owner's inbox. A bot answer that
+ * refers the visitor to the business is stored as a derivation (spec 011, criterion 13).
+ */
+export const addMessage = async (
+  db: PrismaClient,
+  chatRoomId: string,
+  role: WidgetRole,
+  content: string,
+  { derivation = false }: { derivation?: boolean } = {},
+) => {
   const [message] = await db.$transaction([
-    db.chatMessage.create({ data: { chatRoomId, role, message: content }, select: { id: true, createdAt: true } }),
+    db.chatMessage.create({
+      data: { chatRoomId, role, message: content, derivation },
+      select: { id: true, createdAt: true },
+    }),
     db.chatRoom.update({ where: { id: chatRoomId }, data: { lastMessageAt: new Date() } }),
   ]);
   return message.id;
@@ -64,7 +76,15 @@ export const listMessages = async (db: PrismaClient, chatRoomId: string, limit =
 export const countVisitorMessagesSince = (db: PrismaClient, chatRoomId: string, since: Date) =>
   db.chatMessage.count({ where: { chatRoomId, role: "user", createdAt: { gte: since } } });
 
-export const countSiteMessagesSince = (db: PrismaClient, domainId: string, since: Date) =>
+/** Marks a stored bot answer as a derivation, once the detector saw the full reply. */
+export const markDerivation = (db: PrismaClient, messageId: string) =>
+  db.chatMessage.update({ where: { id: messageId }, data: { derivation: true }, select: { id: true } });
+
+/**
+ * The site's bot answers since `since`: the number the daily cap and the "Uso y tope" section
+ * share (spec 011, criterion 9). A person's replies in a live conversation never count.
+ */
+export const countSiteAnswersSince = (db: PrismaClient, domainId: string, since: Date) =>
   db.chatMessage.count({
-    where: { role: "user", createdAt: { gte: since }, ChatRoom: { Customer: { domainId } } },
+    where: { role: "assistant", createdAt: { gte: since }, ChatRoom: { Customer: { domainId } } },
   });

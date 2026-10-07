@@ -1,11 +1,20 @@
 import Link from "next/link";
 import type { MetricsPeriod, OwnerMetrics as Metrics } from "@/actions/metrics";
+import type { SiteUsage } from "@/actions/settings/bot";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatMinutes } from "@/domain/metrics";
 import { cn } from "@/lib/utils";
 import { DailyChart } from "./daily-chart";
 import { StatTile } from "./stat-tile";
 
-type Props = { metrics: Metrics; sites: { id: string; name: string }[]; siteId?: string; days: MetricsPeriod };
+type Props = {
+  metrics: Metrics;
+  sites: { id: string; name: string }[];
+  siteId?: string;
+  days: MetricsPeriod;
+  /** Today's usage of the chosen site (spec 011, criterion 11); null without a site chosen. */
+  usage?: SiteUsage | null;
+};
 
 const percent = new Intl.NumberFormat("es-AR", { style: "percent", maximumFractionDigits: 0 });
 
@@ -17,8 +26,8 @@ const href = ({ siteId, days }: { siteId?: string; days: MetricsPeriod }) => {
   return query ? `/dashboard?${query}` : "/dashboard";
 };
 
-/** Spec 007, criteria 11–12: what the bot brought in, per period and site. */
-export const OwnerMetrics = ({ metrics, sites, siteId, days }: Props) => {
+/** Spec 007, criteria 11–12: what the bot brought in, per period and site. Spec 011: and how honest it was. */
+export const OwnerMetrics = ({ metrics, sites, siteId, days, usage }: Props) => {
   const pill = (active: boolean) =>
     cn(
       "rounded-full border px-3 py-1 text-sm",
@@ -49,6 +58,15 @@ export const OwnerMetrics = ({ metrics, sites, siteId, days }: Props) => {
         )}
       </nav>
 
+      {siteId && usage && (
+        <p className="text-sm" data-testid="usage-today">
+          <Link href={`/settings/${siteId}#uso`} className="underline underline-offset-2">
+            {`Hoy: ${usage.answersToday} de ${usage.cap} respuestas`}
+          </Link>
+          {usage.reached && <span className="text-destructive"> · Hoy el bot llegó al tope y está derivando.</span>}
+        </p>
+      )}
+
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         <StatTile label="Conversaciones" value={String(metrics.conversations)} testId="metric-conversations" />
         <StatTile label="Leads" value={String(metrics.leads)} testId="metric-leads" />
@@ -63,6 +81,33 @@ export const OwnerMetrics = ({ metrics, sites, siteId, days }: Props) => {
           value={String(metrics.needingAttention)}
           hint="El bot derivó o pidieron una persona"
           testId="metric-attention"
+        />
+      </div>
+
+      {/* Spec 011, criteria 1, 3 and 5: honesty metrics. */}
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+        <StatTile label="Respuestas del bot" value={String(metrics.answers)} hint="Lo que respondió el bot, no vos" testId="metric-answers" />
+        <StatTile
+          label="Derivadas"
+          value={String(metrics.derived)}
+          hint={`${metrics.derivationRate === null ? "—" : percent.format(metrics.derivationRate)} de las respuestas: te derivó en vez de inventar`}
+          testId="metric-derived"
+        />
+        <StatTile
+          label="Pidieron una persona"
+          value={String(metrics.humanRequests)}
+          hint="Conversaciones donde el visitante lo pidió"
+          testId="metric-human-requests"
+        />
+        <StatTile
+          label="Tu tiempo de respuesta"
+          value={metrics.responseTime ? formatMinutes(metrics.responseTime.medianMinutes) : "Sin datos todavía"}
+          hint={
+            metrics.responseTime
+              ? `Mediana sobre ${metrics.responseTime.cases} ${metrics.responseTime.cases === 1 ? "conversación" : "conversaciones"} que te necesitaron`
+              : "Desde que el bot te necesita hasta tu primer mensaje"
+          }
+          testId="metric-response-time"
         />
       </div>
 

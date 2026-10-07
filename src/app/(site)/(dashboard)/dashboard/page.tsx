@@ -1,6 +1,7 @@
 import { onListLeadSites } from "@/actions/leads";
 import { onGetOwnerMetrics, type MetricsPeriod } from "@/actions/metrics";
 import { onGetOnboarding } from "@/actions/onboarding";
+import { onGetSiteUsage } from "@/actions/settings/bot";
 import InfoBar from "@/components/infobar";
 import { OwnerMetrics } from "@/components/metrics/owner-metrics";
 import { OnboardingChecklist } from "@/components/onboarding/checklist";
@@ -25,7 +26,8 @@ const DashboardPage = async ({ searchParams }: Props) => {
   const days: MetricsPeriod = params.days === "30" ? 30 : 7;
   const sites = await onListLeadSites();
   const siteId = sites.find((s) => s.id === params.site)?.id;
-  const metrics = await onGetOwnerMetrics({ days, siteId });
+  // Spec 011, criterion 11: with a site chosen, today's usage against its cap.
+  const [metrics, usage] = await Promise.all([onGetOwnerMetrics({ days, siteId }), siteId ? onGetSiteUsage(siteId) : null]);
 
   return (
     <>
@@ -35,7 +37,7 @@ const DashboardPage = async ({ searchParams }: Props) => {
           <h2 className="text-2xl font-bold">Tu bot está funcionando</h2>
           <p className="text-sm text-muted-foreground">Lo que trajo tu bot en el período elegido.</p>
         </header>
-        {metrics && <OwnerMetrics metrics={metrics} sites={sites} siteId={siteId} days={days} />}
+        {metrics && <OwnerMetrics metrics={metrics} sites={sites} siteId={siteId} days={days} usage={usage} />}
       </div>
     </>
   );

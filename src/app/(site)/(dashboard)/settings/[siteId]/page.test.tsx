@@ -5,7 +5,11 @@ import type { SiteSettings } from "@/actions/settings/bot";
 // Spec 004, criteria 1, 2 and 4: the page renders the Spanish sections and the live preview, and
 // any id that is not the owner's ends in a 404.
 const onGetSiteSettings = vi.fn();
-vi.mock("@/actions/settings/bot", () => ({ onGetSiteSettings: (id: string) => onGetSiteSettings(id) }));
+const onGetSiteUsage = vi.fn();
+vi.mock("@/actions/settings/bot", () => ({
+  onGetSiteSettings: (id: string) => onGetSiteSettings(id),
+  onGetSiteUsage: (id: string) => onGetSiteUsage(id),
+}));
 vi.mock("@/actions/settings", () => ({}));
 vi.mock("next/navigation", () => ({
   notFound: () => {
@@ -31,6 +35,7 @@ const settings: SiteSettings = {
     leadCapture: true,
     leadEmail: true,
     attentionEmail: true,
+    dailyAnswerCap: null,
   },
   helpdesk: [{ id: "f1", question: "¿Abren los domingos?", answer: "Sí, de 8 a 13." }],
   filterQuestions: [],
@@ -41,14 +46,17 @@ const render = async (siteId = SITE_ID) => renderToString(await SiteSettingsPage
 describe("site settings page", () => {
   beforeEach(() => {
     onGetSiteSettings.mockReset();
+    onGetSiteUsage.mockReset().mockResolvedValue({ answersToday: 12, cap: 300, remaining: 288, ratio: 0.04, reached: false });
   });
 
   it("shows the sections in Spanish and the real widget as preview", async () => {
     onGetSiteSettings.mockResolvedValue(settings);
     const html = await render();
-    for (const title of ["Negocio", "Apariencia", "Preguntas frecuentes", "Preguntas de calificación", "Captura de datos", "Instalación"]) {
+    for (const title of ["Negocio", "Apariencia", "Preguntas frecuentes", "Preguntas de calificación", "Captura de datos", "Uso y tope", "Instalación"]) {
       expect(html).toContain(title);
     }
+    // Spec 011, criterion 7: today's usage against the cap.
+    expect(html).toContain("Hoy: 12 de 300 respuestas");
     expect(html).toContain('data-testid="bot-preview"');
     expect(html).toContain("¡Hola! Soy el bot de la panadería.");
     expect(html).toContain("¿Abren los domingos?");
@@ -75,6 +83,7 @@ describe("site settings page", () => {
 
   it("is not found when the site is not the owner's", async () => {
     onGetSiteSettings.mockResolvedValue(null);
+    onGetSiteUsage.mockResolvedValue(null);
     await expect(render("ajeno")).rejects.toThrow("NEXT_NOT_FOUND");
     expect(onGetSiteSettings).toHaveBeenCalledWith("ajeno");
   });

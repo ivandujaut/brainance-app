@@ -1,6 +1,6 @@
 # 011 — Tope visible y métricas de honestidad
 
-- **Estado:** Borrador
+- **Estado:** Implementada
 - **ADRs relacionados:** [0008 — Errores y métricas](../adr/0008-errores-y-metricas.md), [0004 — Aislamiento multi-tenant](../adr/0004-aislamiento-multi-tenant.md)
 - **Specs relacionadas:** [007 — Observabilidad](007-observabilidad.md) (tope de costo y métricas del dashboard), [006 — Bandeja](006-bandeja-de-conversaciones.md) (marca de derivación), [010 — Aviso al dueño](010-aviso-al-dueno.md) (`attentionAt`)
 - **Posicionamiento:** segunda y tercera [prueba](../posicionamiento.md#las-tres-pruebas): "la honestidad medida" y "el precio previsible".
