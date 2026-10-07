@@ -1,6 +1,7 @@
 "use server";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { siteIcon } from "@/domain/site-icon";
 import { client } from "@/lib/prisma";
 import { acceptTerms, ensureUser } from "@/server/users";
 import { revalidatePath } from "next/cache";
@@ -16,10 +17,11 @@ export const onLoadAccount = async () => {
   const fullname =
     clerkUser.fullName?.trim() || clerkUser.primaryEmailAddress?.emailAddress.split("@")[0] || "Usuario";
   const user = await ensureUser(client, { clerkId: clerkUser.id, fullname });
-  const domains = await client.domain.findMany({
+  const sites = await client.domain.findMany({
     where: { userId: user.id },
-    select: { id: true, name: true, icon: true },
+    select: { id: true, name: true, icon: true, chatBot: { select: { icon: true } } },
   });
+  const domains = sites.map((site) => ({ id: site.id, name: site.name, icon: siteIcon(site) }));
   return { user, domains };
 };
 
