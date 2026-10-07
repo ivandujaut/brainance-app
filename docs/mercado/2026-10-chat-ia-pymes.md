@@ -65,6 +65,10 @@ Descartados: ninguno.
 2. Titular de la landing con la promesa de honestidad y publicación del eval en rioplatense. (Eval y comportamiento existen; la landing lo tiene como celda del bento.)
 3. Tope diario y consumo visibles y editables por el dueño, más plantillas de FAQ por rubro. (El tope existe internamente; las plantillas no.)
 
+## Anexos
+
+Las notas de cada refutación, con las búsquedas y los contraejemplos que respaldan la sección 3, están en [`refutaciones/`](refutaciones/): un archivo por hueco y lente (`--latam` o `--global`).
+
 ## Fuentes
 
 - G2, alucinación queja n.º 1: https://learn.g2.com/ai-chatbot-hype-vs.-reality-what-g2-data-reveals-about-buyer-experience
