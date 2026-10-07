@@ -105,10 +105,21 @@ describe("dashboard page", () => {
     expect(html).not.toContain("Ver como tabla");
   });
 
-  it("keeps the onboarding checklist until it is complete", async () => {
-    mocks.onGetOnboarding.mockResolvedValue({ completed: false, steps: [], site: null });
+  it("keeps only the onboarding checklist while it is incomplete and nobody wrote yet", async () => {
+    mocks.onGetOnboarding.mockResolvedValue({ completed: false, hasConversations: false, steps: [], site: null });
     const html = await render();
     expect(html).not.toContain("owner-metrics");
     expect(mocks.onGetOwnerMetrics).not.toHaveBeenCalled();
+  });
+
+  // QA of spec 011: a bot that already answers shows its metrics, with the checklist still on top.
+  it("shows the metrics under the checklist once the bot has conversations", async () => {
+    mocks.onGetOnboarding.mockResolvedValue({ completed: false, hasConversations: true, steps: [], site: null });
+    const html = await render({ site: "s1" });
+    expect(html).toContain('data-testid="onboarding-checklist"');
+    expect(html).toContain('data-testid="owner-metrics"');
+    expect(html.indexOf("onboarding-checklist")).toBeLessThan(html.indexOf("owner-metrics"));
+    expect(html).toContain('data-testid="metric-answers">40<');
+    expect(html).toContain("Hoy: 12 de 300 respuestas");
   });
 });

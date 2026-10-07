@@ -24,7 +24,7 @@ Las conversaciones del widget se guardan, pero el dueño no puede verlas: el ít
 
 ### Necesita atención
 
-5. **Dado** una respuesta del bot que deriva al contacto del negocio (repite alguno de sus datos: teléfono, email, link o usuario, aunque cambie el resto del texto) o la respuesta fija del tope diario, **entonces** la conversación queda marcada como **Necesita atención**.
+5. **Dado** una respuesta del bot que deriva al contacto del negocio (dice que no tiene el dato y repite alguno de los datos del contacto: teléfono, email, link o usuario, aunque cambie el resto del texto) o la respuesta fija del tope diario, **entonces** la conversación queda marcada como **Necesita atención**.
 6. **Dado** un mensaje del visitante que pide hablar con una persona ("quiero hablar con alguien", "¿me atiende un humano?", "pasame con un asesor", y variantes), **entonces** la conversación queda marcada como **Necesita atención**.
 7. **Dado** una conversación marcada, **cuando** el dueño toma el control o responde, **entonces** la marca se quita.
 
@@ -97,7 +97,8 @@ Las conversaciones del widget se guardan, pero el dueño no puede verlas: el ít
     - **teléfonos:** comparando solo los dígitos, con 8 o más, y aceptando que falten el código de país o de área;
     - **emails, links y usuarios:** comparados tal cual.
   - Si el contacto no tiene ninguno de esos datos, por ejemplo una dirección, se sigue buscando el texto completo.
-  - **Falso positivo aceptado:** una respuesta que contesta y además ofrece el contacto ("para pedir, escribinos al…") también se marca. Una falsa alarma en la bandeja cuesta menos que un cliente perdido.
+  - ~~**Falso positivo aceptado:** una respuesta que contesta y además ofrece el contacto también se marca.~~ Revisado en el QA de la spec 011 (2026-10-07): con el aviso por email (spec 010) y las métricas de honestidad, cada falsa alarma le manda un email al dueño e infla "Derivadas". Respuestas reales como "Sí, hacemos envíos en CABA. Para más detalles… contactarnos por WhatsApp…" se marcaban.
+  - **Desde entonces** una derivación además tiene que decir que no tiene el dato ("no tengo esa información", "no cuento con ese dato", "no te puedo confirmar", "no figura"), que es lo que el prompt le pide al bot cuando no sabe. El riesgo pasa a ser el contrario: una derivación sin esa frase no se marca. Se mide en la beta junto con el eval.
 - **Polling y cuota de Neon:** ver las consecuencias del ADR 0007. El push activado lo reduce.
 - **El visitante cierra el chat mientras lo atiende una persona:** el mensaje del dueño queda guardado y lo ve al volver a abrir el chat. Notificarlo fuera del sitio queda fuera de alcance.
 

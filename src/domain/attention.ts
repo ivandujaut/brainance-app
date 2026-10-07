@@ -66,7 +66,22 @@ const repeatsContact = (reply: string, contact: string) => {
   );
 };
 
-/** Why this exchange needs the owner, or null. A reply repeating the business contact is a derivation. */
+// The prompt asks the bot to say it does not have the information before offering the contact
+// (src/domain/answer-prompt.ts). An answer that just adds the contact "for more details" is not a
+// derivation (QA of spec 011). Matched on normalized text: no accents, lower case.
+const LACKS_DATA = [
+  /\bno (tengo|tenemos|cuento con|contamos con|dispongo de|disponemos de|manejo|manejamos)\b[^.?!]{0,40}\b(informacion|info|dato|datos|detalle|detalles)\b/,
+  /\b(informacion|dato|datos|detalle|detalles)\b[^.?!]{0,30}\bno (la|lo|las|los) (tengo|tenemos)\b/,
+  /\bno (te |le |les |se )?(puedo|podemos|sabria|sabriamos)\b[^.?!]{0,20}\b(confirmar|decir|responder|asegurar|precisar|informar)/,
+  /\bno (figura|figuran|aparece|aparecen)\b/,
+];
+
+const saysItLacksData = (reply: string) => LACKS_DATA.some((pattern) => pattern.test(reply));
+
+/**
+ * Why this exchange needs the owner, or null. A derivation is a reply that says it lacks the data
+ * and repeats the business contact.
+ */
 export const detectAttention = ({
   visitorText,
   reply,
@@ -78,6 +93,7 @@ export const detectAttention = ({
 }): AttentionReason | null => {
   if (asksForHuman(visitorText)) return "human_request";
   const needle = contact ? normalize(contact) : "";
-  if (needle && repeatsContact(normalize(reply), needle)) return "derivation";
+  const text = normalize(reply);
+  if (needle && saysItLacksData(text) && repeatsContact(text, needle)) return "derivation";
   return null;
 };

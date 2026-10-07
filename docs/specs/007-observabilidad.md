@@ -36,7 +36,7 @@ La beta está casi lista para recibir usuarios, pero si algo se rompe en producc
 
 ### Dashboard del dueño
 
-11. **Dado** un dueño que completó el onboarding, **cuando** entra al dashboard, **entonces** ve, para los últimos 7 o 30 días (a elección) y para todos sus sitios o uno:
+11. **Dado** un dueño que completó el onboarding, o cuyo bot ya tiene al menos una conversación (QA de la spec 011: un bot que ya responde no esconde sus números detrás del checklist), **cuando** entra al dashboard, **entonces** ve, para los últimos 7 o 30 días (a elección) y para todos sus sitios o uno:
     - conversaciones;
     - leads;
     - tasa de captura (leads sobre conversaciones con al menos una respuesta);
@@ -80,7 +80,7 @@ La beta está casi lista para recibir usuarios, pero si algo se rompe en producc
 - `streamAnswer` expone el uso al terminar (tokens, modelo servido, latencia) y el error si falla, para que el endpoint lo registre.
 
 **Rutas**
-- El dashboard (`/dashboard`) suma las métricas debajo del onboarding (o en su lugar si está completo). Acciones `onGetOwnerMetrics({ siteId?, days })` sobre `tenancy.ts`, con su caso en `tenant-isolation.int.test.ts`.
+- El dashboard (`/dashboard`) suma las métricas debajo del onboarding cuando ya hay conversaciones (`onGetOnboarding().hasConversations`), o en su lugar si está completo. Acciones `onGetOwnerMetrics({ siteId?, days })` sobre `tenancy.ts`, con su caso en `tenant-isolation.int.test.ts`.
 - `/admin` (Server Component): `isAdmin()` lee `ADMIN_CLERK_IDS` y, si no corresponde, `notFound()`. Las consultas de administración viven en `src/server/admin-metrics.ts` y nunca se exponen como server actions.
 - Los gráficos usan componentes propios con SVG y los tokens del ADR 0005, sin librería de gráficos nueva. Las dos series usan `--chart-1` (azul) y `--chart-2` (naranja), validadas para daltonismo y contraste 3:1 sobre la superficie en claro y oscuro. Tienen leyenda, etiquetas directas, tooltip con línea guía y vista de tabla.
 - "Necesitaron atención" cuenta las conversaciones con `attentionReason`: desde esta spec, tomar el control quita la marca activa (`needsAttention`) pero conserva el motivo como historial.

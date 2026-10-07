@@ -23,10 +23,16 @@ export const onGetOnboarding = async () => {
   const onboarding = getOnboarding(
     sites.map((s) => ({ faqCount: s._count.helpdesk, installedAt: s.chatBot?.installedAt ?? null })),
   );
+  // A bot that already has conversations shows its metrics before the checklist is done (QA of spec 011).
+  const conversation = await client.chatRoom.findFirst({
+    where: { Customer: { Domain: { User: { clerkId: user.id } } }, message: { some: {} } },
+    select: { id: true },
+  });
   // Beta accounts have a single site; the checklist works on the first one.
   const site = sites[0];
   return {
     ...onboarding,
+    hasConversations: conversation !== null,
     site: site ? { id: site.id, name: site.name, faqCount: site._count.helpdesk } : null,
   };
 };

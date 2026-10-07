@@ -111,13 +111,14 @@ test("at the owner's daily cap, the bot derives instead of answering", async ({ 
 });
 
 // Spec 010, criteria 1 and 12: when the bot derives, the owner is emailed after the visitor got
-// the answer. The echo model repeats the question, so a question quoting the contact is a derivation.
+// the answer. The echo model repeats the question, so a question that says it lacks the data and quotes
+// the contact is a derivation (QA of spec 011: the contact alone is not).
 test("when the bot derives, the owner gets a notice and the answer is not delayed", async ({ page, baseURL }) => {
   const { domainId, name } = await newSite("aviso", { contact: "WhatsApp +54 9 341 555-0101" });
   await hostPage(page, name, domainId, new URL(baseURL!).origin);
   await page.getByRole("button", { name: "Abrir chat" }).click();
   const chat = page.frameLocator('iframe[data-brainance="chat"]');
-  await chat.getByTestId("widget-input").fill("¿Los llamo al WhatsApp +54 9 341 555-0101?");
+  await chat.getByTestId("widget-input").fill("No tengo ese dato: ¿los llamo al WhatsApp +54 9 341 555-0101?");
   await chat.getByTestId("widget-send").click();
   await expect(chat.locator('[data-testid="widget-message"][data-role="assistant"]').last()).toContainText(
     "Respuesta de prueba a:",
