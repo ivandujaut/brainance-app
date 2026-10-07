@@ -27,6 +27,10 @@ Cada ítem va a tener su spec en `docs/specs/`.
 - **Lanzamiento de la beta** ([spec 008](specs/008-lanzamiento-de-la-beta.md)): checklist de despliegue y QA, términos y privacidad, limpieza del código heredado.
 - **Landing con personalidad** ([spec 009](specs/009-landing.md)): dirección editorial, demo con el widget real y figuras de Hairline.
 
+## Posicionamiento
+
+- **Mercado de chat con IA para pymes** ([análisis 2026-10](mercado/2026-10-chat-ia-pymes.md)): qué tienen en común los competidores, dónde no competir y seis huecos verificados. Propone como próximos pasos el aviso al dueño cuando una conversación necesita atención, un titular centrado en la honestidad y un tope de gasto visible.
+
 ## v1: después de la beta
 
 Se mantiene en el backlog para iterar cuando la beta valide el producto:
