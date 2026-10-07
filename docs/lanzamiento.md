@@ -53,6 +53,12 @@
 - [ ] Crear el proyecto (plataforma Next.js) y copiar el **DSN**.
 - [ ] Opcional, para ver los errores con el código fuente: *Settings → Auth Tokens →* crear un token con permiso de releases.
 - [ ] *Alerts →* una regla de "nuevo issue" que mande email.
+- [ ] *Verificar* en una preview, con la sesión iniciada:
+  1. Abrir `<URL de la preview>/api/debug/sentry`. Tiene que responder `"sent": true`.
+  2. En Sentry aparece el issue "Prueba de Sentry (BrAInance)", con el tag `area: debug`.
+  3. En *Additional Data*, `email` y `text` dicen `[redacted]`.
+
+  La ruta solo existe en previews y en local (en producción da 404) y pide sesión.
 
 ## 6. Vercel: proyecto, IA y variables
 

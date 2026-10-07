@@ -14,4 +14,11 @@ test.describe("smoke", () => {
       await expect(page).toHaveURL(/\/auth\/sign-in/);
     });
   }
+
+  // The Sentry test route sends events on our quota: only signed-in users may trigger it. The E2E server
+  // runs as a preview (playwright.config.ts), so the route exists and only the sign-in can block it.
+  test("the Sentry test route is not open to anonymous visitors", async ({ request }) => {
+    const response = await request.get("/api/debug/sentry", { maxRedirects: 0 });
+    expect(response.status()).not.toBe(200);
+  });
 });

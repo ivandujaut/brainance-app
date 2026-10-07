@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/nextjs";
 // Error reporting behind one interface (ADR 0008): Sentry when SENTRY_DSN is set, the console
 // otherwise. Never pass conversation text, emails or answers in `extra` (they are also scrubbed).
 
-export type Area = "widget" | "ai" | "email" | "realtime" | "leads" | "inbox" | "settings";
+export type Area = "widget" | "ai" | "email" | "realtime" | "leads" | "inbox" | "settings" | "debug";
 
 type Context = { area: Area; domainId?: string; extra?: Record<string, unknown> };
 
