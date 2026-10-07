@@ -1,5 +1,5 @@
 "use server";
-import { captureRate, dayKey, fillDays, TIME_ZONE } from "@/domain/metrics";
+import { captureRate, dayKey, derivationRate, fillDays, medianMinutes, TIME_ZONE } from "@/domain/metrics";
 import { Prisma } from "@/generated/prisma/client";
 import { client } from "@/lib/prisma";
 import { currentOwnerId, findOwnedSite } from "@/server/tenancy";
@@ -28,12 +28,13 @@ export const onGetOwnerMetrics = async ({ siteId, days }: { siteId?: string; day
     Prisma.sql`to_char((${column} AT TIME ZONE 'UTC') AT TIME ZONE ${TIME_ZONE}, 'YYYY-MM-DD')`;
   const firstDay = fillDays([], { days: period, today })[0].day;
 
-  const [rooms, leads] = await Promise.all([
-    client.$queryRaw<{ day: string; room: string; answered: boolean; attention: boolean }[]>`
+  const [rooms, leads, answers, responses] = await Promise.all([
+    client.$queryRaw<{ day: string; room: string; answered: boolean; attention: boolean; humanRequest: boolean }[]>`
       SELECT ${day(Prisma.sql`min(m."createdAt") FILTER (WHERE m.role = 'user')`)} AS day,
              r.id AS room,
              bool_or(m.role = 'assistant') AS answered,
-             (r."attentionReason" IS NOT NULL) AS attention
+             (r."attentionReason" IS NOT NULL) AS attention,
+             (r."attentionReason" = 'human_request') AS "humanRequest"
       FROM "ChatMessage" m
       JOIN "ChatRoom" r ON r.id = m."chatRoomId"
       JOIN "Customer" c ON c.id = r."customerId"
@@ -48,6 +49,26 @@ export const onGetOwnerMetrics = async ({ siteId, days }: { siteId?: string; day
       JOIN "Domain" d ON d.id = c."domainId"
       JOIN "User" u ON u.id = d."userId"
       WHERE ${scope} AND c."leadAt" >= ${since}`,
+    // Spec 011, criteria 1, 2 and 4: the bot's answers (never a person's) and how many derived.
+    client.$queryRaw<{ day: string; derived: boolean }[]>`
+      SELECT ${day(Prisma.sql`m."createdAt"`)} AS day, m.derivation AS derived
+      FROM "ChatMessage" m
+      JOIN "ChatRoom" r ON r.id = m."chatRoomId"
+      JOIN "Customer" c ON c.id = r."customerId"
+      JOIN "Domain" d ON d.id = c."domainId"
+      JOIN "User" u ON u.id = d."userId"
+      WHERE ${scope} AND m.role = 'assistant' AND m."createdAt" >= ${since}`,
+    // Spec 011, criterion 3: minutes from the flag to the owner's first message after it.
+    client.$queryRaw<{ day: string; minutes: number }[]>`
+      SELECT ${day(Prisma.sql`r."attentionAt"`)} AS day,
+             extract(epoch FROM (min(m."createdAt") - r."attentionAt")) / 60 AS minutes
+      FROM "ChatRoom" r
+      JOIN "ChatMessage" m ON m."chatRoomId" = r.id AND m.role = 'owner' AND m."createdAt" >= r."attentionAt"
+      JOIN "Customer" c ON c.id = r."customerId"
+      JOIN "Domain" d ON d.id = c."domainId"
+      JOIN "User" u ON u.id = d."userId"
+      WHERE ${scope} AND r."attentionAt" >= ${since}
+      GROUP BY r.id`,
   ]);
 
   // Keep only the calendar days of the period (the query window starts a day early for time zones).
@@ -55,6 +76,10 @@ export const onGetOwnerMetrics = async ({ siteId, days }: { siteId?: string; day
   const periodRooms = inPeriod(rooms);
   const periodLeads = inPeriod(leads);
   const answeredConversations = periodRooms.filter((r) => r.answered).length;
+  const periodAnswers = inPeriod(answers);
+  const derived = periodAnswers.filter((a) => a.derived).length;
+  const responseMinutes = inPeriod(responses).map((r) => Number(r.minutes));
+  const median = medianMinutes(responseMinutes);
 
   const perDay = new Map<string, { day: string; conversations: number; leads: number }>();
   const bucket = (d: string) => perDay.get(d) ?? perDay.set(d, { day: d, conversations: 0, leads: 0 }).get(d)!;
@@ -68,6 +93,12 @@ export const onGetOwnerMetrics = async ({ siteId, days }: { siteId?: string; day
     leads: periodLeads.length,
     captureRate: captureRate({ leads: periodLeads.length, answeredConversations }),
     needingAttention: periodRooms.filter((r) => r.attention).length,
+    // Spec 011: honesty metrics.
+    answers: periodAnswers.length,
+    derived,
+    derivationRate: derivationRate({ answers: periodAnswers.length, derived }),
+    humanRequests: periodRooms.filter((r) => r.humanRequest).length,
+    responseTime: median === null ? null : { medianMinutes: median, cases: responseMinutes.length },
     series: fillDays([...perDay.values()], { days: period, today }),
   };
 };

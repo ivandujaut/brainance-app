@@ -11,6 +11,7 @@ const bot: Bot = {
   addressing: "usted",
   contact: "WhatsApp +54 9 341 555-0101",
   leadCapture: true,
+    dailyAnswerCap: null,
 };
 const site = (chatBot: Partial<Bot> | null): WidgetSite => ({
   id: "6f1c7f4e-1f3a-4c8e-9a3b-2d1e0f9c8b7a",

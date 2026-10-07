@@ -121,4 +121,33 @@ describe.skipIf(!url)("bot settings actions", async () => {
     expect((await bot.onDeleteFilterQuestion(id)).status).toBe(200);
     expect(await db.filterQuestions.count({ where: { domainId: siteId } })).toBe(0);
   });
+
+  // Spec 011, criteria 7, 8, 12 and 14: the owner's daily answer cap and today's usage.
+  it("onUpdateDailyAnswerCap: saves a cap in range, clears it when blank, rejects the rest", async () => {
+    expect((await bot.onUpdateDailyAnswerCap(siteId, { dailyAnswerCap: "20" })).status).toBe(200);
+    expect((await widgetSite()).chatBot?.dailyAnswerCap).toBe(20);
+    expect((await bot.onUpdateDailyAnswerCap(siteId, { dailyAnswerCap: "" })).status).toBe(200);
+    expect((await widgetSite()).chatBot?.dailyAnswerCap).toBeNull();
+    expect(await bot.onUpdateDailyAnswerCap(siteId, { dailyAnswerCap: "19" })).toMatchObject({
+      status: 400,
+      message: "El tope tiene que ser un número entero entre 20 y 300.",
+    });
+    expect((await bot.onUpdateDailyAnswerCap(siteId, { dailyAnswerCap: "301" })).status).toBe(400);
+    expect((await widgetSite()).chatBot?.dailyAnswerCap).toBeNull();
+  });
+
+  it("onGetSiteUsage: today's bot answers against the cap in force", async () => {
+    expect(await bot.onGetSiteUsage(siteId)).toEqual({ answersToday: 0, cap: 300, remaining: 300, ratio: 0, reached: false });
+    const { addMessage, getOrCreateRoom } = await import("@/server/conversations");
+    const room = await getOrCreateRoom(db, { domainId: siteId, visitorId: crypto.randomUUID() });
+    for (let i = 0; i < 20; i++) {
+      await addMessage(db, room, "user", `consulta ${i}`);
+      await addMessage(db, room, "assistant", `respuesta ${i}`);
+    }
+    await addMessage(db, room, "owner", "Te atiendo yo.");
+    expect(await bot.onGetSiteUsage(siteId)).toMatchObject({ answersToday: 20, cap: 300, reached: false });
+    await bot.onUpdateDailyAnswerCap(siteId, { dailyAnswerCap: 20 });
+    expect(await bot.onGetSiteUsage(siteId)).toEqual({ answersToday: 20, cap: 20, remaining: 0, ratio: 1, reached: true });
+    expect(await bot.onGetSiteUsage(crypto.randomUUID())).toBeNull();
+  });
 });

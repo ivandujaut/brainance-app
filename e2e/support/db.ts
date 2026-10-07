@@ -4,11 +4,18 @@ import { Pool } from "pg";
 // Plain SQL instead of the generated Prisma client, which is ESM-only.
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-type SiteOptions = { background?: string; contact?: string; leadCapture?: boolean; leadQuestion?: string };
+type SiteOptions = {
+  background?: string;
+  contact?: string;
+  leadCapture?: boolean;
+  leadQuestion?: string;
+  /** The owner's daily answer cap (spec 011); unset means the beta maximum. */
+  dailyAnswerCap?: number;
+};
 
 export const createSite = async (
   name: string,
-  { background = "#123456", contact, leadCapture = true, leadQuestion }: SiteOptions = {},
+  { background = "#123456", contact, leadCapture = true, leadQuestion, dailyAnswerCap }: SiteOptions = {},
 ) => {
   const {
     rows: [user],
@@ -23,8 +30,8 @@ export const createSite = async (
     [name, user.id],
   );
   await pool.query(
-    `INSERT INTO "ChatBot" ("welcomeMessage", background, contact, "leadCapture", "domainId") VALUES ($1, $2, $3, $4, $5)`,
-    ["¡Hola! Soy el asistente de prueba.", background, contact ?? null, leadCapture, domain.id],
+    `INSERT INTO "ChatBot" ("welcomeMessage", background, contact, "leadCapture", "dailyAnswerCap", "domainId") VALUES ($1, $2, $3, $4, $5, $6)`,
+    ["¡Hola! Soy el asistente de prueba.", background, contact ?? null, leadCapture, dailyAnswerCap ?? null, domain.id],
   );
   await pool.query(`INSERT INTO "HelpDesk" (question, answer, "domainId") VALUES ($1, $2, $3)`, [
     "¿Hacen envíos?",
@@ -50,8 +57,8 @@ export const installedAt = async (domainId: string) => {
   return rows[0]?.installedAt ?? null;
 };
 
-/** Fills the site's daily quota with `count` visitor messages from another visitor. */
-export const seedVisitorMessages = async (domainId: string, count: number) => {
+/** Fills the site's daily quota with `count` bot answers to another visitor (spec 011: the cap counts answers). */
+export const seedBotAnswers = async (domainId: string, count: number) => {
   const {
     rows: [room],
   } = await pool.query<{ id: string }>(
@@ -61,9 +68,20 @@ export const seedVisitorMessages = async (domainId: string, count: number) => {
   );
   await pool.query(
     `INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt")
-     SELECT 'consulta ' || n, 'user', $1, now() FROM generate_series(1, $2) n`,
+     SELECT 'respuesta ' || n, 'assistant', $1, now() FROM generate_series(1, $2) n`,
     [room.id, count],
   );
+};
+
+/** The bot's answers on the site, oldest first, with their derivation mark (spec 011, criterion 13). */
+export const answersOf = async (domainId: string) => {
+  const { rows } = await pool.query<{ message: string; derivation: boolean }>(
+    `SELECT m.message, m.derivation FROM "ChatMessage" m
+     JOIN "ChatRoom" r ON r.id = m."chatRoomId" JOIN "Customer" c ON c.id = r."customerId"
+     WHERE c."domainId" = $1 AND m.role = 'assistant' ORDER BY m."createdAt", m.id`,
+    [domainId],
+  );
+  return rows;
 };
 
 /** The site's leads with their answers (spec 005). */
@@ -141,9 +159,9 @@ export const seedConversation = async (domainId: string) => {
     [crypto.randomUUID(), domainId],
   );
   await pool.query(
-    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt", "createdAt") VALUES
-     ('¿Tienen sin TACC?', 'user', $1, now(), now() - interval '2 seconds'),
-     ('No tengo ese dato. Escribinos por WhatsApp.', 'assistant', $1, now(), now() - interval '1 second')`,
+    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt", "createdAt", derivation) VALUES
+     ('¿Tienen sin TACC?', 'user', $1, now(), now() - interval '2 seconds', false),
+     ('No tengo ese dato. Escribinos por WhatsApp.', 'assistant', $1, now(), now() - interval '1 second', true)`,
     [room.id],
   );
   return room.id;

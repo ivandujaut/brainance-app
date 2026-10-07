@@ -1,6 +1,8 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import type { z } from "zod";
+import { DailyAnswerCapSchema, effectiveAnswerCap, usageState } from "@/domain/answer-cap";
+import { SITE_DAILY_LIMIT } from "@/domain/widget-limits";
 import {
   AppearanceSchema,
   BusinessInfoSchema,
@@ -11,6 +13,7 @@ import {
   MAX_FAQS,
 } from "@/domain/bot-settings";
 import { client } from "@/lib/prisma";
+import { countSiteAnswersSince } from "@/server/conversations";
 import { findOwnedFaq, findOwnedFilterQuestion, findOwnedSite } from "@/server/tenancy";
 import { captureError } from "@/server/observability";
 
@@ -64,6 +67,7 @@ export const onGetSiteSettings = async (id: string) => {
           leadCapture: true,
           leadEmail: true,
           attentionEmail: true,
+          dailyAnswerCap: true,
         },
       },
       helpdesk: { select: { id: true, question: true, answer: true }, orderBy: { question: "asc" } },
@@ -99,6 +103,32 @@ export const onUpdateLeadSettings = async (id: string, input: unknown) => {
   const parsed = LeadSettingsSchema.safeParse(input);
   if (!parsed.success) return firstError(parsed.error);
   return attempt(site.id, () => saveBot(site.id, parsed.data), "Avisos guardados");
+};
+
+/** Spec 011, criteria 8 and 14: the owner's daily answer cap; blank means the beta maximum. */
+export const onUpdateDailyAnswerCap = async (id: string, input: unknown) => {
+  const site = await findOwnedSite(id);
+  if (!site) return NOT_FOUND;
+  const parsed = DailyAnswerCapSchema.safeParse(input);
+  if (!parsed.success) return firstError(parsed.error);
+  return attempt(site.id, () => saveBot(site.id, parsed.data), "Tope guardado");
+};
+
+export type SiteUsage = { answersToday: number; cap: number; remaining: number; ratio: number; reached: boolean };
+
+/**
+ * Spec 011, criteria 7, 11 and 12: today's bot answers against the cap in force. The same count
+ * the widget endpoint checks before calling the model, so the panel and the cap never disagree.
+ */
+export const onGetSiteUsage = async (id: string): Promise<SiteUsage | null> => {
+  const site = await findOwnedSite(id);
+  if (!site) return null;
+  const [bot, answersToday] = await Promise.all([
+    client.chatBot.findUnique({ where: { domainId: site.id }, select: { dailyAnswerCap: true } }),
+    countSiteAnswersSince(client, site.id, new Date(Date.now() - SITE_DAILY_LIMIT.windowMs)),
+  ]);
+  const cap = effectiveAnswerCap(bot?.dailyAnswerCap);
+  return { answersToday, cap, ...usageState({ answersToday, cap }) };
 };
 
 export const onCreateHelpDeskQuestion = async (id: string, input: unknown) => {

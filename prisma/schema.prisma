@@ -61,6 +61,8 @@ model ChatBot {
   leadEmail      Boolean @default(true)
   // Email the owner when a conversation needs attention (spec 010).
   attentionEmail Boolean @default(true)
+  // The owner's daily answer cap (spec 011); null means the beta maximum.
+  dailyAnswerCap Int?
   // Set when the owner confirms the snippet is on their site (later: first widget load).
   installedAt    DateTime?
   Domain         Domain? @relation(fields: [domainId], references: [id], onDelete: Cascade)
@@ -164,6 +166,8 @@ model ChatMessage {
   ChatRoom   ChatRoom? @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
   chatRoomId String?   @db.Uuid
   seen       Boolean   @default(false)
+  // Spec 011: a bot answer that referred the visitor to the business instead of answering.
+  derivation Boolean   @default(false)
 
   @@index([chatRoomId, createdAt])
   @@index([chatRoomId, seen])

@@ -1,12 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
+  answersOf,
   attentionNoticesOf,
   createSite,
   deleteUsers,
   installedAt,
   modelCallsOf,
+  seedBotAnswers,
   seedModelSpend,
-  seedVisitorMessages,
 } from "./support/db";
 
 // Spec 003. The customer's site is simulated on its own origin; the widget loads from the app.
@@ -73,7 +74,7 @@ test("the chat uses the owner's color with readable text", async ({ page, baseUR
 // Spec 004, criterion 7: over the daily cap, the fixed reply refers to the owner's contact.
 test("over the site's daily cap, the bot refers to the owner's contact", async ({ page, baseURL }) => {
   const { domainId, name } = await newSite("tope", { contact: "WhatsApp +54 9 341 555-0101" });
-  await seedVisitorMessages(domainId, 300);
+  await seedBotAnswers(domainId, 300);
   await hostPage(page, name, domainId, new URL(baseURL!).origin);
   await page.getByRole("button", { name: "Abrir chat" }).click();
   const chat = page.frameLocator('iframe[data-brainance="chat"]');
@@ -84,6 +85,29 @@ test("over the site's daily cap, the bot refers to the owner's contact", async (
   );
   // Spec 010, criterion 4: the owner is told about the cap (EMAIL_PROVIDER=log in E2E).
   await expect.poll(async () => (await attentionNoticesOf(domainId))[0]).toMatchObject({ reason: "site_cap", notified: true });
+});
+
+// Spec 011, criteria 9 and 13: the owner's lower cap applies, and the fixed reply is stored as a derivation.
+test("at the owner's daily cap, the bot derives instead of answering", async ({ page, baseURL }) => {
+  const { domainId, name } = await newSite("tope-propio", { contact: "WhatsApp +54 9 341 555-0101", dailyAnswerCap: 20 });
+  await seedBotAnswers(domainId, 19);
+  await hostPage(page, name, domainId, new URL(baseURL!).origin);
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  const chat = page.frameLocator('iframe[data-brainance="chat"]');
+  const reply = chat.locator('[data-testid="widget-message"][data-role="assistant"]').last();
+
+  // Answer 20 still comes from the model.
+  await chat.getByTestId("widget-input").fill("¿Hacen envíos?");
+  await chat.getByTestId("widget-send").click();
+  await expect(reply).toHaveText("Respuesta de prueba a: ¿Hacen envíos?");
+
+  // Answer 21 is the fixed one, and the conversation needs attention.
+  await chat.getByTestId("widget-input").fill("¿Y a Córdoba?");
+  await chat.getByTestId("widget-send").click();
+  await expect(reply).toContainText("WhatsApp +54 9 341 555-0101");
+  await expect.poll(async () => (await attentionNoticesOf(domainId))[0]).toMatchObject({ reason: "site_cap" });
+  const answers = await answersOf(domainId);
+  expect(answers.slice(-2).map((a) => a.derivation)).toEqual([false, true]);
 });
 
 // Spec 010, criteria 1 and 12: when the bot derives, the owner is emailed after the visitor got
