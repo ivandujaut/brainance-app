@@ -77,6 +77,7 @@ export const BotSettings = ({ settings }: { settings: SiteSettings }) => {
             siteId={settings.id}
             leadCapture={bot?.leadCapture ?? true}
             leadEmail={bot?.leadEmail ?? true}
+            attentionEmail={bot?.attentionEmail ?? true}
           />
           <InstallSection siteId={settings.id} name={settings.name} installedAt={bot?.installedAt ?? null} />
         </div>

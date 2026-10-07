@@ -9,6 +9,7 @@ import {
   VISITOR_LIMIT,
   type RejectReason,
 } from "@/domain/widget-limits";
+import { getAppUrl } from "@/lib/app-url";
 import { client } from "@/lib/prisma";
 import { streamAnswer } from "@/server/ai/answer";
 import { answerModelId, resolveAnswerModel } from "@/server/ai/models";
@@ -22,9 +23,12 @@ import {
   getOrCreateRoom,
   listMessages,
 } from "@/server/conversations";
-import { detectAttention } from "@/domain/attention";
+import { detectAttention, type AttentionReason } from "@/domain/attention";
 import { toModelHistory } from "@/domain/takeover";
-import { flagAttention, resolveVisitorTurn } from "@/server/live";
+import { resolveEmailSender } from "@/server/email";
+import { flagAttention, resolveVisitorTurn, type FlagResult } from "@/server/live";
+import { ownerEmail } from "@/server/owner-email";
+import { notifyAttention } from "@/server/owner-notices";
 import { notifyRoomChanged } from "@/server/realtime";
 import { getWidgetSite, siteCapReply, toBusinessKnowledge } from "@/server/widget-site";
 
@@ -38,6 +42,13 @@ const REJECTIONS: Record<Exclude<RejectReason, "site_cap">, { status: number; me
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ domainId: string }> }) {
   const { domainId } = await params;
+  // Spec 010: the owner hears about it by email, after the visitor got their answer.
+  const notifyOwner = (room: string, reason: AttentionReason, flagged: FlagResult) =>
+    notifyAttention(
+      client,
+      { roomId: room, domainId, reason, flagged, now: new Date() },
+      { sender: resolveEmailSender(), ownerEmail, appUrl: getAppUrl() },
+    );
   const parsed = body.safeParse(await request.json().catch(() => null));
   if (!z.string().uuid().safeParse(domainId).success || !parsed.success || !isVisitorId(parsed.data.visitorId)) {
     return NextResponse.json({ error: "bad_request", message: "No pudimos enviar tu mensaje." }, { status: 400 });
@@ -79,8 +90,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Over the site's daily cap (messages or cost): answer without calling the model.
     const reply = siteCapReply(site);
     await addMessage(client, room, "assistant", reply);
-    await flagAttention(client, room, "site_cap");
-    after(() => notifyRoomChanged(client, room));
+    const flagged = await flagAttention(client, room, "site_cap");
+    after(() => Promise.all([notifyRoomChanged(client, room), notifyOwner(room, "site_cap", flagged)]));
     return NextResponse.json({ reply });
   }
 
@@ -94,8 +105,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     onEnd: async ({ text }) => {
       if (text.trim()) await addMessage(client, room, "assistant", text);
       const reason = detectAttention({ visitorText: question, reply: text, contact: site.chatBot?.contact ?? null });
-      if (reason) await flagAttention(client, room, reason);
-      await notifyRoomChanged(client, room);
+      if (reason) {
+        const flagged = await flagAttention(client, room, reason);
+        await notifyRoomChanged(client, room);
+        await notifyOwner(room, reason, flagged);
+      } else {
+        await notifyRoomChanged(client, room);
+      }
     },
   });
   // Keep the function alive until the answer is stored, even after the response is sent.

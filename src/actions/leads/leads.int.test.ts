@@ -89,10 +89,13 @@ describe.skipIf(!url)("lead actions", async () => {
   });
 
   it("onUpdateLeadSettings: turns lead capture and its email on and off", async () => {
-    expect((await bot.onUpdateLeadSettings(panaderia, { leadCapture: false, leadEmail: false })).status).toBe(200);
+    expect(
+      (await bot.onUpdateLeadSettings(panaderia, { leadCapture: false, leadEmail: false, attentionEmail: false })).status,
+    ).toBe(200);
     expect(await db.chatBot.findUniqueOrThrow({ where: { domainId: panaderia } })).toMatchObject({
       leadCapture: false,
       leadEmail: false,
+      attentionEmail: false,
     });
     expect((await bot.onUpdateLeadSettings(panaderia, { leadCapture: "sí" })).status).toBe(400);
   });

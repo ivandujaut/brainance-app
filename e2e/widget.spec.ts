@@ -1,5 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
-import { createSite, deleteUsers, installedAt, modelCallsOf, seedModelSpend, seedVisitorMessages } from "./support/db";
+import {
+  attentionNoticesOf,
+  createSite,
+  deleteUsers,
+  installedAt,
+  modelCallsOf,
+  seedModelSpend,
+  seedVisitorMessages,
+} from "./support/db";
 
 // Spec 003. The customer's site is simulated on its own origin; the widget loads from the app.
 // Chrome's local-network protections are relaxed in playwright.config.ts so these fake public
@@ -74,6 +82,27 @@ test("over the site's daily cap, the bot refers to the owner's contact", async (
   await expect(chat.locator('[data-testid="widget-message"][data-role="assistant"]').last()).toContainText(
     "WhatsApp +54 9 341 555-0101",
   );
+  // Spec 010, criterion 4: the owner is told about the cap (EMAIL_PROVIDER=log in E2E).
+  await expect.poll(async () => (await attentionNoticesOf(domainId))[0]).toMatchObject({ reason: "site_cap", notified: true });
+});
+
+// Spec 010, criteria 1 and 12: when the bot derives, the owner is emailed after the visitor got
+// the answer. The echo model repeats the question, so a question quoting the contact is a derivation.
+test("when the bot derives, the owner gets a notice and the answer is not delayed", async ({ page, baseURL }) => {
+  const { domainId, name } = await newSite("aviso", { contact: "WhatsApp +54 9 341 555-0101" });
+  await hostPage(page, name, domainId, new URL(baseURL!).origin);
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  const chat = page.frameLocator('iframe[data-brainance="chat"]');
+  await chat.getByTestId("widget-input").fill("¿Los llamo al WhatsApp +54 9 341 555-0101?");
+  await chat.getByTestId("widget-send").click();
+  await expect(chat.locator('[data-testid="widget-message"][data-role="assistant"]').last()).toContainText(
+    "Respuesta de prueba a:",
+  );
+  await expect.poll(async () => (await attentionNoticesOf(domainId))[0]).toMatchObject({
+    reason: "derivation",
+    notified: true,
+    notices: 1,
+  });
 });
 
 // Spec 007, criterion 5: every answer records its model call (the mock model costs nothing).

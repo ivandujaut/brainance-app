@@ -30,6 +30,7 @@ const settings: SiteSettings = {
     installedAt: null,
     leadCapture: true,
     leadEmail: true,
+    attentionEmail: true,
   },
   helpdesk: [{ id: "f1", question: "¿Abren los domingos?", answer: "Sí, de 8 a 13." }],
   filterQuestions: [],

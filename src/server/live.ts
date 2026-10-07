@@ -77,6 +77,23 @@ export const resolveVisitorTurn = async (db: PrismaClient, roomId: string, now =
   return turn;
 };
 
-/** The reason stays after the flag is cleared: the dashboard counts conversations that needed attention (spec 007). */
-export const flagAttention = (db: PrismaClient, roomId: string, reason: AttentionReason) =>
-  db.chatRoom.update({ where: { id: roomId }, data: { needsAttention: true, attentionReason: reason } });
+export type FlagResult = { wasFlagged: boolean };
+
+/**
+ * Marks the room as needing attention. The reason stays after the flag is cleared: the dashboard
+ * counts conversations that needed attention (spec 007). A room that was not flagged starts a new
+ * notice episode (spec 010): `attentionAt` is set and the notice counter restarts.
+ */
+export const flagAttention = (db: PrismaClient, roomId: string, reason: AttentionReason): Promise<FlagResult> =>
+  withRoomLock(db, roomId, async (tx) => {
+    const room = await tx.chatRoom.findUniqueOrThrow({ where: { id: roomId }, select: { needsAttention: true } });
+    await tx.chatRoom.update({
+      where: { id: roomId },
+      data: {
+        needsAttention: true,
+        attentionReason: reason,
+        ...(room.needsAttention ? {} : { attentionAt: new Date(), attentionNotices: 0 }),
+      },
+    });
+    return { wasFlagged: room.needsAttention };
+  });

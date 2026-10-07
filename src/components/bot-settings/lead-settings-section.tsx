@@ -7,9 +7,9 @@ import { Switch } from "@/components/ui/switch";
 import { Section } from "./section";
 import { useActionToast } from "@/hooks/use-action-toast";
 
-type Props = { siteId: string; leadCapture: boolean; leadEmail: boolean };
+type Props = { siteId: string; leadCapture: boolean; leadEmail: boolean; attentionEmail: boolean };
 
-/** Spec 005, criterion 15: lead capture and its owner email, per site. Each switch saves on change. */
+/** Lead capture and its owner email (spec 005, criterion 15) and the attention notice (spec 010, criterion 6), per site. Each switch saves on change. */
 export const LeadSettingsSection = ({ siteId, ...initial }: Props) => {
   const notify = useActionToast();
   const [settings, setSettings] = useState(initial);
@@ -52,6 +52,21 @@ export const LeadSettingsSection = ({ siteId, ...initial }: Props) => {
           onCheckedChange={(leadEmail) => change({ leadEmail })}
         />
       </div>
+      <div className="flex items-center justify-between gap-4">
+        <Label htmlFor="attention-email" className="font-normal">
+          Avisarme por email cuando una conversación me necesita
+        </Label>
+        <Switch
+          id="attention-email"
+          checked={settings.attentionEmail}
+          disabled={saving}
+          onCheckedChange={(attentionEmail) => change({ attentionEmail })}
+        />
+      </div>
+      <p className="text-sm text-muted-foreground">
+        Cuando el bot deriva a tu contacto, el visitante pide una persona o el sitio llega al tope del día, te llega un email
+        con la conversación y un link para tomar el control.
+      </p>
       <p className="text-sm text-muted-foreground">
         Los datos que dejan tus visitantes están en{" "}
         <Link href={`/leads?site=${siteId}`} className="underline underline-offset-2 text-foreground">

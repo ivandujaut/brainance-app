@@ -1,6 +1,6 @@
 # 010 — Aviso al dueño cuando una conversación necesita atención
 
-- **Estado:** Borrador
+- **Estado:** Implementada
 - **ADRs relacionados:** [0006 — Proveedor de email](../adr/0006-proveedor-de-email.md), [0008 — Errores y métricas](../adr/0008-errores-y-metricas.md)
 - **Specs relacionadas:** [005 — Captura de leads](005-captura-de-leads.md) (el email al dueño que se reutiliza), [006 — Bandeja de conversaciones](006-bandeja-de-conversaciones.md) (quién marca "Necesita atención")
 - **Posicionamiento:** es la primera de las [tres pruebas](../posicionamiento.md#las-tres-pruebas) de la promesa "vos te enterás solo cuando hace falta".
@@ -23,7 +23,7 @@ Cada criterio se convierte en al menos un test.
 
 ### Cuándo se avisa
 
-1. **Dado** una conversación que pasa a **Necesita atención** por derivación o por pedido de persona (spec 006, criterios 5 y 6), **entonces** el dueño del sitio recibe un email, una sola vez por episodio. Un episodio empieza cuando la conversación se marca y termina cuando el dueño la abre o toma el control; si más tarde se vuelve a marcar, es otro episodio y se avisa de nuevo.
+1. **Dado** una conversación que pasa a **Necesita atención** por derivación o por pedido de persona (spec 006, criterios 5 y 6), **entonces** el dueño del sitio recibe un email, una sola vez por episodio. Un episodio empieza cuando la conversación se marca y termina cuando el dueño toma el control o responde (lo que hoy quita la marca, spec 006); si más tarde se vuelve a marcar, es otro episodio y se avisa de nuevo.
 2. **Dado** una conversación ya marcada y sin atender, **cuando** el visitante vuelve a escribir al menos 30 minutos después del último aviso, **entonces** se manda **un** recordatorio ("sigue esperando") con los mensajes nuevos. No hay más de un recordatorio por episodio.
 3. **Dado** una conversación en la que el dueño ya tomó el control (`liveSince`), **entonces** no se avisa: el dueño está ahí.
 4. **Dado** un sitio que llega a su **tope diario** de mensajes o de costo (spec 007), **entonces** el dueño recibe un email que lo explica, una vez por día por sitio, aunque haya muchas conversaciones afectadas.
@@ -42,7 +42,7 @@ Cada criterio se convierte en al menos un test.
 11. **Dado** un error del proveedor de email, **entonces** la respuesta del bot al visitante no se ve afectada y el error queda en Sentry sin el texto de la conversación (ADR 0008).
 12. **Dado** que el email se manda después de responder al visitante (`after()`), **entonces** la latencia de la respuesta no cambia.
 13. **Dado** una conversación que pasa a Necesita atención, **entonces** se guardan `attentionAt` (cuándo empezó el episodio) y `attentionNotifiedAt` (cuándo se avisó). Sirven para no repetir avisos y para medir, más adelante, el tiempo hasta la primera respuesta humana.
-14. **Dado** que el dueño abre la conversación o toma el control, **entonces** el episodio se cierra (`needsAttention` en falso, como hoy) y los dos campos quedan como historial.
+14. **Dado** que el dueño toma el control o responde, **entonces** el episodio se cierra (`needsAttention` en falso, como hoy) y los campos quedan como historial. Abrir la conversación sin actuar no lo cierra: la marca de la bandeja tampoco se quita, y así el recordatorio sigue valiendo.
 
 ## Fuera de alcance
 
@@ -57,14 +57,16 @@ Cada criterio se convierte en al menos un test.
 - **Dominio puro** (`src/domain/attention-notice.ts`):
   - `decideAttentionNotice({ reason, needsAttentionBefore, liveSince, attentionNotifiedAt, lastVisitorAt, noticesToday, enabled })` devuelve `"notify" | "remind" | "skip"` con el motivo del salto, sin tocar la base;
   - `buildAttentionEmail({ siteName, reason, exchanges, visitorEmail, conversationUrl })` arma asunto, texto y HTML, con escape como `buildLeadEmail`.
-- **Datos (migración):** en `ChatRoom`, `attentionAt DateTime?` y `attentionNotifiedAt DateTime?`; en `ChatBot`, `attentionEmail Boolean @default(true)`. El conteo de avisos por sitio y por día se hace sobre `attentionNotifiedAt` de las salas del sitio; no hace falta tabla nueva.
+- **Datos (migración):** en `ChatRoom`, `attentionAt DateTime?`, `attentionNotifiedAt DateTime?` y `attentionNotices Int` (avisos del episodio: 1 el primero, 2 con el recordatorio; se reinicia al empezar otro episodio); en `ChatBot`, `attentionEmail Boolean @default(true)`. El límite diario cuenta las salas del sitio con `attentionNotifiedAt` en las últimas 24 horas; no hace falta tabla nueva.
+- **Email del dueño:** se guarda en `User.email` al entrar (`ensureUser`) y `ownerEmail` lo lee de la base, con Clerk solo como respaldo para cuentas anteriores. Así los avisos no dependen de Clerk, y el E2E puede verificarlos sin claves.
+- **E2E:** el servidor de Playwright corre con `EMAIL_PROVIDER=log` (el build de producción elegiría Resend), y los tests comprueban en la base que la sala quedó notificada.
 - **Dónde se engancha:** en `POST /api/widget/[domainId]/messages`, después de `flagAttention`, dentro de `after()`. El tope diario (`site_cap`) se avisa desde el mismo lugar, una vez por día por sitio (se comprueba si ya hubo un aviso `site_cap` hoy).
-- **Cierre del episodio:** donde hoy se pone `needsAttention: false` (abrir la conversación en la bandeja y `takeOver` en `src/server/live.ts`).
+- **Cierre del episodio:** donde hoy se pone `needsAttention: false` (`takeOver` y `ownerReply` en `src/server/live.ts`). `flagAttention` devuelve si la sala ya estaba marcada y, si no, inicia el episodio.
 - **Tenancy:** la ruta del widget ya resuelve el sitio por id público; el email va al dueño de ese sitio. Nada nuevo entra desde el navegador.
 - **Privacidad:** el email contiene texto de la conversación, igual que el de leads contiene el email del visitante; el dueño es el responsable del tratamiento (ver `/privacidad`). A Sentry no va texto.
 - **Riesgos:**
   - *Falsos positivos de la derivación* (spec 006, riesgos): cada falsa alarma ahora es un email. El tope de 20 por día y el toggle por sitio acotan el daño; se mide en la beta.
-  - *Clerk caído al resolver el email del dueño:* se registra en Sentry y no se reintenta; el recordatorio del criterio 2 da una segunda oportunidad.
+  - *Fallo del proveedor de email:* se registra en Sentry y no se reintenta; el recordatorio del criterio 2 da una segunda oportunidad. El email del dueño ya no depende de Clerk.
 
 ## Plan de tests
 
@@ -73,5 +75,6 @@ Cada criterio se convierte en al menos un test.
 | 1, 2, 3, 4, 5, 6 | Unitario de la decisión (`notify` / `remind` / `skip` y por qué) | `src/domain/attention-notice.test.ts` |
 | 7, 8, 9, 10 | Unitario del email (contenido, escape, `replyTo`, asunto en una línea) | `src/domain/attention-notice.test.ts` |
 | 1, 2, 4, 5, 11, 13, 14 | Integración con base y `EmailSender` falso: marca, avisa una vez, recuerda a los 30 min, cierra el episodio, tope por día, error del proveedor | `src/server/owner-notices.int.test.ts` |
-| 6 | Integración de la configuración y aislamiento de tenants | `src/actions/tenant-isolation.int.test.ts` |
-| 1, 12 | E2E del widget con `EMAIL_PROVIDER=log`: la derivación deja `attentionNotifiedAt` en la sala y la respuesta llega igual | `e2e/widget.spec.ts` |
+| 6 | Integración de la configuración y aislamiento de tenants | `src/actions/tenant-isolation.int.test.ts`, `src/actions/leads/leads.int.test.ts` |
+| 13 (email del dueño) | Integración: se guarda y se refresca al entrar | `src/server/users.int.test.ts` |
+| 1, 4, 12 | E2E del widget con `EMAIL_PROVIDER=log`: la derivación y el tope dejan la sala notificada y la respuesta llega igual | `e2e/widget.spec.ts` |

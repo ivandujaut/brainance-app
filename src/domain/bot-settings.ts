@@ -74,4 +74,6 @@ export type Faq = z.output<typeof FaqSchema>;
 export const LeadSettingsSchema = z.object({
   leadCapture: z.boolean({ invalid_type_error: "Elegí si el chat pide datos." }),
   leadEmail: z.boolean({ invalid_type_error: "Elegí si querés el aviso por email." }),
+  // Spec 010: email the owner when a conversation needs attention.
+  attentionEmail: z.boolean({ invalid_type_error: "Elegí si querés el aviso por email." }),
 });
