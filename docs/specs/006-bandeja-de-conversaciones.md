@@ -26,7 +26,7 @@ Las conversaciones del widget se guardan, pero el dueño no puede verlas: el ít
 
 5. **Dado** una respuesta del bot que deriva al contacto del negocio (dice que no tiene el dato y repite alguno de los datos del contacto: teléfono, email, link o usuario, aunque cambie el resto del texto) o la respuesta fija del tope diario, **entonces** la conversación queda marcada como **Necesita atención**.
 6. **Dado** un mensaje del visitante que pide hablar con una persona ("quiero hablar con alguien", "¿me atiende un humano?", "pasame con un asesor", y variantes), **entonces** la conversación queda marcada como **Necesita atención**.
-7. **Dado** una conversación marcada, **cuando** el dueño toma el control o responde, **entonces** la marca se quita.
+7. **Dado** una conversación marcada, **cuando** el dueño toma el control o responde, **entonces** la marca se quita. También puede sacarla sin escribirle al visitante con **Marcar como atendida** ([spec 012](012-marcar-como-atendida.md)).
 
 ### Toma de control
 
