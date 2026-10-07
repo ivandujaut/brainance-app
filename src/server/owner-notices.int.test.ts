@@ -3,7 +3,7 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { PrismaClient } from "@/generated/prisma/client";
 import type { Email, EmailSender } from "./email";
 import { addMessage, getOrCreateRoom } from "./conversations";
-import { flagAttention, takeOver } from "./live";
+import { flagAttention, markAttended, takeOver } from "./live";
 import { notifyAttention } from "./owner-notices";
 
 // Integration test (spec 010): needs a migrated Postgres in TEST_DATABASE_URL.
@@ -95,6 +95,16 @@ describe.skipIf(!url)("owner notices", () => {
     expect((await state(id)).needsAttention).toBe(false);
     // The owner released the room (or the bot got it back) and the bot derives again later.
     await db.chatRoom.update({ where: { id }, data: { liveSince: null } });
+    expect(await flagAndNotify(id)).toBe("notify");
+    expect(sent).toHaveLength(2);
+    expect((await state(id)).attentionNotices).toBe(1);
+  });
+
+  // Spec 012, criterion 6: after the owner marked it as attended, a new flag is a new episode.
+  it("notifies again when the bot derives after the conversation was marked as attended", async () => {
+    const id = await room();
+    expect(await flagAndNotify(id)).toBe("notify");
+    await markAttended(db, id);
     expect(await flagAndNotify(id)).toBe("notify");
     expect(sent).toHaveLength(2);
     expect((await state(id)).attentionNotices).toBe(1);

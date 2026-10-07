@@ -116,6 +116,20 @@ describe("buildAttentionEmail", () => {
     expect(email.replyTo).toBeUndefined();
   });
 
+  // Spec 012, criterion 8: the owner who answered elsewhere knows how to clear the flag.
+  it("tells the owner to mark the conversation as attended if they answered elsewhere", () => {
+    const line = "¿Ya le respondiste por otro medio? Marcala como atendida desde la conversación.";
+    for (const email of [
+      buildAttentionEmail(input),
+      buildAttentionEmail({ ...input, reminder: true }),
+      buildAttentionEmail({ ...input, reason: "site_cap" }),
+    ]) {
+      expect(email.text).toContain(line);
+      expect(email.html).toContain(line);
+      expect(email.text.indexOf(line)).toBeLessThan(email.text.indexOf("Ver la conversación"));
+    }
+  });
+
   it("names each reason in Spanish (criterion 7)", () => {
     expect(buildAttentionEmail({ ...input, reason: "human_request" }).text).toContain(
       "El visitante pidió hablar con una persona",

@@ -113,6 +113,17 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
       expect((await room()).liveSince).not.toBeNull();
     });
 
+    it("onMarkAttended: only the owner clears the attention flag", async () => {
+      await db.chatRoom.update({ where: { id: roomId }, data: { needsAttention: true, attentionReason: "derivation" } });
+      as(INTRUDER);
+      expect((await conversation.onMarkAttended(roomId)).status).toBe(404);
+      expect((await room()).needsAttention).toBe(true);
+
+      as(OWNER);
+      expect((await conversation.onMarkAttended(roomId)).status).toBe(200);
+      expect((await room()).needsAttention).toBe(false);
+    });
+
     it("onOwnerReply: nobody else can write into a conversation", async () => {
       as(INTRUDER);
       await conversation.onOwnerReply(roomId, "mensaje intruso");

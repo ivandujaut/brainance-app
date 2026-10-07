@@ -48,6 +48,23 @@ export const releaseToBot = (db: PrismaClient, roomId: string) =>
   });
 
 /**
+ * Spec 012: the owner clears the attention flag without writing to the visitor (they answered by
+ * email or WhatsApp, or it was a false alarm). No notice, no message, and the inbox order stays:
+ * only the active flag goes. The reason and attentionAt stay as history, and the next flag starts
+ * a new episode (flagAttention). Returns whether it changed.
+ */
+export const markAttended = (db: PrismaClient, roomId: string) =>
+  withRoomLock(db, roomId, async (tx) => {
+    const room = await tx.chatRoom.findUniqueOrThrow({
+      where: { id: roomId },
+      select: { needsAttention: true, liveSince: true },
+    });
+    if (!room.needsAttention || room.liveSince) return false;
+    await tx.chatRoom.update({ where: { id: roomId }, data: { needsAttention: false } });
+    return true;
+  });
+
+/**
  * The flag this owner message answers, if it is the owner's first message since the room was
  * flagged (spec 011, criterion 3): the dashboard measures the response time from it.
  */

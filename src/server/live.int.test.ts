@@ -2,7 +2,15 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaClient } from "@/generated/prisma/client";
 import { addMessage, getOrCreateRoom, listMessages } from "./conversations";
-import { flagAttention, ownerReply, RELEASE_NOTICE, releaseToBot, resolveVisitorTurn, takeOver } from "./live";
+import {
+  flagAttention,
+  markAttended,
+  ownerReply,
+  RELEASE_NOTICE,
+  releaseToBot,
+  resolveVisitorTurn,
+  takeOver,
+} from "./live";
 
 // Integration test (spec 006): needs a migrated Postgres in TEST_DATABASE_URL.
 const url = process.env.TEST_DATABASE_URL;
@@ -88,6 +96,49 @@ describe.skipIf(!url)("human takeover", () => {
     const later = await ownerReply(db, roomId, "Volví.", NAME);
     expect((await answered(later!.id)).answersAttentionAt).toEqual(next);
     expect((await answered(reply!.id)).answersAttentionAt).toEqual(first);
+  });
+
+  // Spec 012, criteria 2–7: the owner clears the flag without writing to the visitor.
+  describe("marking as attended", () => {
+    it("clears the flag, keeps its history and leaves the conversation as it was", async () => {
+      await flagAttention(db, roomId, "human_request");
+      const before = await room();
+      const messages = await roles();
+
+      expect(await markAttended(db, roomId)).toBe(true);
+      const after = await room();
+      expect(after).toMatchObject({
+        needsAttention: false,
+        attentionReason: "human_request",
+        attentionAt: before.attentionAt,
+        liveSince: null,
+        lastMessageAt: before.lastMessageAt,
+      });
+      expect(await roles()).toEqual(messages);
+      expect(await resolveVisitorTurn(db, roomId)).toBe("bot");
+    });
+
+    it("changes nothing when the conversation is live or not flagged", async () => {
+      expect(await markAttended(db, roomId)).toBe(false);
+      await flagAttention(db, roomId, "derivation");
+      await takeOver(db, roomId, NAME);
+      await db.chatRoom.update({ where: { id: roomId }, data: { needsAttention: true } });
+      expect(await markAttended(db, roomId)).toBe(false);
+      expect((await room()).needsAttention).toBe(true);
+    });
+
+    it("a later flag starts a new episode, and the owner's next reply counts from it", async () => {
+      await flagAttention(db, roomId, "derivation");
+      const { attentionAt: first } = await room();
+      await markAttended(db, roomId);
+      await flagAttention(db, roomId, "derivation");
+      const { attentionAt: next, needsAttention } = await room();
+      expect(needsAttention).toBe(true);
+      expect(next!.getTime()).toBeGreaterThan(first!.getTime());
+      const reply = await ownerReply(db, roomId, "Te atiendo yo.", NAME);
+      const stored = await db.chatMessage.findUniqueOrThrow({ where: { id: reply!.id }, select: { answersAttentionAt: true } });
+      expect(stored.answersAttentionAt).toEqual(next);
+    });
   });
 
   it("rejects empty or overlong owner replies", async () => {

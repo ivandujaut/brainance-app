@@ -114,6 +114,18 @@ describe.skipIf(!url)("inbox actions", async () => {
     expect((await inbox.onGetConversation(ana))!.live).toBe(false);
   });
 
+  // Spec 012, criteria 2 and 4: marked as attended, it leaves the filter but not its place.
+  it("marks a conversation as attended without moving it in the inbox", async () => {
+    const before = await inbox.onListConversations({ filter: "attention" });
+    expect(before.map((c) => c.id)).toEqual([ana]);
+    expect(await inbox.onMarkAttended(ana)).toEqual({ status: 200, message: "Marcada como atendida" });
+    expect(await inbox.onListConversations({ filter: "attention" })).toEqual([]);
+    expect((await inbox.onListConversations({})).map((c) => c.id)).toEqual([beto, ana]);
+    expect(await inbox.onGetConversation(ana)).toMatchObject({ needsAttention: false, live: false });
+    // Already attended: same answer, nothing changes.
+    expect((await inbox.onMarkAttended(ana)).status).toBe(200);
+  });
+
   it("rejects empty or overlong replies", async () => {
     expect((await inbox.onOwnerReply(ana, " ")).status).toBe(400);
     expect((await inbox.onOwnerReply(ana, "a".repeat(2001))).status).toBe(400);

@@ -44,3 +44,41 @@ test("the owner opens a conversation, takes over, replies and hands it back", as
   await expect(pane.getByTestId("conversation-mode")).toHaveText("Responde el bot");
   await expect(pane).toContainText("Te vuelve a atender el asistente virtual.");
 });
+
+// Spec 012, criteria 1–4: the owner clears the flag without writing to the visitor.
+test("the owner marks a conversation as attended without the visitor seeing anything", async ({ page }) => {
+  const email = await createTestUser("attended");
+  created.push(email);
+  await signInAs(page, email);
+  await page.goto("/dashboard");
+  const domain = `e2e-attended-${Date.now()}.com.ar`;
+  const addSite = page.getByTestId("onboarding-checklist").getByTestId("step-add-site");
+  await addSite.locator('input[name="domain"]').fill(domain);
+  await addSite.getByRole("button", { name: "Agregar sitio" }).click();
+  await expect(addSite).toHaveAttribute("data-done", "true");
+  const siteId = await siteIdByName(domain);
+  const answered = await seedConversation(siteId);
+  const waiting = await seedConversation(siteId);
+  const before = await messagesOf(answered);
+
+  await page.goto(`/conversations?c=${answered}`);
+  const pane = page.getByTestId("conversation-pane");
+  await expect(pane).toContainText("¿Tienen sin TACC?");
+  await pane.getByRole("button", { name: "Marcar como atendida" }).click();
+  await expect(page.getByText("Marcada como atendida").first()).toBeVisible();
+  await expect(pane.getByRole("button", { name: "Marcar como atendida" })).toBeHidden();
+  await expect(pane.getByTestId("conversation-mode")).toHaveText("Responde el bot");
+
+  // Criteria 3 and 4: same place in the list, and nothing new for the visitor.
+  const items = page.getByTestId("inbox-item");
+  await expect(items).toHaveCount(2);
+  await expect(items.nth(0)).toHaveAttribute("href", new RegExp(`c=${waiting}`));
+  await expect(items.nth(1)).toHaveAttribute("href", new RegExp(`c=${answered}`));
+  await expect(items.nth(1)).not.toContainText("Necesita atención");
+  expect(await messagesOf(answered)).toEqual(before);
+
+  // Criterion 2: it leaves the "Necesita atención" filter.
+  await page.getByRole("link", { name: "Necesita atención", exact: true }).click();
+  await expect(items).toHaveCount(1);
+  await expect(items.first()).toHaveAttribute("href", new RegExp(`c=${waiting}`));
+});
