@@ -104,7 +104,7 @@ export const OwnerMetrics = ({ metrics, sites, siteId, days, usage }: Props) => 
           value={metrics.responseTime ? formatMinutes(metrics.responseTime.medianMinutes) : "Sin datos todavía"}
           hint={
             metrics.responseTime
-              ? `Mediana sobre ${metrics.responseTime.cases} ${metrics.responseTime.cases === 1 ? "conversación" : "conversaciones"} que te necesitaron`
+              ? `Mediana sobre ${metrics.responseTime.cases} ${metrics.responseTime.cases === 1 ? "conversación que te necesitó" : "conversaciones que te necesitaron"}`
               : "Desde que el bot te necesita hasta tu primer mensaje"
           }
           testId="metric-response-time"
