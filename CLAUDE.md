@@ -4,7 +4,7 @@ BrAInance: SaaS multi-tenant de chatbots con IA para sitios web (Next.js 16, Rea
 
 ## Antes de escribir código
 
-- Leer `docs/workflow.md` y `docs/principles.md`.
+- Leer `docs/workflow.md`, `docs/principles.md` y `docs/posicionamiento.md` (qué problema resuelve el producto y para quién; los titulares y las specs se contrastan contra eso).
 - Una feature nueva arranca con una spec en `docs/specs/` (template: `docs/specs/_template.md`). Si no existe, se propone primero.
 - Las decisiones de arquitectura o de proveedor se registran como ADR en `docs/adr/`.
 - El alcance actual es la beta (`docs/roadmap.md`). Lo que está en "v1" no se implementa sin pedido explícito.
