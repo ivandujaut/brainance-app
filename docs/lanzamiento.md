@@ -93,7 +93,7 @@
 | `DATABASE_URL`, `DIRECT_URL` | ✓ | ✓ | Neon: branch `production` en P y `development` en V; `DATABASE_URL` con pooling (`-pooler`), `DIRECT_URL` sin pooling |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | ✓ | ✓ | Clerk: producción en P y desarrollo en V |
 | `NEXT_PUBLIC_CLERK_SIGN_IN_URL`, `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | ✓ | ✓ | `/auth/sign-in`, `/auth/sign-up` |
-| `NEXT_PUBLIC_APP_URL` | ✓ |   | URL pública de producción (en Preview se usa la propia) |
+| `NEXT_PUBLIC_APP_URL` | ✓ |   | URL pública de producción (en Preview se usa la URL de la rama, `*-git-develop-*.vercel.app`, que conserva la sesión y sobrevive a cada deploy) |
 | `NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY` | ✓ | ✓ | Uploadcare, proyecto `brainance` → API keys → Public key (*Config*: no es secreta) |
 | `NEXT_PUBLIC_UPLOAD_CARE_CDN_URL` | ✓ | ✓ | Uploadcare → Delivery: el dominio propio del proyecto (`https://4gj75fw3od.ucarecd.net`) |
 | `AI_GATEWAY_API_KEY` |   |   | No hace falta en Vercel (OIDC). Solo en `.env.local` para el eval |
