@@ -1,7 +1,7 @@
 "use server";
 import { client } from "@/lib/prisma";
 import { listMessages } from "@/server/conversations";
-import { OWNER_MESSAGE_MAX, ownerReply, releaseToBot, takeOver } from "@/server/live";
+import { markAttended, OWNER_MESSAGE_MAX, ownerReply, releaseToBot, takeOver } from "@/server/live";
 import { notifyRoomChanged, ownerChannel, publicRealtimeConfig } from "@/server/realtime";
 import { currentOwnerId, findOwnedChatRoom, findOwnedSite } from "@/server/tenancy";
 
@@ -132,6 +132,14 @@ export const onReleaseToBot = async (id: string) => {
   await releaseToBot(client, room.id);
   await notifyRoomChanged(client, room.id);
   return { status: 200, message: "El bot vuelve a responder esta conversación." } as const;
+};
+
+/** Spec 012: clears "Necesita atención" without the visitor seeing anything. */
+export const onMarkAttended = async (id: string) => {
+  const room = await findOwnedChatRoom(id);
+  if (!room) return NOT_FOUND;
+  if (await markAttended(client, room.id)) await notifyRoomChanged(client, room.id);
+  return { status: 200, message: "Marcada como atendida" } as const;
 };
 
 export const onOwnerReply = async (id: string, text: string) => {

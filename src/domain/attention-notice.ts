@@ -102,6 +102,8 @@ export const buildAttentionEmail = ({
         : `Un cliente de ${site} espera tu respuesta`;
   const intro = reminder ? "El visitante sigue esperando y volvió a escribir." : REASONS[reason];
   const noMessages = "Todavía no hay mensajes.";
+  // Spec 012: the owner may answer by email or WhatsApp; the flag is cleared from the conversation.
+  const attendedElsewhere = "¿Ya le respondiste por otro medio? Marcala como atendida desde la conversación.";
 
   const text = [
     intro,
@@ -112,6 +114,7 @@ export const buildAttentionEmail = ({
     ...(visitorEmail
       ? [`Email del visitante: ${visitorEmail}`, "Respondé este email para escribirle directamente.", ""]
       : []),
+    attendedElsewhere,
     `Ver la conversación y tomar el control: ${conversationUrl}`,
   ].join("\n");
 
@@ -125,6 +128,7 @@ export const buildAttentionEmail = ({
 <p>${escapeHtml(intro)}</p>
 ${rows || `<p>${noMessages}</p>`}
 ${visitorEmail ? `<p>Email del visitante: <strong>${escapeHtml(visitorEmail)}</strong><br>Respondé este email para escribirle directamente.</p>` : ""}
+<p>${escapeHtml(attendedElsewhere)}</p>
 <p><a href="${escapeHtml(conversationUrl)}">Ver la conversación y tomar el control</a></p>
 </div>`;
 

@@ -2,7 +2,14 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition, type FormEvent, type KeyboardEvent } from "react";
-import { onMarkRead, onOwnerReply, onReleaseToBot, onTakeOver, type Conversation } from "@/actions/conversation";
+import {
+  onMarkAttended,
+  onMarkRead,
+  onOwnerReply,
+  onReleaseToBot,
+  onTakeOver,
+  type Conversation,
+} from "@/actions/conversation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,11 +43,12 @@ export const ConversationPane = ({ conversation, backHref, onChanged, onRead }: 
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per conversation and per new message
   }, [conversation.id, count]);
 
-  const run = (action: () => Promise<{ status: number; message: string }>, after?: () => void) =>
+  type Result = { status: number; message: string };
+  const run = (action: () => Promise<Result>, after?: (result: Result) => void) =>
     startTransition(async () => {
       const result = await action();
       if (result.status !== 200) notify(result);
-      else after?.();
+      else after?.(result);
       await onChanged();
     });
 
@@ -73,6 +81,17 @@ export const ConversationPane = ({ conversation, backHref, onChanged, onRead }: 
         <Badge variant={conversation.live ? "default" : "secondary"} data-testid="conversation-mode">
           {conversation.live ? "Estás atendiendo" : "Responde el bot"}
         </Badge>
+        {conversation.needsAttention && !conversation.live && (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pending}
+            title="Saca la marca sin escribirle al visitante: el bot sigue respondiendo."
+            onClick={() => run(() => onMarkAttended(conversation.id), notify)}
+          >
+            Marcar como atendida
+          </Button>
+        )}
         {conversation.live ? (
           <Button variant="outline" size="sm" disabled={pending} onClick={() => run(() => onReleaseToBot(conversation.id))}>
             Devolver al bot

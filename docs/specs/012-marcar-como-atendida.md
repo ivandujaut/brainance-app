@@ -1,6 +1,6 @@
 # 012 — Marcar una conversación como atendida
 
-- **Estado:** Borrador
+- **Estado:** Implementada
 - **ADRs relacionados:** [0004 — Aislamiento multi-tenant](../adr/0004-aislamiento-multi-tenant.md)
 - **Specs relacionadas:** [006 — Bandeja de conversaciones](006-bandeja-de-conversaciones.md) (la marca "Necesita atención"), [010 — Aviso al dueño](010-aviso-al-dueno.md) (el email que invita a responder por fuera), [011 — Métricas de honestidad](011-tope-visible-y-metricas-de-honestidad.md) (tiempo de respuesta)
 - **Posicionamiento:** sostiene la promesa "vos te enterás solo cuando hace falta". Una marca que el dueño no puede sacar sigue avisando de algo que ya resolvió.
