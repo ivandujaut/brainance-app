@@ -9,8 +9,7 @@ import {
 } from "@/domain/leads";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { createOrRead } from "./db-utils";
-import type { EmailSender } from "./email";
-import { captureError } from "@/server/observability";
+import { sendOwnerEmail, type OwnerNoticeDeps } from "./owner-notices";
 
 // Lead capture from the public widget (spec 005). The visitor is identified by their secret
 // visitorId (ADR 0003); every question id is checked against the site's own questions.
@@ -98,18 +97,6 @@ export const saveLead = async (
 export const leadCaptured = async (db: PrismaClient, domainId: string, visitorId: string) =>
   (await db.customer.count({ where: { domainId, visitorId, leadAt: { not: null } } })) > 0;
 
-type NoticeDeps = { sender: EmailSender; ownerEmail: (clerkId: string) => Promise<string | null>; appUrl: string };
-
 /** Emails the owner about a new lead. Never throws: the lead is already stored (criterion 11). */
-export const sendLeadNotice = async (notice: LeadNotice, { sender, ownerEmail, appUrl }: NoticeDeps) => {
-  try {
-    const to = await ownerEmail(notice.ownerClerkId);
-    if (!to) throw new Error(`Owner ${notice.ownerClerkId} has no email address`);
-    const email = buildLeadEmail({ ...notice, leadsUrl: `${appUrl}/leads` });
-    await sender.send({ to, ...email });
-    return true;
-  } catch (error) {
-    captureError(error, { area: "email" });
-    return false;
-  }
-};
+export const sendLeadNotice = (notice: LeadNotice, deps: OwnerNoticeDeps) =>
+  sendOwnerEmail(notice.ownerClerkId, buildLeadEmail({ ...notice, leadsUrl: `${deps.appUrl}/leads` }), deps);

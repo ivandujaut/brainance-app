@@ -16,7 +16,11 @@ export const onLoadAccount = async () => {
 
   const fullname =
     clerkUser.fullName?.trim() || clerkUser.primaryEmailAddress?.emailAddress.split("@")[0] || "Usuario";
-  const user = await ensureUser(client, { clerkId: clerkUser.id, fullname });
+  const user = await ensureUser(client, {
+    clerkId: clerkUser.id,
+    fullname,
+    email: clerkUser.primaryEmailAddress?.emailAddress ?? null,
+  });
   const sites = await client.domain.findMany({
     where: { userId: user.id },
     select: { id: true, name: true, icon: true, chatBot: { select: { icon: true } } },

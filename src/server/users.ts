@@ -9,15 +9,16 @@ import { createOrRead } from "./db-utils";
  */
 export const ensureUser = async (
   db: PrismaClient,
-  { clerkId, fullname }: { clerkId: string; fullname: string },
+  { clerkId, fullname, email = null }: { clerkId: string; fullname: string; email?: string | null },
 ): Promise<User> => {
   const user = await createOrRead(
-    // Signing up means accepting the terms shown on the sign-up page (spec 008).
+    // Signing up means accepting the terms shown on the sign-up page (spec 008). The email is
+    // refreshed on every visit, so owner notices reach the current address (spec 010).
     () =>
       db.user.upsert({
         where: { clerkId },
-        update: {},
-        create: { clerkId, fullname, termsAcceptedAt: new Date(), termsVersion: TERMS_VERSION },
+        update: email ? { email } : {},
+        create: { clerkId, fullname, email, termsAcceptedAt: new Date(), termsVersion: TERMS_VERSION },
       }),
     () => db.user.findUniqueOrThrow({ where: { clerkId } }),
   );

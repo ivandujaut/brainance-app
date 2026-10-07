@@ -37,7 +37,8 @@ export default defineConfig({
     : {
         command: `npm run start -- -p ${PORT}`,
         // Like a Vercel preview, so test-only routes exist and the E2E can check they need sign-in.
-        env: { ...(process.env as Record<string, string>), VERCEL_ENV: "preview" },
+        // Emails go to the server log (the production build would pick Resend by default).
+        env: { EMAIL_PROVIDER: "log", ...(process.env as Record<string, string>), VERCEL_ENV: "preview" },
         // A static file: readiness does not depend on Clerk or the database.
         url: `${baseURL}/widget.js`,
         reuseExistingServer: !process.env.CI,

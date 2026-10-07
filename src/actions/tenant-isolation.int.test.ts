@@ -214,12 +214,12 @@ describe.skipIf(!url)("tenant isolation of server actions", async () => {
 
     it("onUpdateLeadSettings: only the owner turns lead capture off", async () => {
       as(INTRUDER);
-      await bot.onUpdateLeadSettings(siteId, { leadCapture: false, leadEmail: false });
-      expect((await site()).chatBot).toMatchObject({ leadCapture: true, leadEmail: true });
+      await bot.onUpdateLeadSettings(siteId, { leadCapture: false, leadEmail: false, attentionEmail: false });
+      expect((await site()).chatBot).toMatchObject({ leadCapture: true, leadEmail: true, attentionEmail: true });
 
       as(OWNER);
-      await bot.onUpdateLeadSettings(siteId, { leadCapture: false, leadEmail: true });
-      expect((await site()).chatBot).toMatchObject({ leadCapture: false, leadEmail: true });
+      await bot.onUpdateLeadSettings(siteId, { leadCapture: false, leadEmail: true, attentionEmail: false });
+      expect((await site()).chatBot).toMatchObject({ leadCapture: false, leadEmail: true, attentionEmail: false });
     });
 
     it("leads: only the owner lists, exports and deletes them", async () => {

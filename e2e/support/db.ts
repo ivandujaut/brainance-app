@@ -13,7 +13,7 @@ export const createSite = async (
   const {
     rows: [user],
   } = await pool.query<{ id: string }>(
-    `INSERT INTO "User" (fullname, "clerkId", "updatedAt") VALUES ('E2E', $1, now()) RETURNING id`,
+    `INSERT INTO "User" (fullname, "clerkId", email, "updatedAt") VALUES ('E2E', $1, 'duena-e2e@example.com', now()) RETURNING id`,
     [`e2e_${crypto.randomUUID()}`],
   );
   const {
@@ -171,4 +171,15 @@ export const completeOnboarding = async (domainId: string) => {
     await pool.query(`INSERT INTO "HelpDesk" (question, answer, "domainId") VALUES ($1, $2, $3)`, [`¿Pregunta ${n}?`, `Respuesta ${n}.`, domainId]);
   }
   await pool.query(`UPDATE "ChatBot" SET "installedAt" = now() WHERE "domainId" = $1`, [domainId]);
+};
+
+/** Owner notices sent for the site's conversations (spec 010): one row per room, newest first. */
+export const attentionNoticesOf = async (domainId: string) => {
+  const { rows } = await pool.query<{ reason: string | null; notified: boolean; notices: number }>(
+    `SELECT r."attentionReason" AS reason, r."attentionNotifiedAt" IS NOT NULL AS notified, r."attentionNotices" AS notices
+     FROM "ChatRoom" r JOIN "Customer" c ON c.id = r."customerId"
+     WHERE c."domainId" = $1 ORDER BY r."createdAt" DESC`,
+    [domainId],
+  );
+  return rows;
 };

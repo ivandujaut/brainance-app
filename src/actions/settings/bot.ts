@@ -63,6 +63,7 @@ export const onGetSiteSettings = async (id: string) => {
           installedAt: true,
           leadCapture: true,
           leadEmail: true,
+          attentionEmail: true,
         },
       },
       helpdesk: { select: { id: true, question: true, answer: true }, orderBy: { question: "asc" } },
@@ -97,7 +98,7 @@ export const onUpdateLeadSettings = async (id: string, input: unknown) => {
   if (!site) return NOT_FOUND;
   const parsed = LeadSettingsSchema.safeParse(input);
   if (!parsed.success) return firstError(parsed.error);
-  return attempt(site.id, () => saveBot(site.id, parsed.data), "Captura de datos guardada");
+  return attempt(site.id, () => saveBot(site.id, parsed.data), "Avisos guardados");
 };
 
 export const onCreateHelpDeskQuestion = async (id: string, input: unknown) => {
