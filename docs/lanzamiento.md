@@ -50,10 +50,14 @@
 
 ## 5. Errores (Sentry, ADR 0008)
 
-- [ ] Crear el proyecto (plataforma Next.js) y copiar el **DSN**.
+- [x] Crear el proyecto (plataforma Next.js) y copiar el **DSN**.
+  - Organización `valtiq` (región US), proyecto `brainance-app`.
+  - Solo *Error monitoring*: Replay, Tracing, Profiling, Logging y Metrics desactivados.
+  - *Security & Privacy:* Data Scrubber y Default Scrubbers activados, y no se guardan IPs. Es una segunda capa: la primera es `sentry-scrub.ts`.
+  - `SENTRY_DSN` y `NEXT_PUBLIC_SENTRY_DSN` van como *Config*, porque el DSN es público. Por ahora solo en Preview.
 - [ ] Opcional, para ver los errores con el código fuente: *Settings → Auth Tokens →* crear un token con permiso de releases.
-- [ ] *Alerts →* una regla de "nuevo issue" que mande email.
-- [ ] *Verificar* en una preview, con la sesión iniciada:
+- [x] *Monitors & Alerts →* "A new issue is created" → email a Ivan. La regla por defecto, de alta prioridad, también queda activa.
+- [x] *Verificar* en una preview, con la sesión iniciada. Hecho el 2026-10-07 (issue BRAINANCE-APP-1): `environment: preview`, `area: debug`, `email` y `text` en `[redacted]`, sin IP ni request, y la alerta se disparó.
   1. Abrir `<URL de la preview>/api/debug/sentry`. Tiene que responder `"sent": true`.
   2. En Sentry aparece el issue "Prueba de Sentry (BrAInance)", con el tag `area: debug`.
   3. En *Additional Data*, `email` y `text` dicen `[redacted]`.
