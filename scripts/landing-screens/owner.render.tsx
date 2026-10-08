@@ -19,6 +19,7 @@ vi.mock("@/actions/conversation", () => ({
   onGetConversation: async () => CONVERSATION,
   onGetInboxRealtime: async () => null,
   onMarkRead: vi.fn(),
+  onMarkAttended: vi.fn(),
   onOwnerReply: vi.fn(),
   onTakeOver: vi.fn(),
   onReleaseToBot: vi.fn(),
@@ -26,6 +27,7 @@ vi.mock("@/actions/conversation", () => ({
 vi.mock("@/actions/leads", () => ({ onListLeadSites: async () => SITES }));
 vi.mock("@/actions/metrics", () => ({ onGetOwnerMetrics: async () => METRICS }));
 vi.mock("@/actions/onboarding", () => ({ onGetOnboarding: async () => ({ completed: true }) }));
+vi.mock("@/actions/settings/bot", () => ({ onGetSiteUsage: async () => null }));
 // The sidebar and the page title read the current section from here.
 const current = vi.hoisted(() => ({ page: "conversations" }));
 vi.mock("@/context/use-sidebar", () => ({
@@ -66,5 +68,6 @@ it("renders the metrics dashboard with fixture data", async () => {
   const page = await DashboardPage({ searchParams: Promise.resolve({ days: "30" }) });
   const html = renderToStaticMarkup(await OwnerLayout({ children: page }));
   expect(html).toContain("Tasa de captura");
+  expect(html).toContain("Respuestas del bot");
   save("dashboard", html);
 });

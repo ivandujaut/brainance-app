@@ -124,11 +124,16 @@ export const roomOf = async (domainId: string) => {
   return rows[0]?.id ?? null;
 };
 
+// Timestamps are stored to the millisecond and messages are ordered by them (then by a random id),
+// so two seeded rows inserted back to back could tie and swap. Each one goes after the room's last.
+const after = (room: string) =>
+  `GREATEST(now(), (SELECT max("createdAt") FROM "ChatMessage" WHERE "chatRoomId" = ${room}) + interval '1 millisecond')`;
+
 /** Simulates the owner taking over from the inbox and replying (same rows the inbox writes). */
 export const ownerTakesOver = async (roomId: string, businessName: string) => {
   await pool.query(`UPDATE "ChatRoom" SET "liveSince" = now(), "lastMessageAt" = now() WHERE id = $1`, [roomId]);
   await pool.query(
-    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", seen, "updatedAt") VALUES ($1, 'system', $2, true, now())`,
+    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", seen, "updatedAt", "createdAt") VALUES ($1, 'system', $2::uuid, true, now(), ${after("$2::uuid")})`,
     [`Ahora te atiende una persona de ${businessName}.`, roomId],
   );
 };
@@ -137,16 +142,16 @@ export const ownerTakesOver = async (roomId: string, businessName: string) => {
 export const ownerReleases = async (roomId: string) => {
   await pool.query(`UPDATE "ChatRoom" SET "liveSince" = NULL, "lastMessageAt" = now() WHERE id = $1`, [roomId]);
   await pool.query(
-    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", seen, "updatedAt") VALUES ('Te vuelve a atender el asistente virtual.', 'system', $1, true, now())`,
+    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", seen, "updatedAt", "createdAt") VALUES ('Te vuelve a atender el asistente virtual.', 'system', $1::uuid, true, now(), ${after("$1::uuid")})`,
     [roomId],
   );
 };
 
 export const ownerSays = async (roomId: string, text: string) => {
-  await pool.query(`INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt") VALUES ($1, 'owner', $2, now())`, [
-    text,
-    roomId,
-  ]);
+  await pool.query(
+    `INSERT INTO "ChatMessage" (message, role, "chatRoomId", "updatedAt", "createdAt") VALUES ($1, 'owner', $2::uuid, now(), ${after("$2::uuid")})`,
+    [text, roomId],
+  );
 };
 
 export const messagesOf = async (roomId: string) => {

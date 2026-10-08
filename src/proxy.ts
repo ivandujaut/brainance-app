@@ -34,7 +34,9 @@ export default function proxy(req: NextRequest, event: NextFetchEvent) {
   if (pathname.startsWith("/widget/")) return widgetPage(req);
   if (pathname.startsWith("/api/widget/")) return NextResponse.next();
   // Landing and legal pages are static and public (spec 008): readable even if Clerk is down.
-  if (pathname === "/" || pathname === "/terminos" || pathname === "/privacidad") return NextResponse.next();
+  if (pathname === "/" || pathname === "/terminos" || pathname === "/privacidad" || pathname === "/como-medimos") {
+    return NextResponse.next();
+  }
   return clerk(req, event);
 }
 
