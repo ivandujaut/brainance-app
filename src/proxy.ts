@@ -33,6 +33,8 @@ export default function proxy(req: NextRequest, event: NextFetchEvent) {
   // The widget runs inside customers' sites for anonymous visitors: no Clerk session involved.
   if (pathname.startsWith("/widget/")) return widgetPage(req);
   if (pathname.startsWith("/api/widget/")) return NextResponse.next();
+  // Vercel Cron: authenticated by CRON_SECRET in the route, not by a Clerk session (spec 015).
+  if (pathname.startsWith("/api/cron/")) return NextResponse.next();
   // Landing and legal pages are static and public (spec 008): readable even if Clerk is down.
   if (pathname === "/" || pathname === "/terminos" || pathname === "/privacidad" || pathname === "/como-medimos") {
     return NextResponse.next();

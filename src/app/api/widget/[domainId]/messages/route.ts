@@ -10,6 +10,8 @@ import {
   type RejectReason,
 } from "@/domain/widget-limits";
 import { effectiveAnswerCap } from "@/domain/answer-cap";
+import { ipDailyReply } from "@/domain/fallback-reply";
+import type { IpLimitReason } from "@/domain/ip-limits";
 import { getAppUrl } from "@/lib/app-url";
 import { client } from "@/lib/prisma";
 import { streamAnswer } from "@/server/ai/answer";
@@ -30,9 +32,16 @@ import { toModelHistory } from "@/domain/takeover";
 import { resolveEmailSender } from "@/server/email";
 import { flagAttention, resolveVisitorTurn, type FlagResult } from "@/server/live";
 import { ownerEmail } from "@/server/owner-email";
+import { admitMessage, requestFingerprint } from "@/server/ip-limits";
 import { notifyAttention } from "@/server/owner-notices";
 import { notifyRoomChanged } from "@/server/realtime";
-import { getWidgetSite, siteCapReply, siteFallbackReply, toBusinessKnowledge } from "@/server/widget-site";
+import {
+  getWidgetSite,
+  siteCapReply,
+  siteFallbackReply,
+  toBusinessKnowledge,
+  type WidgetSite,
+} from "@/server/widget-site";
 
 const body = z.object({ visitorId: z.string(), text: z.string() });
 
@@ -41,6 +50,11 @@ const REJECTIONS: Record<Exclude<RejectReason, "site_cap">, { status: number; me
   too_long: { status: 400, message: `Tu mensaje es muy largo: escribilo en menos de ${MAX_MESSAGE_LENGTH} caracteres.` },
   visitor_rate: { status: 429, message: "Enviaste muchos mensajes seguidos. Esperá unos minutos y volvé a intentar." },
 };
+
+// Spec 015: what a connection over its limits reads.
+const IP_BURST_MESSAGE = "Se enviaron muchos mensajes desde tu conexión. Esperá unos minutos y volvé a intentar.";
+const ipRejection = (reason: IpLimitReason, site: WidgetSite) =>
+  reason === "ip_daily" ? ipDailyReply(toBusinessKnowledge(site)) : IP_BURST_MESSAGE;
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ domainId: string }> }) {
   const { domainId } = await params;
@@ -57,6 +71,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
   const site = await getWidgetSite(client, domainId);
   if (!site) return NextResponse.json({ error: "not_found", message: "Este chat no está disponible." }, { status: 404 });
+
+  // Spec 015: limits per IP and site, before anything is stored (not even a new visitor).
+  const fingerprint = requestFingerprint(request.headers);
+  if (fingerprint) {
+    const ip = await admitMessage(client, { fingerprint, domainId, visitorId: parsed.data.visitorId });
+    if (!ip.ok) return NextResponse.json({ error: ip.reason, message: ipRejection(ip.reason, site) }, { status: 429 });
+  }
 
   const room = await getOrCreateRoom(client, { domainId, visitorId: parsed.data.visitorId });
   // Spec 006: while a person attends the conversation, the bot stays quiet.

@@ -66,6 +66,8 @@ jobs:
       WIDGET_ALLOW_HTTP: "true"
       AI_ANSWER_MODEL: mock/echo
       AI_ALLOW_MOCK_MODEL: "true"
+      # Spec 015: IP limits run in E2E with a test-only secret (fingerprints are seeded with it).
+      RATE_LIMIT_SECRET: e2e-only-rate-limit-secret
       # Sign-up/onboarding specs skip themselves when these secrets are missing.
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.E2E_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.E2E_CLERK_SECRET_KEY }}

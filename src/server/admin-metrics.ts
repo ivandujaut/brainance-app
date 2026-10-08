@@ -21,7 +21,7 @@ const MAX_LATENCY_SAMPLE = 20_000;
 export const adminMetrics = async (db: PrismaClient, { days, capUsd }: { days: 1 | 7 | 30; capUsd: number }) => {
   const since = new Date(Date.now() - days * DAY_MS);
   const lastDay = new Date(Date.now() - DAY_MS);
-  const [bySite, today, latencies, totals, fallbackRows] = await Promise.all([
+  const [bySite, today, latencies, totals, fallbackRows, blockedRows] = await Promise.all([
     db.modelCall.groupBy({
       by: ["domainId"],
       where: { createdAt: { gte: since } },
@@ -44,28 +44,38 @@ export const adminMetrics = async (db: PrismaClient, { days, capUsd }: { days: 1
       JOIN "Customer" c ON c.id = r."customerId"
       WHERE m.fallback AND m."createdAt" >= ${since}
       GROUP BY c."domainId"`),
+    // Spec 015, criterion 11: requests stopped by the IP limit, per site.
+    db.rateLimitHit.groupBy({ by: ["domainId"], where: { kind: "blocked", createdAt: { gte: since } }, _count: { _all: true } }),
   ]);
   const fallbacks = new Map(fallbackRows.map((f) => [f.domainId, f.count]));
+  const blocked = new Map(blockedRows.map((b) => [b.domainId, b._count._all]));
+  const calls = new Map(bySite.map((s) => [s.domainId, s]));
+  // A site under attack may never have reached the model: it is listed for its stopped requests.
+  const siteIds = [...new Set([...calls.keys(), ...blocked.keys()])];
   const domains = await db.domain.findMany({
-    where: { id: { in: bySite.map((s) => s.domainId) } },
+    where: { id: { in: siteIds } },
     select: { id: true, name: true, User: { select: { fullname: true } } },
   });
   const names = new Map(domains.map((d) => [d.id, d]));
   const spentToday = new Map(today.map((t) => [t.domainId, Number(t._sum.costUsd ?? 0)]));
 
-  const sites = bySite
-    .map((s) => ({
-      domainId: s.domainId,
-      site: names.get(s.domainId)?.name ?? "(borrado)",
-      owner: names.get(s.domainId)?.User?.fullname ?? "",
-      calls: s._count._all,
-      errors: s._count.error,
-      fallbacks: fallbacks.get(s.domainId) ?? 0,
-      costUsd: Number(s._sum.costUsd ?? 0),
-      spentTodayUsd: spentToday.get(s.domainId) ?? 0,
-      nearCap: (spentToday.get(s.domainId) ?? 0) >= capUsd * COST_CAP_WARN_RATIO,
-    }))
-    .sort((a, b) => b.costUsd - a.costUsd);
+  const sites = siteIds
+    .map((domainId) => {
+      const s = calls.get(domainId);
+      return {
+        domainId,
+        site: names.get(domainId)?.name ?? "(borrado)",
+        owner: names.get(domainId)?.User?.fullname ?? "",
+        calls: s?._count._all ?? 0,
+        errors: s?._count.error ?? 0,
+        fallbacks: fallbacks.get(domainId) ?? 0,
+        blocked: blocked.get(domainId) ?? 0,
+        costUsd: Number(s?._sum.costUsd ?? 0),
+        spentTodayUsd: spentToday.get(domainId) ?? 0,
+        nearCap: (spentToday.get(domainId) ?? 0) >= capUsd * COST_CAP_WARN_RATIO,
+      };
+    })
+    .sort((a, b) => b.costUsd - a.costUsd || b.blocked - a.blocked);
 
   const values = latencies.map((l) => l.latencyMs);
   return {
@@ -75,6 +85,7 @@ export const adminMetrics = async (db: PrismaClient, { days, capUsd }: { days: 1
     calls: totals._count._all,
     errorRate: totals._count._all ? totals._count.error / totals._count._all : 0,
     fallbacks: fallbackRows.reduce((sum, f) => sum + f.count, 0),
+    blocked: blockedRows.reduce((sum, b) => sum + b._count._all, 0),
     latencyP50: percentile(values, 50),
     latencyP95: percentile(values, 95),
     sites,

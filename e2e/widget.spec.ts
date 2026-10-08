@@ -7,7 +7,9 @@ import {
   installedAt,
   modelCallsOf,
   seedBotAnswers,
+  seedIpHits,
   seedModelSpend,
+  visitorsOf,
 } from "./support/db";
 
 // Spec 003. The customer's site is simulated on its own origin; the widget loads from the app.
@@ -134,6 +136,26 @@ test("when the model fails, the visitor gets the business's contact", async ({ p
   await page.getByRole("button", { name: "Abrir chat" }).click();
   await expect(chat.getByText("¿Abren hoy? [falla]", { exact: true })).toHaveCount(1);
   await expect(chat.getByText("No pude responder tu consulta", { exact: false })).toHaveCount(1);
+});
+
+// Spec 015, criteria 1 and 3: a connection that already created 10 visitors on the site in the last
+// hour cannot create another one; the visitor reads why. Needs RATE_LIMIT_SECRET in the app and the test.
+test("one connection cannot keep inventing visitors on a site", async ({ page, baseURL }) => {
+  test.skip(!process.env.RATE_LIMIT_SECRET, "Needs RATE_LIMIT_SECRET");
+  const ip = "203.0.113.77";
+  const { domainId, name } = await newSite("ip");
+  await seedIpHits(domainId, ip, "new_visitor", 10);
+  await page.setExtraHTTPHeaders({ "x-forwarded-for": ip });
+  await hostPage(page, name, domainId, new URL(baseURL!).origin);
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  const chat = page.frameLocator('iframe[data-brainance="chat"]');
+  await chat.getByTestId("widget-input").fill("¿Hacen envíos?");
+  await chat.getByTestId("widget-send").click();
+  await expect(
+    chat.getByText("Se enviaron muchos mensajes desde tu conexión. Esperá unos minutos y volvé a intentar."),
+  ).toBeVisible();
+  await expect(chat.getByTestId("widget-input")).toHaveValue("¿Hacen envíos?");
+  expect(await visitorsOf(domainId)).toBe(0);
 });
 
 // Spec 010, criteria 1 and 12: when the bot derives, the owner is emailed after the visitor got

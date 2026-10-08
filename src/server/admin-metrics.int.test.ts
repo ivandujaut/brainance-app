@@ -22,14 +22,24 @@ describe.skipIf(!url)("adminMetrics", () => {
   const clerkId = "user_int_admin_metrics";
   let cara: string;
   let barato: string;
+  let frenado: string;
 
   beforeAll(async () => {
     await db.user.deleteMany({ where: { clerkId } });
     const user = await db.user.create({
-      data: { clerkId, fullname: "Dueña Admin", domains: { create: [{ name: "cara-admin.com.ar", icon: "" }, { name: "barato-admin.com.ar", icon: "" }] } },
+      data: { clerkId, fullname: "Dueña Admin", domains: { create: [{ name: "cara-admin.com.ar", icon: "" }, { name: "barato-admin.com.ar", icon: "" }, { name: "abusado-admin.com.ar", icon: "" }] } },
       include: { domains: { orderBy: { name: "desc" } } },
     });
-    [cara, barato] = user.domains.map((d) => d.id);
+    [cara, barato, frenado] = user.domains.map((d) => d.id);
+    // Spec 015: requests stopped by the IP limit; the abused site never reached the model.
+    const blocked = (domainId: string, hoursAgo: number) => ({
+      fingerprint: "huella",
+      domainId,
+      kind: "blocked",
+      reason: "ip_burst",
+      createdAt: new Date(Date.now() - hoursAgo * 3600 * 1000),
+    });
+    await db.rateLimitHit.createMany({ data: [blocked(cara, 1), blocked(frenado, 1), blocked(frenado, 2), blocked(frenado, 48)] });
     const call = (domainId: string, costUsd: number, latencyMs: number, error: string | null = null, hoursAgo = 1) => ({
       domainId,
       purpose: "answer",
@@ -66,6 +76,7 @@ describe.skipIf(!url)("adminMetrics", () => {
   });
 
   afterAll(async () => {
+    await db.rateLimitHit.deleteMany({ where: { domainId: { in: [cara, barato, frenado] } } });
     await db.user.deleteMany({ where: { clerkId } });
     await db.$disconnect();
   });
@@ -77,9 +88,21 @@ describe.skipIf(!url)("adminMetrics", () => {
       ["cara-admin.com.ar", "Dueña Admin", 3, 1.7],
       ["barato-admin.com.ar", "Dueña Admin", 1, 0.01],
     ]);
-    expect(mine[0]).toMatchObject({ errors: 1, fallbacks: 1, nearCap: true });
+    expect(mine[0]).toMatchObject({ errors: 1, fallbacks: 1, blocked: 1, nearCap: true });
     expect(mine[1]).toMatchObject({ fallbacks: 0, nearCap: false });
     expect(m.fallbacks).toBeGreaterThanOrEqual(1);
+    expect(m.blocked).toBeGreaterThanOrEqual(3);
+  });
+
+  // Spec 015, criterion 11: a site under attack shows up even if it never reached the model.
+  it("lists the requests stopped by the IP limit per site", async () => {
+    const m = await adminMetrics(db, { days: 1, capUsd: 2 });
+    expect(m.sites.find((s) => s.domainId === frenado)).toMatchObject({
+      site: "abusado-admin.com.ar",
+      calls: 0,
+      costUsd: 0,
+      blocked: 2,
+    });
     expect(m.totalCostUsd).toBeGreaterThanOrEqual(1.71);
     expect(m.latencyP50).not.toBeNull();
     expect(m.errorRate).toBeGreaterThan(0);

@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import { Pool } from "pg";
 
 // Seeds E2E fixtures straight into the app's database (same DATABASE_URL as the app under test).
@@ -214,4 +215,21 @@ export const attentionNoticesOf = async (domainId: string) => {
     [domainId],
   );
   return rows;
+};
+
+/**
+ * Spec 015: seeds requests counted for an IPv4 address on a site, fingerprinted with the same
+ * RATE_LIMIT_SECRET as the app under test.
+ */
+export const seedIpHits = async (domainId: string, ip: string, kind: "message" | "new_visitor" | "lead", count: number) => {
+  const fingerprint = createHmac("sha256", process.env.RATE_LIMIT_SECRET!).update(ip).digest("base64url");
+  await pool.query(
+    `INSERT INTO "RateLimitHit" (fingerprint, "domainId", kind) SELECT $1, $2, $3 FROM generate_series(1, $4)`,
+    [fingerprint, domainId, kind, count],
+  );
+};
+
+export const visitorsOf = async (domainId: string) => {
+  const { rows } = await pool.query<{ count: number }>(`SELECT count(*)::int AS count FROM "Customer" WHERE "domainId" = $1`, [domainId]);
+  return rows[0].count;
 };
