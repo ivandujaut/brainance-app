@@ -31,6 +31,7 @@ Cada ítem va a tener su spec en `docs/specs/`.
 - **Marcar como atendida** ([spec 012](specs/012-marcar-como-atendida.md)): saca la marca "Necesita atención" sin escribirle al visitante, para cuando el dueño ya respondió por email o WhatsApp, o fue un falso positivo.
 - **Portada con la promesa** ([spec 013](specs/013-portada-con-la-promesa.md)): titular "Ningún cliente sin respuesta", las tres pruebas con ejemplos del producto, el eval publicado en `/como-medimos` y qué pasa cuando termina la beta.
 - **Respuesta cuando el modelo falla** ([spec 014](specs/014-respuesta-cuando-el-modelo-falla.md)): si el modelo falla, tarda o vuelve vacío, el visitante recibe el contacto del negocio, la conversación queda "Necesita atención" y el dueño recibe un aviso por día. Cierra el caso que más contradice "Ningún cliente sin respuesta".
+- **Límite por IP en el widget** ([spec 015](specs/015-limite-por-ip.md), [ADR 0009](adr/0009-limites-por-ip-del-widget.md)): una sola IP no puede agotar el tope de un sitio, inventar visitantes ni mandar leads en masa. Se guarda solo una huella de la IP, por hasta 48 horas.
 
 ## Posicionamiento
 
