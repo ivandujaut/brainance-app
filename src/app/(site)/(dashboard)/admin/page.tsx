@@ -47,7 +47,7 @@ const AdminPage = async ({ searchParams }: Props) => {
           </Link>
         ))}
       </nav>
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatTile label="Costo de IA" value={usd.format(m.totalCostUsd)} hint={`${m.calls} respuestas`} testId="admin-cost" />
         <StatTile label="Latencia p50" value={ms(m.latencyP50)} />
         <StatTile label="Latencia p95" value={ms(m.latencyP95)} />
@@ -59,6 +59,13 @@ const AdminPage = async ({ searchParams }: Props) => {
           hint="El modelo falló y el visitante recibió el contacto"
           testId="admin-fallbacks"
         />
+        {/* Spec 015, criterion 11: a burst here usually means someone is abusing a site. */}
+        <StatTile
+          label="Frenados por IP"
+          value={String(m.blocked)}
+          hint="Pedidos de una misma conexión por encima del límite"
+          testId="admin-blocked"
+        />
       </div>
       <Card>
         <CardHeader>
@@ -66,7 +73,7 @@ const AdminPage = async ({ searchParams }: Props) => {
         </CardHeader>
         <CardContent className="overflow-x-auto">
           {m.sites.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No hubo llamadas al modelo en este período.</p>
+            <p className="text-sm text-muted-foreground">No hubo llamadas al modelo ni pedidos frenados en este período.</p>
           ) : (
             <table className="w-full text-sm tabular-nums" data-testid="admin-sites">
               <thead className="text-left text-muted-foreground">
@@ -76,6 +83,7 @@ const AdminPage = async ({ searchParams }: Props) => {
                   <th className="py-2 font-normal text-right">Respuestas</th>
                   <th className="py-2 font-normal text-right">Errores</th>
                   <th className="py-2 font-normal text-right">Respaldo</th>
+                  <th className="py-2 font-normal text-right">Frenados</th>
                   <th className="py-2 font-normal text-right">Costo</th>
                   <th className="py-2 font-normal text-right">Últimas 24 h</th>
                 </tr>
@@ -95,6 +103,7 @@ const AdminPage = async ({ searchParams }: Props) => {
                     <td className="py-2 text-right">{s.calls}</td>
                     <td className="py-2 text-right">{s.errors}</td>
                     <td className="py-2 text-right">{s.fallbacks}</td>
+                    <td className="py-2 text-right">{s.blocked}</td>
                     <td className="py-2 text-right">{usd.format(s.costUsd)}</td>
                     <td className="py-2 text-right">{usd.format(s.spentTodayUsd)}</td>
                   </tr>

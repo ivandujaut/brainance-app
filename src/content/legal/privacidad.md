@@ -23,6 +23,7 @@ Respecto de los datos de los visitantes, **el dueño del sitio es el responsable
 
 - **Identificador anónimo:** al abrir el chat se genera un identificador aleatorio que se guarda en el almacenamiento local de tu navegador, para que puedas retomar la conversación. No usamos cookies de publicidad ni de analítica.
 - **Conversaciones:** los mensajes que escribís y las respuestas del bot o de una persona del negocio.
+- **Huella de la conexión:** para prevenir abusos guardamos un código derivado de la dirección IP desde la que escribís, calculado de forma que no permite recuperar la IP. No guardamos la dirección IP.
 - **Datos de contacto, solo si decidís dejarlos:** tu email y tus respuestas a las preguntas del negocio, junto con la fecha en que los enviaste y aceptaste el aviso de uso de datos.
 
 No pedimos datos sensibles. Te pedimos que no los escribas en el chat.
@@ -54,6 +55,7 @@ Algunos de estos proveedores procesan datos fuera de la Argentina. Además, el d
 
 - Las conversaciones y los contactos se guardan mientras el sitio exista en BrAInance. Si el dueño borra el sitio, se borran sus conversaciones, contactos y métricas.
 - El dueño puede borrar en cualquier momento los datos de contacto de un visitante desde la sección Leads; la conversación queda sin datos personales.
+- La huella de la conexión se borra todos los días: ninguna se guarda más de 48 horas.
 - Los datos de la cuenta del dueño se guardan mientras la cuenta esté activa.
 
 ## Tus derechos

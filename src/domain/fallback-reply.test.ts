@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fallbackReply, fallbackSuffix, siteCapReply } from "./fallback-reply";
+import { fallbackReply, fallbackSuffix, ipDailyReply, siteCapReply } from "./fallback-reply";
 
 // Spec 014: fixed replies that refer the visitor to the business, in the business's addressing.
 
@@ -41,5 +41,17 @@ describe("fallbackSuffix", () => {
 
   it("starts a new paragraph after a partial answer (criterion 4)", () => {
     expect(fallbackSuffix("Sí, abrimos los domingos de", "Respaldo.")).toBe("\n\nRespaldo.");
+  });
+});
+
+// Spec 015, criterion 2: a connection that sent too many messages today gets the contact.
+describe("ipDailyReply", () => {
+  it("gives the contact in the business's addressing", () => {
+    expect(ipDailyReply({ contact, addressing: "vos" })).toBe(
+      "Desde tu conexión se enviaron muchos mensajes hoy. Podés comunicarte con el negocio por WhatsApp +54 9 341 555-0101.",
+    );
+    expect(ipDailyReply({ contact, addressing: "usted" })).toBe(
+      "Desde su conexión se enviaron muchos mensajes hoy. Puede comunicarse con el negocio por WhatsApp +54 9 341 555-0101.",
+    );
   });
 });

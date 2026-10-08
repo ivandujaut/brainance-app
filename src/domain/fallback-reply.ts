@@ -1,7 +1,8 @@
 import type { Addressing } from "./answer-prompt";
 
-// Fixed replies that refer the visitor to the business without calling the model (spec 014): when
-// the model fails, and when the site reached its daily cap (spec 007). Both follow the addressing.
+// Fixed replies that refer the visitor to the business without calling the model: when the model
+// fails (spec 014), when the site reached its daily cap (spec 007) and when one connection sent too
+// many messages today (spec 015). All follow the addressing.
 
 type Business = { contact: string; addressing: Addressing };
 
@@ -17,6 +18,10 @@ export const fallbackReply = (business: Business) =>
 /** Fixed answer once the site reaches its daily cap. */
 export const siteCapReply = (business: Business) =>
   `En este momento no puedo responder más consultas. ${reachUs(business)}`;
+
+/** What a connection over its daily limit reads (spec 015, criterion 2). */
+export const ipDailyReply = (business: Business) =>
+  `Desde ${business.addressing === "usted" ? "su" : "tu"} conexión se enviaron muchos mensajes hoy. ${reachUs(business)}`;
 
 /** What to append to a (possibly partial) answer: the fallback, as a new paragraph after any text. */
 export const fallbackSuffix = (partial: string, fallback: string) => (partial.trim() ? `\n\n${fallback}` : fallback);

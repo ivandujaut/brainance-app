@@ -14,9 +14,10 @@ vi.mock("@/server/admin-metrics", async (original) => ({
     calls: 4,
     errorRate: 0.25,
     fallbacks: 3,
+    blocked: 7,
     latencyP50: 800,
     latencyP95: 3000,
-    sites: [{ domainId: "d1", site: "cara.com.ar", owner: "Dueña", calls: 3, errors: 1, fallbacks: 3, costUsd: 1.7, spentTodayUsd: 1.7, nearCap: true }],
+    sites: [{ domainId: "d1", site: "cara.com.ar", owner: "Dueña", calls: 3, errors: 1, fallbacks: 3, blocked: 7, costUsd: 1.7, spentTodayUsd: 1.7, nearCap: true }],
   }),
 }));
 vi.mock("next/navigation", () => ({
@@ -57,5 +58,14 @@ describe("admin page", () => {
     expect(html).toContain("Respuestas de respaldo");
     expect(html).toMatch(/data-testid="admin-fallbacks"[^>]*>[\s\S]*?3/);
     expect(html).toContain("Respaldo");
+  });
+
+  // Spec 015, criterion 11.
+  it("shows how many requests the IP limit stopped", async () => {
+    owner.id = "user_admin";
+    const html = await render();
+    expect(html).toContain("Frenados por IP");
+    expect(html).toMatch(/data-testid="admin-blocked"[^>]*>[\s\S]*?7/);
+    expect(html).toContain("Frenados");
   });
 });

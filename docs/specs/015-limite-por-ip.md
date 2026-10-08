@@ -1,6 +1,6 @@
 # 015 — Límite por IP en el widget
 
-- **Estado:** Borrador
+- **Estado:** Implementada
 - **ADRs relacionados:** [0003 — Arquitectura del widget](../adr/0003-arquitectura-del-widget.md), [0009 — Límites por IP del widget](../adr/0009-limites-por-ip-del-widget.md)
 - **Specs relacionadas:** [003 — Widget embebible](003-widget-embebible.md), [005 — Captura de leads](005-captura-de-leads.md), [011 — Tope visible](011-tope-visible-y-metricas-de-honestidad.md), [014 — Respuesta cuando el modelo falla](014-respuesta-cuando-el-modelo-falla.md)
 - **Posicionamiento:** protege dos promesas. Una es "Ningún cliente sin respuesta": un abusador no puede agotar el tope y dejar a los clientes reales con la respuesta fija. La otra es "el precio previsible": un sitio abusado no agota el gasto de todos.
@@ -67,14 +67,15 @@ Cada criterio se convierte en al menos un test. Todos los límites son **por IP 
 
 - **Dominio** (`src/domain/ip-limits.ts`):
   - `IP_LIMITS` con los números de los criterios.
-  - `checkIpLimits({ kind, counts })` devuelve `{ ok: true }` o `{ ok: false, reason: "ip_burst" | "ip_daily" | "ip_new_visitors" | "ip_leads" }`.
+  - `checkMessageIpLimits(counts)` y `checkLeadIpLimits(counts)` devuelven `{ ok: true }` o `{ ok: false, reason: "ip_burst" | "ip_daily" | "ip_new_visitors" | "ip_leads" }`. El límite diario se revisa antes que la ráfaga, porque su respuesta da el contacto.
   - `ipKey(ip)` normaliza: recorta IPv4 y lleva IPv6 a /64. Es puro, con tests.
 - **Servidor** (`src/server/ip-limits.ts`):
   - `clientIp(request)` toma el primer valor de `x-forwarded-for`.
   - `ipFingerprint(ip, secret)` es el HMAC con `node:crypto`.
-  - `countIpEvents(...)` y `recordIpEvent(...)` leen y escriben `RateLimitHit`.
+  - `admitMessage(...)` y `admitLead(...)` cuentan en `RateLimitHit` y, si el pedido pasa, lo registran.
+  - `purgeRateLimitHits(...)` borra lo de más de 24 horas.
   - `recordIpBlock(...)` registra el pedido frenado y manda el aviso del criterio 12 (deduplicado en memoria por sitio y día, como los avisos de costo).
-- **Datos (migración):** `RateLimitHit { id, createdAt, fingerprint, domainId, kind }`, con `kind` en `message | new_visitor | lead | blocked`, índice `(fingerprint, domainId, kind, createdAt)` e índice `(createdAt)` para la purga. Sin relación con `Domain`, para no frenar borrados en cascada; un sitio borrado deja huellas huérfanas que la purga borra al día siguiente.
+- **Datos (migración `rate_limit_hits`):** `RateLimitHit { id, createdAt, fingerprint, domainId, kind, reason }`, con `kind` en `message | new_visitor | lead | blocked` y `reason` solo para los frenados. Índices: `(fingerprint, domainId, kind, createdAt)` para los conteos, `(domainId, kind, createdAt)` para `/admin` y `(createdAt)` para la purga. Sin relación con `Domain`, para no frenar borrados en cascada; un sitio borrado deja huellas huérfanas que la purga borra al día siguiente.
 - **Ruta de mensajes:** el chequeo por IP va **antes** de `getOrCreateRoom`. Para saber si el visitante es nuevo, se consulta si existe el `Customer` (`domainId`, `visitorId`) antes de crearlo. Si el pedido pasa, registra `message` y, si corresponde, `new_visitor`.
 - **Ruta de leads:** chequeo antes de `saveLead`; si pasa, registra `lead`.
 - **Respuesta 429:** usa el mismo formato que los rechazos actuales (`{ error, message }`), así que el widget la muestra sin cambios: ya muestra `message` y le devuelve el texto al visitante.
@@ -85,7 +86,7 @@ Cada criterio se convierte en al menos un test. Todos los límites son **por IP 
 - **Variables nuevas** en `.env.example`: `RATE_LIMIT_SECRET` (secreto, al menos 32 bytes aleatorios) y `CRON_SECRET`.
 - **Regla de WAF:** paso manual nuevo en `docs/lanzamiento.md`. Una regla para `POST` a `^/api/widget/[^/]+/(messages|lead)$`, de 30 pedidos por 60 s por IP, con respuesta 429.
 - **Privacidad:** `src/content/legal/privacidad.md` suma, en "Datos de los visitantes" y en "Cuánto tiempo guardamos", que se guarda una huella irreversible de la IP por hasta 48 horas para prevenir abusos. Ver la decisión 3.
-- **E2E:** el servidor de Playwright corre sin `x-forwarded-for` real, así que el E2E manda el encabezado con `page.setExtraHTTPHeaders`. Funciona porque, fuera de Vercel, `next start` no lo pisa.
+- **E2E:** el E2E manda `x-forwarded-for` con `page.setExtraHTTPHeaders` y siembra huellas con el mismo `RATE_LIMIT_SECRET`, que la CI define solo para el job de E2E. Sin esa variable, la prueba se saltea.
 - **Riesgos:**
   - *CGNAT:* muchos clientes reales detrás de una IP. Se mitiga con números holgados y la métrica de frenados en `/admin`; si aparecen falsos positivos, se suben.
   - *Muchas IP (botnet, proxies rotativos):* estos límites no lo frenan. Siguen el tope del sitio, el tope de costo y la regla de WAF.

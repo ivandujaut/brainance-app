@@ -21,7 +21,7 @@
 - [x] *GitHub → Settings → Secrets and variables → Actions:* cargar las cadenas **directas**:
   - `NEON_DIRECT_URL`: branch `production`.
   - `NEON_DEV_DIRECT_URL`: branch `development`.
-- [x] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. Se repite con cada migración nueva (última: 2026-10-08, `model_fallback` de la spec 014). El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
+- [x] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. Se repite con cada migración nueva (última: 2026-10-08, `rate_limit_hits` de la spec 015). El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
   - Alternativa desde tu máquina: `DIRECT_URL="<directa>" npx prisma migrate deploy`.
   - Si la base se creó antes con `db push`, primero: `npx prisma migrate resolve --applied 20261001000000_init`.
   - La migración `20261007120000_remove_legacy` se frena sola si `Bookings`, `Campaign` o `Product` tienen filas. En ese caso, exportalas y vaciá las tablas antes.
@@ -106,6 +106,8 @@
 | `LEGAL_REVIEWED` | ✓ |   | `true` recién después del paso 9 |
 | `AI_SITE_DAILY_COST_USD` | opc. | opc. | Por defecto 2 |
 | `PUSHER_APP_ID`, `PUSHER_KEY`, `PUSHER_SECRET`, `PUSHER_CLUSTER` | opc. | opc. | Pusher (ADR 0007); sin esto, todo anda por polling |
+| `RATE_LIMIT_SECRET` | ✓ | ✓ | *Secret*: `openssl rand -base64 32`, uno distinto por entorno (spec 015). Sin esto, el widget queda sin límite por IP |
+| `CRON_SECRET` | ✓ |   | *Secret*: `openssl rand -base64 32`. Vercel Cron lo manda para purgar las huellas de IP (spec 015) |
 
 No cargar nunca `AI_ALLOW_MOCK_MODEL` ni `WIDGET_ALLOW_HTTP` en P.
 
@@ -119,6 +121,15 @@ No cargar nunca `AI_ALLOW_MOCK_MODEL` ni `WIDGET_ALLOW_HTTP` en P.
 Estado al 2026-10-06: cargadas en V las de Neon, Clerk (desarrollo), Uploadcare y `EMAIL_PROVIDER`. P sigue sin variables hasta tener dominio, Clerk de producción y Resend.
 
 - [ ] *Verificar:* *Deployments →* un redeploy termina sin errores.
+
+### Firewall y cron (spec 015, ADR 0009)
+
+- [ ] *Firewall → Configure → New Rule:* "Widget por IP".
+  - Condición: *Request Path* coincide con la regex `^/api/widget/[^/]+/(messages|lead)$` y *Method* es `POST`.
+  - Acción: *Rate Limit*, *Fixed Window* de 60 s, 30 pedidos, clave *IP*, respuesta 429.
+  - Es la única regla de rate limit que admite Hobby. Es un escudo grueso: los límites por sitio están en la app.
+- [ ] *Settings → Cron Jobs:* después del deploy de producción aparece `/api/cron/purge-rate-limits`, que corre todos los días a las 07:00 UTC (4:00 en Argentina). Hace falta `CRON_SECRET` en P.
+- [ ] *Verificar:* *Cron Jobs → Run* devuelve `{"deleted": …}`. Sin el encabezado del cron, la ruta responde 401.
 
 ## 7. QA en la preview (criterios 3 y 4)
 
