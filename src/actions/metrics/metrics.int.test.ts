@@ -19,7 +19,7 @@ describe.skipIf(!url)("owner metrics", async () => {
     answered?: boolean;
     lead?: boolean;
     /** Spec 011: why the room needed attention; a derivation marks the answer as derived. */
-    attention?: "derivation" | "human_request";
+    attention?: "derivation" | "human_request" | "model_error";
     /** Minutes until the owner's first message after the room was flagged (spec 011, criterion 3). */
     attendedAfter?: number;
     /** A person attended the whole conversation: no bot answer at all (spec 011, criterion 4). */
@@ -46,7 +46,7 @@ describe.skipIf(!url)("owner metrics", async () => {
               create: [
                 { role: "user", message: "hola", createdAt: at },
                 ...(answered && !live
-                  ? [{ role: "assistant" as const, message: "¡Hola!", createdAt: answerAt, derivation: attention === "derivation" }]
+                  ? [{ role: "assistant" as const, message: "¡Hola!", createdAt: answerAt, derivation: attention === "derivation" || attention === "model_error", fallback: attention === "model_error" }]
                   : []),
                 ...(live ? [{ role: "owner" as const, message: "Te atiendo yo.", createdAt: answerAt }] : []),
                 ...(attendedAfter
@@ -111,6 +111,12 @@ describe.skipIf(!url)("owner metrics", async () => {
     expect(metrics!.derivationRate).toBeCloseTo(2 / 5);
     expect(metrics!.responseTime).toEqual({ medianMinutes: 10, cases: 2 });
     expect(await onGetOwnerMetrics({ days: 7, siteId: taller })).toMatchObject({ answers: 1, derived: 0, humanRequests: 0, responseTime: null });
+  });
+
+  // Spec 014, criterion 15: the reply sent when the model failed is a derivation the owner sees.
+  it("counts a model failure as a derived answer and a conversation that needed attention", async () => {
+    await conversation(panaderia, daysAgo(1), { attention: "model_error" });
+    expect(await onGetOwnerMetrics({ days: 7 })).toMatchObject({ answers: 4, derived: 2, needingAttention: 2 });
   });
 
   // QA of spec 011: the bot got the conversation back and derived again, which moved the room's

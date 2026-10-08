@@ -1,7 +1,10 @@
 // "Needs attention" rule for the inbox (spec 006). Deliberately simple and explainable; if the beta
 // shows it is not enough, a classifier replaces it (ADR 0001).
 
-export type AttentionReason = "derivation" | "human_request" | "site_cap";
+export type AttentionReason = "derivation" | "human_request" | "site_cap" | "model_error";
+
+/** Reasons that usually hit every conversation of a site at once: the owner hears about them once a day. */
+export const DAILY_REASONS: readonly AttentionReason[] = ["site_cap", "model_error"];
 
 const normalize = (text: string) =>
   text

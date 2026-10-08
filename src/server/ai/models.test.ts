@@ -27,4 +27,33 @@ describe("resolveAnswerModel", () => {
     const result = streamText({ model: resolveAnswerModel(), prompt: "¿Hacen envíos?" });
     expect(await result.text).toBe("Respuesta de prueba a: ¿Hacen envíos?");
   });
+
+  // Spec 014: E2E runs need a model that fails on demand.
+  describe("failure markers", () => {
+    const answer = async (prompt: string) => {
+      vi.stubEnv("AI_ANSWER_MODEL", "mock/echo");
+      vi.stubEnv("AI_ALLOW_MOCK_MODEL", "true");
+      let error: unknown = null;
+      const result = streamText({ model: resolveAnswerModel(), prompt, onError: (e) => void (error = e.error) });
+      let text = "";
+      for await (const piece of result.textStream) text += piece;
+      return { text, error };
+    };
+
+    it("fails before any text with [falla]", async () => {
+      const { text, error } = await answer("¿Abren hoy? [falla]");
+      expect(text).toBe("");
+      expect(String(error)).toContain("Mock model failure");
+    });
+
+    it("answers nothing with [vacio]", async () => {
+      expect(await answer("¿Abren hoy? [vacio]")).toEqual({ text: "", error: null });
+    });
+
+    it("fails after part of the answer with [corte]", async () => {
+      const { text, error } = await answer("¿Abren hoy? [corte]");
+      expect(text).toBe("Respuesta de ");
+      expect(String(error)).toContain("Mock model failure");
+    });
+  });
 });

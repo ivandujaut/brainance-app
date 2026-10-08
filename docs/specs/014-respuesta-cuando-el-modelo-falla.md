@@ -1,6 +1,6 @@
 # 014 — Respuesta cuando el modelo falla
 
-- **Estado:** Borrador
+- **Estado:** Implementada
 - **ADRs relacionados:** [0001 — Estrategia de modelos de IA](../adr/0001-estrategia-de-modelos-de-ia.md), [0008 — Errores y métricas](../adr/0008-errores-y-metricas.md)
 - **Specs relacionadas:** [003 — Widget embebible](003-widget-embebible.md), [007 — Observabilidad](007-observabilidad.md) (tope de costo y `ModelCall`), [010 — Aviso al dueño](010-aviso-al-dueno.md), [011 — Tope visible y métricas de honestidad](011-tope-visible-y-metricas-de-honestidad.md) (la respuesta fija del tope, que cuenta como derivada)
 - **Posicionamiento:** es el caso que contradice la promesa "Ningún cliente sin respuesta" de forma más directa. Cuando el sistema falla, el visitante tiene que recibir el contacto del negocio y el dueño tiene que enterarse.
@@ -84,9 +84,9 @@ Cada criterio se convierte en al menos un test.
 - **Ruta** (`messages/route.ts`): en `onEnd`, si `fallback`, guarda el mensaje con `derivation: true`, llama a `flagAttention(room, "model_error")` y a `notifyOwner`, y no corre `detectAttention`. El `captureError` de `after()` queda para lo que falle al guardar.
 - **Widget** (`src/components/widget/chat.tsx`): no cambia el camino feliz, porque el respaldo llega como texto. El `fail(...)` por stream vacío queda solo para errores de red reales. El criterio 8 se cumple porque el servidor ya no deja la pregunta sin respuesta.
 - **Bandeja** (`src/components/inbox/links.ts`): rótulo de `model_error`.
-- **Admin** (`src/server/admin-metrics.ts`): cuenta los `ChatRoom` con `attentionReason = 'model_error'` o, más preciso, los mensajes de respaldo. Para no depender del texto, conviene contar las filas de `ModelCall` con `error` no nulo cuyo `chatRoomId` tiene un mensaje derivado en ese minuto. Si resulta frágil, se suma `ChatMessage.fallback Boolean` (con migración). Se decide al implementar.
-- **Sin migración**, salvo la opción anterior. `attentionReason` es texto y el comentario del schema suma el motivo nuevo.
-- **E2E:** hace falta un modelo de prueba que falle. Se suma `mock/fail` (y `mock/empty`), habilitado igual que `mock/echo` con `AI_ALLOW_MOCK_MODEL=true`. Como el modelo es uno por servidor, la suite de fallo levanta el suyo, o el modelo mock falla cuando la pregunta trae un marcador (`[falla]`). Lo segundo es más barato y no toca la configuración de Playwright.
+- **Admin** (`src/server/admin-metrics.ts`): cuenta los mensajes con `ChatMessage.fallback`, por sitio y en total. Se eligió la columna (migración `model_fallback`) en lugar de cruzar `ModelCall` con los mensajes: es exacta y no depende del texto ni de la hora.
+- **Migración:** `ChatMessage.fallback Boolean @default(false)`. `attentionReason` es texto y el comentario del schema suma el motivo nuevo.
+- **E2E:** el modelo `mock/echo` falla con marcadores en la pregunta: `[falla]` antes de cualquier texto, `[vacio]` sin texto y `[corte]` después de las primeras palabras. No hace falta otro servidor ni otra configuración de Playwright.
 - **Riesgos:**
   - *El respaldo esconde un problema largo:* si el crédito se agota, todos los sitios responden con el contacto durante horas y el producto parece andar. Lo mitigan la alerta de Sentry, el email al 50 % del AI Gateway y el contador de `/admin`.
   - *Derivaciones infladas:* un mal día del proveedor sube la tasa de derivación que ve el dueño. Es lo que pasó desde el lado del visitante, así que es honesto; si confunde, se separa (ver Fuera de alcance).
@@ -99,8 +99,9 @@ Cada criterio se convierte en al menos un test.
 | 5, 6 | Unitario de los textos de respaldo y del tope, de vos y de usted | `src/domain/fallback-reply.test.ts` |
 | 11, 12, 13 | Unitario de la decisión y del email para `model_error` | `src/domain/attention-notice.test.ts` |
 | 1, 2, 3, 4 | Unitario de `streamAnswer` con modelos mock: error antes del texto, timeout al primer fragmento y al total, texto vacío, error a mitad | `src/server/ai/answer.test.ts` |
-| 7, 8, 9, 10, 17 | Integración de la ruta con un modelo que falla: guarda la pregunta una vez y el respaldo derivado, marca `model_error`, registra `ModelCall` con error | `src/app/api/widget/[domainId]/messages/route.int.test.ts` |
+| 3, 4, 7, 8, 9, 10, 11, 12, 14, 17 | Integración de la ruta con un modelo que falla: guarda la pregunta una vez y el respaldo derivado, marca `model_error`, registra `ModelCall` con error, avisa una vez por día | `src/app/api/widget/[domainId]/messages/route.int.test.ts` |
 | 11, 12, 13, 14 | Integración del aviso: un email por sitio por día, respeta interruptor y control | `src/server/owner-notices.int.test.ts` |
 | 15 | Integración de métricas: el respaldo cuenta como derivada | `src/actions/metrics/metrics.int.test.ts` |
-| 16 | Integración de `/admin` | `src/server/admin-metrics.int.test.ts` |
+| 16 | Integración de `/admin` y render de la página | `src/server/admin-metrics.int.test.ts`, `src/app/(site)/(dashboard)/admin/page.test.tsx` |
+| 1 (E2E) | Unitario de los marcadores del modelo mock | `src/server/ai/models.test.ts` |
 | 1, 8, 9 | E2E del widget con `mock/fail`: el visitante ve el contacto, al recargar no hay duplicados y la bandeja muestra "El bot no pudo responder" | `e2e/widget.spec.ts` |

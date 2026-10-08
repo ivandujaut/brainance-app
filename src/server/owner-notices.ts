@@ -1,4 +1,4 @@
-import type { AttentionReason } from "@/domain/attention";
+import { DAILY_REASONS, type AttentionReason } from "@/domain/attention";
 import {
   ATTENTION_NOTICE_LIMITS,
   buildAttentionEmail,
@@ -63,7 +63,7 @@ export const notifyAttention = async (
   deps: OwnerNoticeDeps,
 ): Promise<AttentionNoticeResult> => {
   const since = new Date(now.getTime() - DAY_MS);
-  const [room, site, noticesToday, capNoticedToday] = await Promise.all([
+  const [room, site, noticesToday, reasonNoticedToday] = await Promise.all([
     db.chatRoom.findUniqueOrThrow({
       where: { id: roomId },
       select: {
@@ -78,9 +78,12 @@ export const notifyAttention = async (
       select: { name: true, chatBot: { select: { attentionEmail: true } }, User: { select: { clerkId: true } } },
     }),
     db.chatRoom.count({ where: { Customer: { domainId }, attentionNotifiedAt: { gte: since } } }),
-    db.chatRoom
-      .count({ where: { Customer: { domainId }, attentionReason: "site_cap", attentionNotifiedAt: { gte: since } } })
-      .then((n) => n > 0),
+    // The cap and model failures are told once a day per site (spec 010, criterion 4; spec 014).
+    DAILY_REASONS.includes(reason)
+      ? db.chatRoom
+          .count({ where: { Customer: { domainId }, attentionReason: reason, attentionNotifiedAt: { gte: since } } })
+          .then((n) => n > 0)
+      : false,
   ]);
   const decision = decideAttentionNotice({
     reason,
@@ -90,7 +93,7 @@ export const notifyAttention = async (
     attentionNotifiedAt: room.attentionNotifiedAt,
     attentionNotices: room.attentionNotices,
     noticesToday,
-    capNoticedToday,
+    reasonNoticedToday,
     now,
   });
   if (decision.action === "skip") {

@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionToast } from "@/hooks/use-action-toast";
 import { cn } from "@/lib/utils";
+import type { AttentionReason } from "@/domain/attention";
 import { ATTENTION_REASONS } from "./links";
 
 const MAX_REPLY = 2000;
@@ -76,7 +77,7 @@ export const ConversationPane = ({ conversation, backHref, onChanged, onRead }: 
           <p className="text-xs text-muted-foreground">{conversation.site}</p>
         </div>
         {conversation.needsAttention && (
-          <Badge variant="destructive">{ATTENTION_REASONS[conversation.attentionReason ?? ""] ?? "Necesita atención"}</Badge>
+          <Badge variant="destructive">{ATTENTION_REASONS[conversation.attentionReason as AttentionReason] ?? "Necesita atención"}</Badge>
         )}
         <Badge variant={conversation.live ? "default" : "secondary"} data-testid="conversation-mode">
           {conversation.live ? "Estás atendiendo" : "Responde el bot"}

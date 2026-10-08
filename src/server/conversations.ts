@@ -33,7 +33,8 @@ export const getOrCreateRoom = async (
 
 /**
  * Stores a message and moves the conversation to the top of the owner's inbox. A bot answer that
- * refers the visitor to the business is stored as a derivation (spec 011, criterion 13).
+ * refers the visitor to the business is stored as a derivation (spec 011, criterion 13), and the
+ * reply sent because the model failed, as a fallback too (spec 014).
  */
 export const addMessage = async (
   db: PrismaClient,
@@ -42,12 +43,13 @@ export const addMessage = async (
   content: string,
   {
     derivation = false,
+    fallback = false,
     answersAttentionAt = null,
-  }: { derivation?: boolean; answersAttentionAt?: Date | null } = {},
+  }: { derivation?: boolean; fallback?: boolean; answersAttentionAt?: Date | null } = {},
 ) => {
   const [message] = await db.$transaction([
     db.chatMessage.create({
-      data: { chatRoomId, role, message: content, derivation, answersAttentionAt },
+      data: { chatRoomId, role, message: content, derivation, fallback, answersAttentionAt },
       select: { id: true, createdAt: true },
     }),
     db.chatRoom.update({ where: { id: chatRoomId }, data: { lastMessageAt: new Date() } }),

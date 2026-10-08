@@ -69,7 +69,10 @@ describe("answerQuestion", () => {
   });
 });
 
-const streamingModel = (chunks: string[], { fail = false } = {}) =>
+const streamingModel = (
+  chunks: string[],
+  { fail = false, failAfterText = false, initialDelayInMs = 0, chunkDelayInMs = 0 } = {},
+) =>
   new MockLanguageModelV4({
     provider: "mock",
     modelId: "mock-stream",
@@ -77,9 +80,12 @@ const streamingModel = (chunks: string[], { fail = false } = {}) =>
       if (fail) throw new Error("provider down");
       return {
         stream: simulateReadableStream({
+          initialDelayInMs,
+          chunkDelayInMs,
           chunks: [
             { type: "text-start" as const, id: "t1" },
             ...chunks.map((delta) => ({ type: "text-delta" as const, id: "t1", delta })),
+            ...(failAfterText ? [{ type: "error" as const, error: new Error("connection reset") }] : []),
             { type: "text-end" as const, id: "t1" },
             {
               type: "finish" as const,
@@ -112,7 +118,7 @@ describe("streamAnswer", () => {
 
     expect(pieces).toEqual(["Sí, ", "OSDE 210 ", "en adelante."]);
     await result.finished;
-    expect(finished).toEqual({ text: "Sí, OSDE 210 en adelante.", finishReason: "stop" });
+    expect(finished).toEqual({ text: "Sí, OSDE 210 en adelante.", finishReason: "stop", fallback: false });
   });
 
   it("uses the same system prompt and history order as answerQuestion", async () => {
@@ -164,5 +170,104 @@ describe("streamAnswer", () => {
       await result.finished;
     }).rejects.toThrow();
     expect(onEnd).not.toHaveBeenCalled();
+  });
+});
+
+// Spec 014: when the model fails, times out or answers nothing, the visitor gets the fallback.
+describe("streamAnswer with a fallback", () => {
+  const fallbackText = "No pude responder su consulta en este momento. Puede comunicarse con el negocio por el teléfono.";
+  const read = async (stream: AsyncIterable<string>) => {
+    let text = "";
+    for await (const piece of stream) text += piece;
+    return text;
+  };
+
+  it("streams the fallback when the model fails before any text (criterion 1)", async () => {
+    const onEnd = vi.fn();
+    const onSettled = vi.fn();
+    const result = streamAnswer({
+      business,
+      question: "hola",
+      model: streamingModel([], { fail: true }),
+      fallbackText,
+      onEnd,
+      onSettled,
+    });
+    expect(await read(result.textStream)).toBe(fallbackText);
+    await expect(result.finished).resolves.toMatchObject({ text: fallbackText, fallback: true });
+    expect(onEnd).toHaveBeenCalledWith(expect.objectContaining({ text: fallbackText, fallback: true }));
+    // Criterion 10: the failed call is still recorded as such.
+    expect(onSettled).toHaveBeenCalledWith(expect.objectContaining({ finishReason: "error", error: expect.stringContaining("provider down") }));
+  });
+
+  it("gives up when the first piece takes too long (criterion 2)", async () => {
+    const onSettled = vi.fn();
+    const result = streamAnswer({
+      business,
+      question: "hola",
+      model: streamingModel(["tarde"], { initialDelayInMs: 300 }),
+      fallbackText,
+      timeouts: { firstChunkMs: 30, totalMs: 1_000 },
+      onSettled,
+    });
+    expect(await read(result.textStream)).toBe(fallbackText);
+    await expect(result.finished).resolves.toMatchObject({ fallback: true });
+    expect(onSettled).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringContaining("timed out") }));
+  });
+
+  it("gives up when the whole answer takes too long, keeping what arrived (criteria 2 and 4)", async () => {
+    const result = streamAnswer({
+      business,
+      question: "hola",
+      model: streamingModel(["Sí, ", "abrimos ", "los ", "domingos."], { chunkDelayInMs: 60 }),
+      fallbackText,
+      timeouts: { firstChunkMs: 1_000, totalMs: 150 },
+    });
+    const text = await read(result.textStream);
+    expect(text).toMatch(/^Sí, .*\n\nNo pude responder/);
+    expect(text).not.toContain("domingos.");
+    await expect(result.finished).resolves.toMatchObject({ text, fallback: true });
+  });
+
+  it("streams the fallback when the answer is empty (criterion 3)", async () => {
+    const onSettled = vi.fn();
+    const result = streamAnswer({ business, question: "hola", model: streamingModel(["  "]), fallbackText, onSettled });
+    expect(await read(result.textStream)).toBe(`  ${fallbackText}`);
+    await expect(result.finished).resolves.toMatchObject({ fallback: true });
+    // The call itself worked: its usage counts as usual.
+    expect(onSettled).toHaveBeenCalledWith(expect.objectContaining({ error: null, finishReason: "stop" }));
+  });
+
+  it("adds the fallback after a partial answer when the model fails midway (criterion 4)", async () => {
+    const result = streamAnswer({
+      business,
+      question: "hola",
+      model: streamingModel(["Sí, abrimos "], { failAfterText: true }),
+      fallbackText,
+    });
+    const text = await read(result.textStream);
+    expect(text).toBe(`Sí, abrimos \n\n${fallbackText}`);
+    await expect(result.finished).resolves.toMatchObject({ text, fallback: true });
+  });
+
+  it("does not use the fallback when the model answers", async () => {
+    const result = streamAnswer({ business, question: "hola", model: streamingModel(["Hola."]), fallbackText });
+    expect(await read(result.textStream)).toBe("Hola.");
+    await expect(result.finished).resolves.toMatchObject({ text: "Hola.", fallback: false });
+  });
+
+  it("finishes and reports even if nobody reads the stream (the visitor closed the chat)", async () => {
+    const onEnd = vi.fn();
+    const result = streamAnswer({ business, question: "hola", model: streamingModel(["Hola."]), fallbackText, onEnd });
+    await result.finished;
+    expect(onEnd).toHaveBeenCalledWith(expect.objectContaining({ text: "Hola.", fallback: false }));
+  });
+
+  it("serves the answer as a plain text response", async () => {
+    const result = streamAnswer({ business, question: "hola", model: streamingModel(["Ho", "la."]), fallbackText });
+    const response = result.toTextStreamResponse({ headers: { "Cache-Control": "no-store" } });
+    expect(response.headers.get("content-type")).toContain("text/plain");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(await response.text()).toBe("Hola.");
   });
 });

@@ -47,11 +47,18 @@ const AdminPage = async ({ searchParams }: Props) => {
           </Link>
         ))}
       </nav>
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
         <StatTile label="Costo de IA" value={usd.format(m.totalCostUsd)} hint={`${m.calls} respuestas`} testId="admin-cost" />
         <StatTile label="Latencia p50" value={ms(m.latencyP50)} />
         <StatTile label="Latencia p95" value={ms(m.latencyP95)} />
         <StatTile label="Errores del modelo" value={percent.format(m.errorRate)} />
+        {/* Spec 014, criterion 16: the visitor got the contact instead of an answer. */}
+        <StatTile
+          label="Respuestas de respaldo"
+          value={String(m.fallbacks)}
+          hint="El modelo falló y el visitante recibió el contacto"
+          testId="admin-fallbacks"
+        />
       </div>
       <Card>
         <CardHeader>
@@ -68,6 +75,7 @@ const AdminPage = async ({ searchParams }: Props) => {
                   <th className="py-2 font-normal">Dueño</th>
                   <th className="py-2 font-normal text-right">Respuestas</th>
                   <th className="py-2 font-normal text-right">Errores</th>
+                  <th className="py-2 font-normal text-right">Respaldo</th>
                   <th className="py-2 font-normal text-right">Costo</th>
                   <th className="py-2 font-normal text-right">Últimas 24 h</th>
                 </tr>
@@ -86,6 +94,7 @@ const AdminPage = async ({ searchParams }: Props) => {
                     <td className="py-2">{s.owner}</td>
                     <td className="py-2 text-right">{s.calls}</td>
                     <td className="py-2 text-right">{s.errors}</td>
+                    <td className="py-2 text-right">{s.fallbacks}</td>
                     <td className="py-2 text-right">{usd.format(s.costUsd)}</td>
                     <td className="py-2 text-right">{usd.format(s.spentTodayUsd)}</td>
                   </tr>

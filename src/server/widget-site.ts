@@ -1,6 +1,7 @@
 import type { BusinessKnowledge } from "@/domain/answer-prompt";
 import { ADDRESSING, defaultWelcome, WIDGET_DEFAULT_COLOR, type Addressing } from "@/domain/bot-settings";
 import { isHexColor, readableTextColor } from "@/domain/color-contrast";
+import { fallbackReply, siteCapReply as capReply } from "@/domain/fallback-reply";
 import type { PrismaClient } from "@/generated/prisma/client";
 
 // Fallback until the owner saves a contact channel in the bot settings (spec 004).
@@ -69,8 +70,10 @@ export const toBusinessKnowledge = (site: WidgetSite): BusinessKnowledge => ({
 });
 
 /** Fixed answer once the site reaches its daily cap: no model call, just the way to reach the business. */
-export const siteCapReply = (site: WidgetSite) =>
-  `En este momento no puedo responder más consultas. Podés comunicarte con el negocio por ${toBusinessKnowledge(site).contact}.`;
+export const siteCapReply = (site: WidgetSite) => capReply(toBusinessKnowledge(site));
+
+/** What the visitor reads when the model fails (spec 014). */
+export const siteFallbackReply = (site: WidgetSite) => fallbackReply(toBusinessKnowledge(site));
 
 /** Marks the site's bot as installed the first time the widget loads from the site itself. */
 export const markInstalled = (db: PrismaClient, domainId: string) =>

@@ -3,7 +3,11 @@ import { MockLanguageModelV4, simulateReadableStream } from "ai/test";
 
 export const DEFAULT_ANSWER_MODEL = "anthropic/claude-haiku-4.5";
 
-/** Deterministic, free model for E2E runs: streams back "Respuesta de prueba a: <last question>". */
+/**
+ * Deterministic, free model for E2E runs: streams back "Respuesta de prueba a: <last question>".
+ * Markers in the question simulate failures (spec 014): "[falla]" fails before any text, "[vacio]"
+ * answers nothing and "[corte]" fails after the first words.
+ */
 const echoModel = () =>
   new MockLanguageModelV4({
     provider: "mock",
@@ -14,13 +18,18 @@ const echoModel = () =>
         lastUser?.role === "user"
           ? lastUser.content.map((part) => (part.type === "text" ? part.text : "")).join("")
           : "";
-      const words = `Respuesta de prueba a: ${question}`.split(/(?<= )/);
+      if (question.includes("[falla]")) throw new Error("Mock model failure");
+      const empty = question.includes("[vacio]");
+      const cut = question.includes("[corte]");
+      const all = `Respuesta de prueba a: ${question}`.split(/(?<= )/);
+      const words = empty ? [] : cut ? all.slice(0, 2) : all;
       return {
         stream: simulateReadableStream({
           chunkDelayInMs: 20,
           chunks: [
             { type: "text-start" as const, id: "echo" },
             ...words.map((delta) => ({ type: "text-delta" as const, id: "echo", delta })),
+            ...(cut ? [{ type: "error" as const, error: new Error("Mock model failure") }] : []),
             { type: "text-end" as const, id: "echo" },
             {
               type: "finish" as const,

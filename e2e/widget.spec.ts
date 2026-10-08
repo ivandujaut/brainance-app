@@ -110,6 +110,32 @@ test("at the owner's daily cap, the bot derives instead of answering", async ({ 
   expect(answers.slice(-2).map((a) => a.derivation)).toEqual([false, true]);
 });
 
+// Spec 014, criteria 1, 8 and 9: when the model fails, the visitor gets the contact instead of an
+// error, nothing is duplicated, and the conversation needs attention. "[falla]" makes the mock model fail.
+test("when the model fails, the visitor gets the business's contact", async ({ page, baseURL }) => {
+  const { domainId, name } = await newSite("falla", { contact: "WhatsApp +54 9 341 555-0101" });
+  await hostPage(page, name, domainId, new URL(baseURL!).origin);
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  const chat = page.frameLocator('iframe[data-brainance="chat"]');
+  await chat.getByTestId("widget-input").fill("¿Abren hoy? [falla]");
+  await chat.getByTestId("widget-send").click();
+  const reply = chat.locator('[data-testid="widget-message"][data-role="assistant"]').last();
+  await expect(reply).toHaveText(
+    "No pude responder tu consulta en este momento. Podés comunicarte con el negocio por WhatsApp +54 9 341 555-0101.",
+  );
+  await expect(chat.getByText("No pudimos enviar tu mensaje", { exact: false })).toHaveCount(0);
+  await expect(chat.getByTestId("widget-input")).toHaveValue("");
+  await expect.poll(async () => (await attentionNoticesOf(domainId))[0]).toMatchObject({
+    reason: "model_error",
+    notified: true,
+  });
+
+  await page.reload();
+  await page.getByRole("button", { name: "Abrir chat" }).click();
+  await expect(chat.getByText("¿Abren hoy? [falla]", { exact: true })).toHaveCount(1);
+  await expect(chat.getByText("No pude responder tu consulta", { exact: false })).toHaveCount(1);
+});
+
 // Spec 010, criteria 1 and 12: when the bot derives, the owner is emailed after the visitor got
 // the answer. The echo model repeats the question, so a question that says it lacks the data and quotes
 // the contact is a derivation (QA of spec 011: the contact alone is not).
