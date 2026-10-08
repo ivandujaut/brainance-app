@@ -1,6 +1,6 @@
 # 013 — Portada con la promesa y sus pruebas
 
-- **Estado:** Implementada (2026-10-08). Falta la primera corrida publicada del eval (`docs/lanzamiento.md`, paso 8).
+- **Estado:** Implementada (2026-10-08). Eval publicado el 2026-10-08: correcta 98 %, sin inventar 95 %, tono 100 % (tercera corrida, después de dos ajustes del prompt).
 - **ADRs relacionados:** [0001 — Estrategia de modelos de IA](../adr/0001-estrategia-de-modelos-de-ia.md) (el eval), [0005 — Design system](../adr/0005-design-system-tokens-de-marca.md)
 - **Specs relacionadas:** [009 — Landing](009-landing.md) (la portada actual, su diseño y sus capturas), [001 — Respuestas con IA](001-respuestas-con-ia.md) (el eval de 75 casos), [010 — Aviso al dueño](010-aviso-al-dueno.md), [011 — Tope y métricas](011-tope-visible-y-metricas-de-honestidad.md), [012 — Marcar como atendida](012-marcar-como-atendida.md), [008 — Lanzamiento](008-lanzamiento-de-la-beta.md) (términos)
 - **Posicionamiento:** es la spec del "titular y portada nuevos" de [Decisiones que se derivan](../posicionamiento.md#decisiones-que-se-derivan). Cierra la segunda y la tercera prueba: el eval publicado y qué pasa cuando termina la beta.
@@ -107,6 +107,20 @@ Cada criterio se convierte en al menos un test.
 - **El titular** va un tamaño más chico que el de la spec 009 y con líneas balanceadas, porque es más largo.
 - **El footer** cambió su frase a "El chat de tu sitio que contesta lo que sabe y te pasa a vos lo que no."
 - **Las capturas del hero** se regeneraron con las fichas de honestidad (`PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npm run landing:screens` en el entorno de desarrollo).
+
+## El eval publicado
+
+Haiku 4.5, 76 consultas × 2, Opus 5.5 de juez. El umbral se alcanzó en la tercera corrida:
+
+| Corrida | Prompt | Correcta | Sin inventar | Tono |
+|---|---|---|---|---|
+| 1 | El de `develop` | 97 % | 88 % | 76 % |
+| 2 | Sin agregados razonables, sin "hoy", usted estricto | 98 % | 93 % | 99 % |
+| 3 | La parte que no sabe en una sola oración, sin extender políticas, el contacto en su horario | 98 % | 95 % | 100 % |
+
+- Los errores de la corrida 1 eran inventos chicos que acompañaban respuestas correctas ("depende de varios factores", "lo anunciamos en redes", "hoy atendemos hasta las 20") y voseo en negocios de usted.
+- El punto flojo que queda es la consulta cuyo dato no está cargado (83 % sin inventar): el bot a veces supone qué no hace el negocio. Se ve en la tabla por tipo de `/como-medimos`, y uno de sus ejemplos es una respuesta fallada.
+- El prompt se ajustó mirando los errores de este mismo set, así que el número puede ser optimista. `/como-medimos` lo dice entre los límites; el próximo paso es sumar consultas que el bot no haya visto, de tráfico real cuando lo haya.
 
 ## Plan de tests
 

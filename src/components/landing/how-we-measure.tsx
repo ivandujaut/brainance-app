@@ -125,6 +125,10 @@ export const HowWeMeasure = ({ set, summary }: { set: EvalSet; summary: EvalSumm
       </li>
       <li>La calificación la hace un modelo: el juez también es una IA y puede equivocarse.</li>
       <li>Con dos corridas por consulta, cada porcentaje tiene un margen de error de unos ±8 puntos.</li>
+      <li>
+        Ajustamos las instrucciones del bot mirando los errores de este mismo set, así que el número puede ser algo
+        optimista. Por eso vamos a sumar consultas nuevas que el bot no haya visto.
+      </li>
       <li>Mide al bot con negocios de prueba. Con el tuyo, depende de la información que cargues.</li>
     </ul>
 
