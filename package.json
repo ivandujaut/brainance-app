@@ -15,6 +15,7 @@
     "eval:rag": "tsx --env-file-if-exists=.env.local evals/rag-answers/run-eval.mjs",
     "eval:rag:cases": "node evals/rag-answers/render-cases.mjs",
     "eval:publish": "tsx evals/rag-answers/publish.mjs",
+    "eval:summary": "tsx evals/rag-answers/summarize.mjs",
     "landing:screens": "vitest run -c scripts/landing-screens/vitest.config.ts && node scripts/landing-screens/shoot.mjs"
   },
   "dependencies": {

@@ -46,6 +46,21 @@ describe("Proofs", () => {
     expect(html).toContain('href="/como-medimos"');
   });
 
+  // Spec 016, criterion 5: the promise's own case is not hidden in the average.
+  it("shows, next to the total, how it did when the data was not loaded", () => {
+    const withCase = renderToString(
+      <Proofs
+        evalSummary={{
+          ...summary,
+          byType: [{ type: "no_en_kb", label: "El dato no está cargado", cases: 21, answers: 42, correcta: 0.95, sinInvento: 0.93 }],
+        }}
+      />,
+    );
+    const numbers = text(withCase.match(/<p[^>]*data-testid="eval-promise-case"[^>]*>[\s\S]*?<\/p>/)?.[0] ?? "");
+    expect(numbers).toMatch(/Cuando el dato no estaba cargado, no inventó en el 93\s?% de los casos/);
+    expect(html).not.toContain('data-testid="eval-promise-case"');
+  });
+
   it("shows today's usage against the cap the owner sets (criterion 8)", () => {
     expect(page).toContain("Hoy: 12 de 300 respuestas");
     expect(html).toContain('role="progressbar"');

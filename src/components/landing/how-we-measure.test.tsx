@@ -73,6 +73,27 @@ describe("HowWeMeasure", () => {
     expect(page).toMatch(/Todavía no publicamos una corrida/);
     expect(page).toMatch(/95\s?% sin inventar/);
     expect(page).toMatch(/85\s?% correctas/);
+    // Spec 016, criterion 8.
+    expect(page).toMatch(/90\s?% sin inventar cuando el dato no está cargado/);
     expect(page).not.toContain("Incorrecta");
+  });
+
+  // Spec 016, criterion 6: how the panel counts derivations, and how well.
+  it("explains how derivations are counted and how well the detector did", () => {
+    const measured = { ...summary, detector: { shouldDerive: 40, counted: 38, shouldNotDerive: 90, falseAlarms: 2 } };
+    const page = text(renderToString(<HowWeMeasure set={set} summary={measured} />));
+    expect(page).toContain("Cómo contamos las derivaciones");
+    expect(page).toMatch(/dice que no tiene el dato y repite tu contacto/);
+    expect(page).toMatch(/contó 38 de 40 \(95\s?%\)/);
+    expect(page).toMatch(/2 de 90 respuestas/);
+    expect(page).toMatch(/no te llega el aviso/);
+  });
+
+  it("says the detector is measured from the next run when the published one did not (criterion 7)", () => {
+    for (const s of [summary, null]) {
+      const page = text(renderToString(<HowWeMeasure set={set} summary={s} />));
+      expect(page).toContain("Cómo contamos las derivaciones");
+      expect(page).toMatch(/empieza con la próxima corrida/);
+    }
   });
 });

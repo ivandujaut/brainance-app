@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { StatTile } from "@/components/metrics/stat-tile";
 import { BETA_DAILY_ANSWER_MAX, MIN_DAILY_ANSWER_CAP, usageState } from "@/domain/answer-cap";
 import { buildAttentionEmail } from "@/domain/attention-notice";
-import { formatEvalDate, formatRatio, type EvalSummary } from "@/domain/eval-summary";
+import { formatEvalDate, formatRatio, promiseCase, type EvalSummary } from "@/domain/eval-summary";
 import { derivationRate, formatMinutes } from "@/domain/metrics";
 
 // Spec 013, criteria 5–8: the three proofs of the promise. The examples are built from the
@@ -94,6 +94,13 @@ const EvalNumbers = ({ summary }: { summary: EvalSummary | null }) => (
           <strong>{formatRatio(summary.metrics.sinInvento)} de las respuestas</strong> y respondió bien el{" "}
           <strong>{formatRatio(summary.metrics.correcta)}</strong>.
         </p>
+        {/* Spec 016, criterion 5: the promise's own case, not hidden in the average. */}
+        {promiseCase(summary) && (
+          <p className="leading-relaxed" data-testid="eval-promise-case">
+            Cuando el dato no estaba cargado, no inventó en el{" "}
+            <strong>{formatRatio(promiseCase(summary)!.sinInvento)} de los casos</strong>.
+          </p>
+        )}
         <p className="text-sm text-muted-foreground">
           Medido el {formatEvalDate(summary.ranAt)}, con el modelo que usa el bot ({summary.model}), {summary.reps}{" "}
           veces cada consulta.

@@ -86,7 +86,8 @@ export const HowWeMeasure = ({ set, summary }: { set: EvalSet; summary: EvalSumm
     ) : (
       <p>
         Todavía no publicamos una corrida. Los números aparecen acá cuando una corrida completa llega a nuestro umbral:{" "}
-        {formatRatio(PUBLISH_THRESHOLD.sinInvento)} sin inventar y {formatRatio(PUBLISH_THRESHOLD.correcta)} correctas.
+        {formatRatio(PUBLISH_THRESHOLD.sinInvento)} sin inventar y {formatRatio(PUBLISH_THRESHOLD.correcta)} correctas en
+        total, y {formatRatio(PUBLISH_THRESHOLD.noEnKbSinInvento)} sin inventar cuando el dato no está cargado.
         Si no llega, primero mejoramos el bot.
       </p>
     )}
@@ -115,6 +116,27 @@ export const HowWeMeasure = ({ set, summary }: { set: EvalSet; summary: EvalSumm
           ))}
         </ul>
       </>
+    )}
+
+    {/* Spec 016, criteria 6 and 7. */}
+    <H2>Cómo contamos las derivaciones</H2>
+    <p>
+      Tu panel cuenta como derivada una respuesta del bot que dice que no tiene el dato y repite tu contacto: tu
+      teléfono, tu email o tu link. Esas son las conversaciones que te avisamos por email.
+    </p>
+    {summary?.detector ? (
+      <p data-testid="detector-numbers">
+        En esta corrida, de las respuestas que debían derivar, el panel contó {summary.detector.counted} de{" "}
+        {summary.detector.shouldDerive} (
+        {formatRatio(summary.detector.shouldDerive ? summary.detector.counted / summary.detector.shouldDerive : 1)}). Y
+        contó como derivadas {summary.detector.falseAlarms} de {summary.detector.shouldNotDerive} respuestas que no
+        derivaban. Una derivación que el panel no cuenta es una conversación de la que no te llega el aviso.
+      </p>
+    ) : (
+      <p>
+        Medimos qué tan bien las cuenta con este mismo eval. La medición empieza con la próxima corrida que
+        publiquemos.
+      </p>
     )}
 
     <H2>Lo que esto no prueba</H2>

@@ -98,7 +98,7 @@ jobs:
 
       - name: Subir los resultados a una rama
         run: |
-          node evals/rag-answers/summarize.mjs >> "$GITHUB_STEP_SUMMARY"
+          npm run --silent eval:summary >> "$GITHUB_STEP_SUMMARY"
           branch="eval/rag-answers-$(date -u +%F)-${GITHUB_RUN_NUMBER}"
           git config user.name "Ivan Dujaut"
           git config user.email "dujautivan@gmail.com"

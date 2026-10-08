@@ -10,7 +10,7 @@ Mide qué tan bien responde cada modelo candidato a las consultas de los visitan
 | `cases.json` | 76 consultas con el comportamiento esperado y los hechos que deben o no aparecer |
 | `cases.md` | Vista legible de los casos (`npm run eval:rag:cases` la regenera y valida el set) |
 | `run-eval.mjs` | Runner: llama a `answerQuestion` (`src/server/ai/answer.ts`, el mismo código que usará producción) y califica con un juez IA |
-| `summarize.mjs` | Tabla resumen por variante y por tipo de caso |
+| `summarize.mjs` | Tabla resumen por variante y por tipo de caso, y cómo le fue al detector de derivaciones (`npm run eval:summary`) |
 | `results/_state.json` | Métricas, precios por modelo y archivos que forman el harness |
 
 **Tipos de caso** (`tags[0]`): `respondible` (30), `no_en_kb` (15), `multiple` (10), `premisa_falsa` (10), `fuera_de_tema` (10) e `historial` (1).
@@ -21,6 +21,8 @@ Mide qué tan bien responde cada modelo candidato a las consultas de los visitan
 - `tono`: español natural, trato correcto (vos o usted) y breve.
 
 Además se registran el costo, la latencia, los tokens y la cantidad de palabras de cada respuesta.
+
+**Detector de derivaciones** ([spec 016](../../docs/specs/016-medir-derivaciones-y-dato-no-cargado.md)): cada respuesta pasa por `detectAttention` (`src/domain/attention.ts`), el mismo código que decide en producción si una respuesta "derivó", y el resultado queda en el campo `detector`. En las respuestas que el juez calificó correctas, se compara con el comportamiento esperado: `abstain` y `partial` deben derivar; `answer` y `redirect`, no. El resumen muestra la cobertura, las falsas alarmas y la lista de derivaciones que el detector no contó.
 
 **Alcance:** el bot recibe la base de conocimiento completa (no hay recuperación con embeddings). Los casos y los hechos esperados los generó Claude a partir de los negocios ficticios; conviene reemplazarlos o complementarlos con consultas reales cuando haya tráfico.
 
@@ -43,7 +45,7 @@ Respuestas fijas que deberían reprobar casi todo. Si `correcta` no da ~0%, el j
 ```bash
 npm run eval:rag -- --flow evals/rag-answers/sanity --model fixture/empty --approve-harness
 npm run eval:rag -- --flow evals/rag-answers/sanity --variant v1 --model fixture/no-se
-node evals/rag-answers/summarize.mjs evals/rag-answers/sanity
+npm run eval:summary -- evals/rag-answers/sanity
 ```
 
 ### 3. Piloto (6 casos, uno por negocio y tipo)
@@ -64,7 +66,7 @@ npm run eval:rag -- --variant v1 --model openai/gpt-5.6-luna --reps 2
 npm run eval:rag -- --variant v2 --model google/gemini-3.5-flash-lite --reps 2
 npm run eval:rag -- --variant v3 --model openai/gpt-6-luna --reps 2
 npm run eval:rag -- --variant v4 --model google/gemini-3.6-flash --reps 2
-node evals/rag-answers/summarize.mjs
+npm run eval:summary
 ```
 
 Si se corta, volver a correr el mismo comando retoma lo que falta. Los intentos fallidos (errores de API, timeouts, modelo servido distinto del pedido) van a `errors.jsonl` y no cuentan como respuestas incorrectas.
@@ -73,7 +75,7 @@ Si se corta, volver a correr el mismo comando retoma lo que falta. Los intentos 
 
 ## Publicar los resultados (spec 013)
 
-`npm run eval:publish` lee `results/baseline/results.jsonl` y las respuestas de `traces/`, y escribe `src/content/eval/rag-answers.json`. De ahí leen la portada y `/como-medimos`, que muestran los números solo si llegan al umbral (95 % sin inventar y 85 % correctas, `src/domain/eval-summary.ts`). Las trazas no se commitean, así que se publica justo después de correr el eval. El workflow *Correr eval de respuestas* hace las dos cosas y sube el resultado a una rama (`docs/lanzamiento.md`, paso 8).
+`npm run eval:publish` lee `results/baseline/results.jsonl` y las respuestas de `traces/`, y escribe `src/content/eval/rag-answers.json`. De ahí leen la portada y `/como-medimos`, que muestran los números solo si llegan al umbral (95 % sin inventar y 85 % correctas en total, y 90 % sin inventar en "El dato no está cargado"; `src/domain/eval-summary.ts`). Las trazas no se commitean, así que se publica justo después de correr el eval. El workflow *Correr eval de respuestas* hace las dos cosas y sube el resultado a una rama (`docs/lanzamiento.md`, paso 8).
 
 ## Qué se commitea
 

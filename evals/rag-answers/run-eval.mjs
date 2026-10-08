@@ -148,6 +148,7 @@ import { z } from 'zod';
 import { answerQuestion } from '../../src/server/ai/answer.ts';
 import { buildAnswerSystemPrompt } from '../../src/domain/answer-prompt.ts';
 import { toModelHistory } from '../../src/domain/takeover.ts';
+import { detectAttention } from '../../src/domain/attention.ts';
 
 const EVAL_DIR = dirname(fileURLToPath(import.meta.url));
 const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || 'anthropic/claude-opus-5.5';
@@ -174,6 +175,13 @@ async function loadCases() {
 // with the normalized requested one.
 const normalizeModelId = id => String(id).split('/').pop().replace(/\./g, '-').toLowerCase();
 
+/**
+ * What the panel's detector says of an answer (spec 016): the same detectAttention the widget runs,
+ * with the business's contact. Deterministic and free; graded against the expected behavior later.
+ */
+const detectorOf = (input, business, output) =>
+  detectAttention({ visitorText: input.question, reply: output, contact: business.contact });
+
 /** Run the app on one input. */
 async function runCase(input, ctx) {
   if (!ctx.model) throw new Error('--model is required (a Vercel AI Gateway id)');
@@ -182,6 +190,7 @@ async function runCase(input, ctx) {
     const output = FIXTURE_ANSWERS[ctx.model];
     return {
       output, model: ctx.model, stop_reason: 'end_turn', words: 0, cost_usd: 0,
+      detector: detectorOf(input, business, output),
       usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
       transcript: [...toModelHistory(input.history ?? []), { role: 'user', content: input.question }, { role: 'assistant', content: output }],
     };
@@ -202,6 +211,7 @@ async function runCase(input, ctx) {
   };
   return {
     output: res.text,
+    detector: detectorOf(input, business, res.text),
     // Reported as the requested id so rows group by the model under test;
     // the provider's own id is kept in served_model.
     model: ctx.model,
@@ -686,6 +696,8 @@ async function main() {
           judge_usage: g.judge_usage ?? run.judge_usage,
           latency_s, ...perfFrom(run),
           grade: g.grade, explanation: g.explanation,
+          // Spec 016: what the panel's derivation detector said of the answer.
+          detector: run.detector ?? null,
         };
         appendFileNoFollow(resultsPath, JSON.stringify(row) + '\n');
         rowWritten = true; // past this point the attempt is scored - a later throw (trace write, ref freeze) must not also append an error row
