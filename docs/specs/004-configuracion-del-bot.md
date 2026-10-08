@@ -27,6 +27,7 @@ El widget ya responde en el sitio del cliente, pero el bot no sabe a qué se ded
 ### Negocio
 
 5. **Dado** el formulario de Negocio, **cuando** el dueño guarda una descripción (hasta 1.000 caracteres), un trato (vos o usted) y un contacto (hasta 200 caracteres, por ejemplo "WhatsApp +54 9 341 555-0101"), **entonces** el bot del widget usa esos datos en las respuestas siguientes.
+   - *QA de la spec 013 (2026-10-08):* el saludo del chat también sigue el trato. Si el mensaje de bienvenida es el que puso BrAInance, al guardar otro trato se cambia por la versión de ese trato ("¡Hola! ¿Tiene alguna consulta? Escríbanos acá.") y el aviso de guardado lo dice. Si el dueño escribió el suyo, no se toca; con "De usted", Negocio y Apariencia avisan si el saludo tutea (`welcomeNeedsReview` en `src/domain/bot-settings.ts`).
 6. **Dado** un sitio sin descripción o sin contacto cargados, **entonces** el bot sigue funcionando con los valores actuales ("el sitio web <dominio>" y "los canales de contacto que figuran en este sitio"), y la pantalla señala que completar esos campos mejora las respuestas.
 7. **Dado** un sitio que alcanzó el tope diario de mensajes (spec 003, criterio 14), **cuando** llega otro, **entonces** la respuesta fija deriva al contacto cargado por el dueño.
 

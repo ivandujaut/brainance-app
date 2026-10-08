@@ -9,13 +9,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { BusinessInfoSchema, LIMITS } from "@/domain/bot-settings";
+import { BusinessInfoSchema, LIMITS, type Addressing } from "@/domain/bot-settings";
 import { Counter, FieldError, Section } from "./section";
+import { WelcomeHint } from "./welcome-hint";
 import { useActionToast } from "@/hooks/use-action-toast";
 
-type Props = { siteId: string; bot: SiteSettings["chatBot"] };
+type Props = {
+  siteId: string;
+  bot: SiteSettings["chatBot"];
+  /** The welcome as the Apariencia section has it, to warn if it does not match the addressing. */
+  welcome: string;
+  onAddressingChange: (addressing: Addressing) => void;
+  /** Our default welcome follows the addressing on save; the page shows the new one. */
+  onWelcomeChange: (welcome: string) => void;
+};
 
-export const BusinessForm = ({ siteId, bot }: Props) => {
+export const BusinessForm = ({ siteId, bot, welcome, onAddressingChange, onWelcomeChange }: Props) => {
   const notify = useActionToast();
   const form = useForm<z.input<typeof BusinessInfoSchema>, unknown, z.output<typeof BusinessInfoSchema>>({
     resolver: zodResolver(BusinessInfoSchema),
@@ -26,11 +35,14 @@ export const BusinessForm = ({ siteId, bot }: Props) => {
     },
   });
   const { errors, isSubmitting } = form.formState;
-  const [description, contact] = useWatch({ control: form.control, name: ["description", "contact"] });
+  const [description, contact, addressing] = useWatch({
+    control: form.control,
+    name: ["description", "contact", "addressing"],
+  });
 
   const onSubmit = form.handleSubmit(async (values) => {
     const result = await onUpdateBusinessInfo(siteId, values);
-    notify(result);
+    if (notify(result) && "welcomeMessage" in result && result.welcomeMessage) onWelcomeChange(result.welcomeMessage);
   });
 
   return (
@@ -63,7 +75,14 @@ export const BusinessForm = ({ siteId, bot }: Props) => {
             control={form.control}
             name="addressing"
             render={({ field }) => (
-              <RadioGroup value={field.value} onValueChange={field.onChange} className="flex gap-6">
+              <RadioGroup
+                value={field.value}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  onAddressingChange(value as Addressing);
+                }}
+                className="flex gap-6"
+              >
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="vos" id="addressing-vos" />
                   <Label htmlFor="addressing-vos" className="font-normal">
@@ -80,6 +99,7 @@ export const BusinessForm = ({ siteId, bot }: Props) => {
             )}
           />
           <FieldError message={errors.addressing?.message} />
+          <WelcomeHint welcome={welcome} addressing={addressing === "usted" ? "usted" : "vos"} where="negocio" />
         </fieldset>
 
         <div className="flex flex-col gap-2">

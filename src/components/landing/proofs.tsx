@@ -159,7 +159,7 @@ const PROOFS = (summary: EvalSummary | null) => [
 export const Proofs = ({ evalSummary }: { evalSummary: EvalSummary | null }) => (
   <section aria-labelledby="pruebas" className="mx-auto max-w-6xl px-4 py-20 md:px-8">
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Las pruebas</p>
-    <h2 id="pruebas" className="mt-3 max-w-2xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+    <h2 id="pruebas" className="mt-3 scroll-mt-16 max-w-2xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
       Te lo prometemos con pruebas, <span className="text-muted-foreground">no con adjetivos.</span>
     </h2>
     <ol className="mt-12 flex flex-col gap-16">

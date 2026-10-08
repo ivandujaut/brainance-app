@@ -2,6 +2,7 @@
 import { client } from "@/lib/prisma";
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { canAddDomain, domainLimitFor } from "@/domain/plans";
+import { defaultWelcome } from "@/domain/bot-settings";
 import { isValidDomain } from "@/domain/domains";
 import { findOwnedSite } from "@/server/tenancy";
 import { captureError } from "@/server/observability";
@@ -41,7 +42,7 @@ export const onIntegrateDomain = async (domain: string, icon: string) => {
           create: {
             name,
             icon,
-            chatBot: { create: { welcomeMessage: "¡Hola! ¿Tenés alguna consulta? Escribinos acá." } },
+            chatBot: { create: { welcomeMessage: defaultWelcome("vos") } },
           },
         },
       },

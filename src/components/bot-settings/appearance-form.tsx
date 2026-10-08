@@ -7,19 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { AppearanceSchema, LIMITS, SUGGESTED_COLORS } from "@/domain/bot-settings";
+import { AppearanceSchema, LIMITS, SUGGESTED_COLORS, type Addressing } from "@/domain/bot-settings";
 import { AA_CONTRAST, contrastRatio, isHexColor, LIGHT_TEXT, readableTextColor } from "@/domain/color-contrast";
 import { cn } from "@/lib/utils";
 import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from "@/schemas/settings.schema";
 import { Counter, FieldError, Section } from "./section";
+import { WelcomeHint } from "./welcome-hint";
 import { useActionToast } from "@/hooks/use-action-toast";
 
 export type Look = { background: string; welcomeMessage: string; icon: string | null };
 
-type Props = { siteId: string; look: Look; onChange: (look: Look) => void };
+type Props = { siteId: string; look: Look; onChange: (look: Look) => void; addressing: Addressing };
 type Errors = Partial<Record<keyof Look, string>>;
 
-export const AppearanceForm = ({ siteId, look, onChange }: Props) => {
+export const AppearanceForm = ({ siteId, look, onChange, addressing }: Props) => {
   const notify = useActionToast();
   const [errors, setErrors] = useState<Errors>({});
   const [saving, setSaving] = useState(false);
@@ -164,6 +165,7 @@ export const AppearanceForm = ({ siteId, look, onChange }: Props) => {
             onChange={(e) => set({ welcomeMessage: e.target.value })}
           />
           <FieldError message={errors.welcomeMessage} />
+          <WelcomeHint welcome={look.welcomeMessage} addressing={addressing} where="apariencia" />
         </div>
 
         <Button type="submit" disabled={saving || uploading} className="self-end" data-testid="save-appearance">

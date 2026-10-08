@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { SiteSettings, SiteUsage } from "@/actions/settings/bot";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { WIDGET_DEFAULT_COLOR, WIDGET_DEFAULT_WELCOME } from "@/domain/bot-settings";
+import { defaultWelcome, WIDGET_DEFAULT_COLOR, type Addressing } from "@/domain/bot-settings";
 import { AppearanceForm, type Look } from "./appearance-form";
 import { BusinessForm } from "./business-form";
 import { FaqSection } from "./faq-section";
@@ -27,13 +27,15 @@ const SECTIONS = [
 /** Settings page of one site (spec 004): sections on the left, the real widget as a live preview on the right. */
 export const BotSettings = ({ settings, usage }: { settings: SiteSettings; usage: SiteUsage }) => {
   const bot = settings.chatBot;
+  // The addressing chosen in Negocio, saved or not: the welcome warning follows it.
+  const [addressing, setAddressing] = useState<Addressing>(bot?.addressing === "usted" ? "usted" : "vos");
   // Unsaved appearance changes, so the preview reflects them before saving.
   const [look, setLook] = useState<Look>({
     background: bot?.background || WIDGET_DEFAULT_COLOR,
-    welcomeMessage: bot?.welcomeMessage || WIDGET_DEFAULT_WELCOME,
+    welcomeMessage: bot?.welcomeMessage || defaultWelcome(addressing),
     icon: bot?.icon || null,
   });
-  const preview = <Preview siteId={settings.id} name={settings.name} look={look} />;
+  const preview = <Preview siteId={settings.id} name={settings.name} look={look} addressing={addressing} />;
 
   return (
     <div className="flex-1 h-0 overflow-y-auto w-full pb-10">
@@ -71,8 +73,14 @@ export const BotSettings = ({ settings, usage }: { settings: SiteSettings; usage
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] items-start">
         <div className="flex flex-col gap-6 min-w-0">
-          <BusinessForm siteId={settings.id} bot={bot} />
-          <AppearanceForm siteId={settings.id} look={look} onChange={setLook} />
+          <BusinessForm
+            siteId={settings.id}
+            bot={bot}
+            welcome={look.welcomeMessage}
+            onAddressingChange={setAddressing}
+            onWelcomeChange={(welcomeMessage) => setLook((current) => ({ ...current, welcomeMessage }))}
+          />
+          <AppearanceForm siteId={settings.id} look={look} onChange={setLook} addressing={addressing} />
           <FaqSection siteId={settings.id} faqs={settings.helpdesk} />
           <FilterQuestionsSection siteId={settings.id} questions={settings.filterQuestions} />
           <LeadSettingsSection

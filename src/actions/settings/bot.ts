@@ -8,6 +8,7 @@ import {
   BusinessInfoSchema,
   canAddFaq,
   FaqSchema,
+  welcomeForAddressing,
   FilterQuestionSchema,
   LeadSettingsSchema,
   MAX_FAQS,
@@ -81,12 +82,30 @@ export type SiteSettings = NonNullable<Awaited<ReturnType<typeof onGetSiteSettin
 const saveBot = (domainId: string, data: Record<string, unknown>) =>
   client.chatBot.upsert({ where: { domainId }, create: { domainId, ...data }, update: data });
 
-export const onUpdateBusinessInfo = async (id: string, input: unknown) => {
+/**
+ * Saves the business data. If the welcome is still one BrAInance wrote, it follows the new
+ * addressing (QA of spec 013) and the result carries it so the page can show it; the owner's own
+ * welcome is never rewritten.
+ */
+export const onUpdateBusinessInfo = async (
+  id: string,
+  input: unknown,
+): Promise<ActionResult & { welcomeMessage?: string }> => {
   const site = await findOwnedSite(id);
   if (!site) return NOT_FOUND;
   const parsed = BusinessInfoSchema.safeParse(input);
   if (!parsed.success) return firstError(parsed.error);
-  return attempt(site.id, () => saveBot(site.id, parsed.data), "Datos del negocio guardados");
+  const current = await client.chatBot.findUnique({ where: { domainId: site.id }, select: { welcomeMessage: true } });
+  const welcome = welcomeForAddressing(current?.welcomeMessage, parsed.data.addressing);
+  if (welcome === current?.welcomeMessage) {
+    return attempt(site.id, () => saveBot(site.id, parsed.data), "Datos del negocio guardados");
+  }
+  const result = await attempt(
+    site.id,
+    () => saveBot(site.id, { ...parsed.data, welcomeMessage: welcome }),
+    `Datos del negocio guardados. El saludo del chat ahora es de ${parsed.data.addressing}.`,
+  );
+  return result.status === 200 ? { ...result, welcomeMessage: welcome } : result;
 };
 
 export const onUpdateAppearance = async (id: string, input: unknown) => {

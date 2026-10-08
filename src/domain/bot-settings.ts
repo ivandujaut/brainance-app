@@ -21,7 +21,39 @@ export type Addressing = (typeof ADDRESSING)[number];
 
 /** What the widget shows until the owner saves their own. */
 export const WIDGET_DEFAULT_COLOR = "#FFA947";
-export const WIDGET_DEFAULT_WELCOME = "¡Hola! ¿En qué te puedo ayudar?";
+
+/** The welcome every new site gets, in the business's addressing (QA of spec 013). */
+const DEFAULT_WELCOME: Record<Addressing, string> = {
+  vos: "¡Hola! ¿Tenés alguna consulta? Escribinos acá.",
+  usted: "¡Hola! ¿Tiene alguna consulta? Escríbanos acá.",
+};
+
+/** Welcomes BrAInance wrote, current and past: changing them is not touching the owner's text. */
+const OUR_WELCOMES = new Set([...Object.values(DEFAULT_WELCOME), "¡Hola! ¿En qué te puedo ayudar?"]);
+
+export const defaultWelcome = (addressing: Addressing) => DEFAULT_WELCOME[addressing];
+
+/**
+ * The welcome to keep when the owner changes the addressing: ours follows the addressing, the
+ * owner's own text stays as it is (the settings page warns if it does not match).
+ */
+export const welcomeForAddressing = (current: string | null | undefined, addressing: Addressing) => {
+  const text = current?.trim();
+  return !text || OUR_WELCOMES.has(text) ? defaultWelcome(addressing) : (current as string);
+};
+
+// Voseo and tuteo forms an owner's welcome may use; matched without accents, as owners often skip them.
+const INFORMAL =
+  /\b(vos|te|tu|tus|tenes|podes|queres|necesitas|sabes|buscas|escribinos|escribime|contanos|contame|consultanos|preguntanos|dejanos|contactanos|pasa|mira|fijate|ayudarte)\b/;
+
+/** Whether a text addresses the reader informally (vos or tú), for the "De usted" warning. */
+export const looksInformal = (text: string) =>
+  INFORMAL.test(
+    text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase(),
+  );
 
 /** Starting points for the owner; any other hex color is accepted too. */
 export const SUGGESTED_COLORS = ["#FFA947", "#E11D48", "#7C3AED", "#2563EB", "#0EA5E9", "#10B981", "#FACC15", "#0F172A"];
@@ -77,3 +109,7 @@ export const LeadSettingsSchema = z.object({
   // Spec 010: email the owner when a conversation needs attention.
   attentionEmail: z.boolean({ invalid_type_error: "Elegí si querés el aviso por email." }),
 });
+
+/** The owner's own welcome speaks informally to a formal business's visitors: worth a warning. */
+export const welcomeNeedsReview = (welcome: string, addressing: Addressing) =>
+  addressing === "usted" && welcomeForAddressing(welcome, addressing) === welcome && looksInformal(welcome);

@@ -81,6 +81,16 @@ describe("site settings page", () => {
     expect(await render()).not.toContain('data-testid="business-hint"');
   });
 
+  // QA of spec 013: a formal business with the owner's own informal welcome gets a warning in
+  // Negocio and in Apariencia; our default welcome needs none, it follows the addressing on save.
+  it("warns when a formal business keeps an informal welcome of the owner's", async () => {
+    const formal = (welcomeMessage: string) => ({ ...settings, chatBot: { ...settings.chatBot!, addressing: "usted", welcomeMessage } });
+    onGetSiteSettings.mockResolvedValue(formal("¡Hola! ¿Querés ver el menú?"));
+    expect((await render()).match(/data-testid="welcome-hint"/g)).toHaveLength(2);
+    onGetSiteSettings.mockResolvedValue(formal("¡Hola! ¿Tenés alguna consulta? Escribinos acá."));
+    expect(await render()).not.toContain('data-testid="welcome-hint"');
+  });
+
   it("is not found when the site is not the owner's", async () => {
     onGetSiteSettings.mockResolvedValue(null);
     onGetSiteUsage.mockResolvedValue(null);

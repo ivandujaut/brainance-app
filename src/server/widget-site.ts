@@ -1,5 +1,5 @@
 import type { BusinessKnowledge } from "@/domain/answer-prompt";
-import { ADDRESSING, WIDGET_DEFAULT_COLOR, WIDGET_DEFAULT_WELCOME, type Addressing } from "@/domain/bot-settings";
+import { ADDRESSING, defaultWelcome, WIDGET_DEFAULT_COLOR, type Addressing } from "@/domain/bot-settings";
 import { isHexColor, readableTextColor } from "@/domain/color-contrast";
 import type { PrismaClient } from "@/generated/prisma/client";
 
@@ -48,7 +48,7 @@ export const toPublicConfig = (site: WidgetSite) => {
   const leadCapture = site.chatBot?.leadCapture !== false;
   return {
     name: site.name,
-    welcomeMessage: site.chatBot?.welcomeMessage || WIDGET_DEFAULT_WELCOME,
+    welcomeMessage: site.chatBot?.welcomeMessage || defaultWelcome(addressingOf(site)),
     icon: site.chatBot?.icon || null,
     ...widgetColors(site.chatBot),
     leadCapture,
@@ -57,11 +57,13 @@ export const toPublicConfig = (site: WidgetSite) => {
 };
 
 const isAddressing = (value: unknown): value is Addressing => ADDRESSING.includes(value as Addressing);
+const addressingOf = (site: WidgetSite): Addressing =>
+  isAddressing(site.chatBot?.addressing) ? site.chatBot.addressing : "vos";
 
 export const toBusinessKnowledge = (site: WidgetSite): BusinessKnowledge => ({
   name: site.name,
   description: site.chatBot?.description || `el sitio web ${site.name}`,
-  addressing: isAddressing(site.chatBot?.addressing) ? site.chatBot.addressing : "vos",
+  addressing: addressingOf(site),
   contact: site.chatBot?.contact || DEFAULT_CONTACT,
   faqs: site.helpdesk,
 });
