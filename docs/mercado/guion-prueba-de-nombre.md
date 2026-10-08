@@ -1,5 +1,7 @@
 # Guion: prueba del nombre con dueños
 
+> **Después de la primera prueba:** Ladero quedó descartado. El dueño del taller no sabe qué significa, y dice que sus clientes tampoco. Cuando haya nuevos finalistas, reemplazalos en los pasos 1 a 6. El paso nuevo, **"La palabra del dueño"**, se hace antes de decir cualquier nombre.
+
 Sirve para decidir si **Ladero** funciona antes de pagar dominios y marca. Se compara con los otros dos finalistas de la [segunda ronda](research_notes/Nombres%20y%20dominio%20para%20BrAInance/segunda_ronda_delegar.md), **Posta** y **Atendero**: con un solo nombre, la gente tiende a decir que sí por cortesía.
 
 Con el primer cliente (el taller) se suma una parte B. No prueba el nombre: mide qué preguntas le llegan por WhatsApp y cuántas se podrían delegar.
@@ -31,6 +33,13 @@ Con el primer cliente (el taller) se suma una parte B. No prueba el nombre: mide
 
 **0. Apertura**
 > "Estoy armando algo para negocios que atienden solos y quiero tu opinión sobre unos nombres. No hay respuestas correctas; me sirve más lo que no te gusta."
+
+**La palabra del dueño.** Va antes de decir cualquier nombre, porque después ya no vale:
+> "Si alguien te contestara los mensajes de los clientes mientras vos estás trabajando, ¿cómo le dirías? ¿Cómo se lo presentarías a un cliente?"
+>
+> "¿Y en el taller (o en tu negocio), cómo le dicen al que te da una mano?"
+
+Anotá las palabras textuales. Si varios dueños usan la misma, es candidata. Así salió Naranja: del nombre que los clientes le daban a la tarjeta.
 
 **1. Dictado.** Por audio o en voz alta, una sola vez:
 > "Te digo tres palabras y las escribís como te salgan: [nombre 1], [nombre 2], [nombre 3]."

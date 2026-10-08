@@ -58,3 +58,23 @@ Otros revisados y descartados por dominio o por sentido: mientras (.com a la ven
 3. **Atendero** es la más registrable (palabra inventada) y la única con el .com libre. Hay que buscar en el INPI el vecino Atendare y probar si a los dueños les suena a oficio o a error.
 
 Las limitaciones son las mismas de la primera ronda: DNS solamente, sin nic.ar, sin INPI y sin prueba con usuarios.
+
+## Prueba 1 con dueños (taller mecánico, primer cliente)
+
+- **Resultado:** el dueño no sabe qué significa "ladero" y dice que sus clientes tampoco. Atiende por WhatsApp y sus clientes llegan solo por recomendación.
+- **Lectura (inferencia):** "ladero" vive más en la prensa política que en el habla cotidiana de este público. La primera ronda sobreestimó cuánto se usa. Ladero queda descartado: el nombre lo tiene que entender sin explicación el dueño, y también sus clientes si alguna vez lo ven.
+- **Criterio nuevo, primero en la lista:** se entiende sin explicación, para el dueño y para sus clientes.
+- **Mismo concepto ("el que te cubre mientras estás ocupado") con palabras que usa todo el mundo**, revisadas por DNS:
+
+| Dominio | .com | .com.ar | .ar | .app |
+|---|---|---|---|---|
+| manoderecha | tomado | sin NS | sin NS | tomado |
+| tumanoderecha | tomado | sin NS | sin NS | sin NS |
+| unamano | a la venta | tomado | tomado | tomado |
+| tecubro | tomado | sin NS | sin NS | tomado |
+| yotecubro | tomado | sin NS | sin NS | sin NS |
+| socio | tomado | tomado | tomado | tomado |
+| refuerzo / turefuerzo | tomado / sin NS | tomado / sin NS | tomado / sin NS | sin NS / sin NS |
+| ayudante / holaayudante | tomado / sin NS | tomado / sin NS | sin NS / sin NS | sin NS / sin NS |
+
+- **Siguiente paso:** preguntarle al dueño, antes de mostrarle nombres, cómo le diría a quien le contesta los mensajes mientras trabaja (paso nuevo del [guion](../../guion-prueba-de-nombre.md)).
