@@ -10,6 +10,8 @@ BrAInance permite agregar a tu sitio web un chat con inteligencia artificial que
 
 El servicio está en etapa beta: es gratuito, puede cambiar, tener errores o interrupciones, y no ofrecemos garantías de disponibilidad. Aplicamos límites de uso por sitio (por ejemplo, cantidad de mensajes y costo de inteligencia artificial por día); al alcanzarlos, el chat deriva a tus visitantes al contacto que configuraste.
 
+**Cuando termine la beta**, te avisamos por email con al menos 30 días de anticipación y te decimos el precio: uno por cada sitio (tu local), en pesos, con un tope de uso que elegís vos. Como no te pedimos medios de pago, no se cobra nada automáticamente: seguís usando el servicio solo si aceptás ese precio. Si no seguís, el chat deja de responder en tu sitio, y durante esos 30 días podés descargar en CSV los datos de contacto que dejaron tus visitantes.
+
 ## Tu cuenta
 
 Sos responsable de la actividad de tu cuenta y de mantener seguros tus datos de acceso. Tenés que tener al menos 18 años y facultades para representar al negocio que registrás.

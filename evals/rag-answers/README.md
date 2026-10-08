@@ -7,13 +7,13 @@ Mide qué tan bien responde cada modelo candidato a las consultas de los visitan
 | Archivo | Qué es |
 |---|---|
 | `businesses/*.json` | 5 negocios argentinos ficticios con su base de conocimiento, tono (vos/usted) y contacto |
-| `cases.json` | 75 consultas con el comportamiento esperado y los hechos que deben o no aparecer |
+| `cases.json` | 76 consultas con el comportamiento esperado y los hechos que deben o no aparecer |
 | `cases.md` | Vista legible de los casos (`npm run eval:rag:cases` la regenera y valida el set) |
 | `run-eval.mjs` | Runner: llama a `answerQuestion` (`src/server/ai/answer.ts`, el mismo código que usará producción) y califica con un juez IA |
 | `summarize.mjs` | Tabla resumen por variante y por tipo de caso |
 | `results/_state.json` | Métricas, precios por modelo y archivos que forman el harness |
 
-**Tipos de caso** (`tags[0]`): `respondible` (30), `no_en_kb` (15), `multiple` (10), `premisa_falsa` (10) y `fuera_de_tema` (10).
+**Tipos de caso** (`tags[0]`): `respondible` (30), `no_en_kb` (15), `multiple` (10), `premisa_falsa` (10), `fuera_de_tema` (10) e `historial` (1).
 
 **Métricas** (cada una aprobada o no, calificadas por separado por el juez):
 - `correcta`: cumple el comportamiento esperado, incluye lo pedido y no hace lo prohibido. **Es la métrica principal.**
@@ -70,6 +70,10 @@ node evals/rag-answers/summarize.mjs
 Si se corta, volver a correr el mismo comando retoma lo que falta. Los intentos fallidos (errores de API, timeouts, modelo servido distinto del pedido) van a `errors.jsonl` y no cuentan como respuestas incorrectas.
 
 `gpt-6-luna` no tiene precio verificado: su costo aparece como "sin precio" hasta que se agregue en `results/_state.json`.
+
+## Publicar los resultados (spec 013)
+
+`npm run eval:publish` lee `results/baseline/results.jsonl` y las respuestas de `traces/`, y escribe `src/content/eval/rag-answers.json`. De ahí leen la portada y `/como-medimos`, que muestran los números solo si llegan al umbral (95 % sin inventar y 85 % correctas, `src/domain/eval-summary.ts`). Las trazas no se commitean, así que se publica justo después de correr el eval. El workflow *Correr eval de respuestas* hace las dos cosas y sube el resultado a una rama (`docs/lanzamiento.md`, paso 8).
 
 ## Qué se commitea
 

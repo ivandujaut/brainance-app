@@ -1,6 +1,6 @@
 # 013 — Portada con la promesa y sus pruebas
 
-- **Estado:** Borrador
+- **Estado:** Implementada (2026-10-08). Falta la primera corrida publicada del eval (`docs/lanzamiento.md`, paso 8).
 - **ADRs relacionados:** [0001 — Estrategia de modelos de IA](../adr/0001-estrategia-de-modelos-de-ia.md) (el eval), [0005 — Design system](../adr/0005-design-system-tokens-de-marca.md)
 - **Specs relacionadas:** [009 — Landing](009-landing.md) (la portada actual, su diseño y sus capturas), [001 — Respuestas con IA](001-respuestas-con-ia.md) (el eval de 75 casos), [010 — Aviso al dueño](010-aviso-al-dueno.md), [011 — Tope y métricas](011-tope-visible-y-metricas-de-honestidad.md), [012 — Marcar como atendida](012-marcar-como-atendida.md), [008 — Lanzamiento](008-lanzamiento-de-la-beta.md) (términos)
 - **Posicionamiento:** es la spec del "titular y portada nuevos" de [Decisiones que se derivan](../posicionamiento.md#decisiones-que-se-derivan). Cierra la segunda y la tercera prueba: el eval publicado y qué pasa cuando termina la beta.
@@ -95,6 +95,18 @@ Cada criterio se convierte en al menos un test.
   - *El eval no llega al umbral.* La portada sale igual con las otras dos pruebas y sin números en la segunda. Se informa y se decide si mejorar el prompt antes.
   - *El eval no es tráfico real.* Lo decimos en la página: es la ventaja de publicarlo y no esconderlo. Cuando haya consultas reales, se suman casos.
   - *Prometer el aviso de 30 días* es un compromiso: queda en los términos, no solo en la portada.
+
+## Decisiones de la implementación
+
+- **Las cuatro decisiones quedaron como estaban propuestas.** `TERMS_VERSION` pasa a `2026-10-07.2`.
+- **El set tiene 76 consultas de seis tipos**, no 75 de cinco: incluye una que sigue una conversación anterior (`historial`). `/como-medimos` toma la cantidad y los tipos de `evals/rag-answers/cases.json`, así no quedan escritos a mano.
+- **Las tres pruebas no llevan figuras de Hairline.** Los ejemplos del email, de las fichas y del uso del día ya son la imagen de cada prueba, y una figura al lado competía con ellos. Hairline sigue en "Cómo funciona". El bento "Qué hace por vos" se quitó; "te pasa los contactos" queda en "Cómo funciona".
+- **El ejemplo del email sale de `buildAttentionEmail`**, el mismo código que arma el email real (spec 010). Las fichas usan `StatTile` del panel y el uso del día, `usageState` (spec 011).
+- **Las respuestas del bot para los ejemplos** están en las trazas del eval, que no se commitean. Por eso `eval:publish` corre en el mismo job que el eval.
+- **La pared de preguntas** marca las derivadas con una flecha y "a vos"; "Te la pasó" queda para lectores de pantalla, para que la píldora no se corte en la columna derecha.
+- **El titular** va un tamaño más chico que el de la spec 009 y con líneas balanceadas, porque es más largo.
+- **El footer** cambió su frase a "El chat de tu sitio que contesta lo que sabe y te pasa a vos lo que no."
+- **Las capturas del hero** se regeneraron con las fichas de honestidad (`PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npm run landing:screens` en el entorno de desarrollo).
 
 ## Plan de tests
 

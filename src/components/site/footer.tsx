@@ -8,8 +8,10 @@ const GROUPS = [
   {
     title: "Producto",
     links: [
+      { href: "/#pruebas", label: "Las pruebas" },
       { href: "/#como-funciona", label: "Cómo funciona" },
-      { href: "/#que-hace", label: "Qué hace por vos" },
+      { href: "/como-medimos", label: "Cómo lo medimos" },
+      { href: "/#beta", label: "La beta y el precio" },
       { href: "/auth/sign-up", label: "Probalo gratis" },
     ],
   },
@@ -37,7 +39,7 @@ export const SiteFooter = () => (
           <Wordmark className="text-2xl" />
         </Link>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          El chat con IA que responde a tus clientes a cualquier hora y te pasa los contactos.
+          El chat de tu sitio que contesta lo que sabe y te pasa a vos lo que no.
         </p>
       </div>
       <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">

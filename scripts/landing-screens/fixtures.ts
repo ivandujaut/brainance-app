@@ -120,6 +120,14 @@ export const METRICS = {
   leads: SERIES.reduce((n, d) => n + d.leads, 0),
   captureRate: 0,
   needingAttention: 14,
+  // Spec 011: the honesty tiles. About 8% of the answers went to the owner.
+  answers: 0,
+  derived: 31,
+  derivationRate: 0 as number | null,
+  humanRequests: 5,
+  responseTime: { medianMinutes: 14, cases: 12 } as { medianMinutes: number; cases: number } | null,
   series: SERIES,
 };
 METRICS.captureRate = METRICS.leads / METRICS.answeredConversations;
+METRICS.answers = Math.round(METRICS.conversations * 1.6);
+METRICS.derivationRate = METRICS.derived / METRICS.answers;

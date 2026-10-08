@@ -1,6 +1,6 @@
 # 009 — Landing con personalidad
 
-- **Estado:** Implementada (2026-10-07)
+- **Estado:** Implementada (2026-10-07). El mensaje (titular, la sección del problema y el bento) lo reemplazó la [spec 013](013-portada-con-la-promesa.md); el diseño sigue siendo este.
 - **ADRs relacionados:** [0005 — Design system con tokens de marca](../adr/0005-design-system-tokens-de-marca.md)
 
 ## Problema

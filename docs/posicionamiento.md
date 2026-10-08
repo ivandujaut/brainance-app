@@ -38,9 +38,9 @@ Todo el resto (24/7, "entrenalo con tu web", instalación en un paso) es lo mín
 
 La desconfianza en la IA es alta: el 64 % de las personas preferiría que las empresas no la usen para atenderlas. Por eso cada mensaje tiene una prueba visible, no un adjetivo.
 
-1. **El aviso al dueño.** Cuando el bot deriva o el visitante pide una persona, al dueño le llega un email con el motivo, el resumen y el link para tomar el control; si no contesta, se le vuelve a avisar. *Hoy no existe y es lo primero que se construye.*
-2. **La honestidad medida.** El panel muestra cuántas consultas respondió y cuántas derivó, y el eval en rioplatense se publica. *El panel ya lo muestra (spec 011: respuestas, derivadas, pedidos de persona y tiempo de respuesta del dueño); falta publicar el eval en la portada.*
-3. **El precio previsible.** El tope diario se ve y se edita desde el panel, y la portada dice qué pasa cuando termina la beta. *El dueño ve el uso del día y fija su tope desde la configuración (spec 011); falta que la portada diga qué pasa cuando termina la beta.*
+1. **El aviso al dueño.** Cuando el bot deriva o el visitante pide una persona, al dueño le llega un email con el motivo, el resumen y el link para tomar el control; si no contesta, se le vuelve a avisar. *Hecho (specs 010 y 012) y contado en la portada (spec 013).*
+2. **La honestidad medida.** El panel muestra cuántas consultas respondió y cuántas derivó, y el eval en rioplatense se publica. *El panel lo muestra (spec 011) y la portada lo cuenta, con `/como-medimos` (spec 013). Falta la primera corrida publicada del eval.*
+3. **El precio previsible.** El tope diario se ve y se edita desde el panel, y la portada dice qué pasa cuando termina la beta. *Hecho: el dueño ve el uso del día y fija su tope (spec 011), y la portada y los términos dicen qué pasa cuando termina la beta (spec 013).*
 
 ## Cómo se cuenta
 

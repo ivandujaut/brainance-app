@@ -151,8 +151,11 @@ Abrir un issue por cada falla y enlazarlo acá.
 
 ## 8. Eval de respuestas (ADR 0001)
 
-- [ ] Crear una key aparte para el eval (*AI Gateway → API Keys*, por ejemplo `brainance-eval`) y ponerla como `AI_GATEWAY_API_KEY` en `.env.local`: `npm run eval:rag -- --variant beta --model anthropic/claude-haiku-4.5` (ver `evals/rag-answers/README.md`). Incluye el caso con historial del dueño (`cd-takeover-01`).
-- [ ] *Verificar:* el resumen cumple los umbrales del ADR 0001. Guardar el resultado en `evals/rag-answers/results/`.
+- [ ] Crear una key aparte para el eval (*Vercel → AI Gateway → API Keys*, por ejemplo `brainance-eval`) y cargarla en GitHub como secret `AI_GATEWAY_API_KEY` (*Repo → Settings → Secrets and variables → Actions*). No va en Vercel: la app usa OIDC (paso 6).
+- [ ] *Actions → Correr eval de respuestas → Run workflow* sobre `develop`, con el modelo de producción (`anthropic/claude-haiku-4.5`) y 2 repeticiones. La primera vez, tildar **Aprobar el harness**. Cuesta unos US$ 2 a 4 y tarda entre 10 y 30 minutos.
+- [ ] El workflow sube los resultados a una rama `eval/rag-answers-<fecha>-<n>` con `src/content/eval/rag-answers.json` (spec 013). Abrir un PR contra `develop`: al mergearlo, la portada y `/como-medimos` muestran los números si llegan al umbral (95 % sin inventar y 85 % correctas).
+- [ ] *Verificar:* el resumen del job cumple los umbrales del ADR 0001 y de la spec 013. Si no llega, la portada sale sin números y se mejora el prompt antes (con su propio eval).
+- Para correrlo en local: `AI_GATEWAY_API_KEY` en `.env.local`, `npm run eval:rag -- --variant baseline --model anthropic/claude-haiku-4.5 --reps 2` y después `npm run eval:publish` (ver `evals/rag-answers/README.md`).
 
 ## 9. Legal (bloquea la apertura)
 

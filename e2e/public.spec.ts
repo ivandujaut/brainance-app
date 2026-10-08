@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
 test("the landing explains BrAInance in Spanish, without paid plans or blog", async ({ page }) => {
   const response = await page.goto("/");
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Tu negocio responde a las 3 de la mañana.");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Ningún cliente sin respuesta.");
   await expect(page.getByRole("heading", { name: /Tres pasos, una tarde/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Crear mi bot gratis/ }).first()).toHaveAttribute("href", "/auth/sign-up");
   await expect(page.getByText(/Choose what fits|News Room|Unlimited|Free Trial/)).toHaveCount(0);
@@ -33,14 +33,16 @@ test("the landing hero shows the real inbox", async ({ page }) => {
   await expect.poll(() => shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
 });
 
-// Spec 009: the problem block shows everyday questions with the bot's answer, in parallax columns.
-test("the question wall shows real questions with the bot's answers", async ({ page }) => {
+// Spec 009 and 013: the problem in the owner's words, with everyday questions the bot answered or
+// passed on, in parallax columns.
+test("the question wall shows real questions, answered or passed on to the owner", async ({ page }) => {
   await page.goto("/");
   const block = page.getByTestId("question-wall");
-  await expect(block.getByRole("heading", { name: /quiere la respuesta ahora/ })).toBeVisible();
-  const cards = block.getByRole("list", { name: "Preguntas respondidas por el bot" }).getByRole("listitem");
+  await expect(block.getByRole("heading", { name: /si no contesto, se van a otro/ })).toBeVisible();
+  const cards = block.getByRole("list", { name: "Preguntas que el bot respondió o te pasó" }).getByRole("listitem");
   expect(await cards.count()).toBeGreaterThanOrEqual(12);
   await expect(cards.first()).toContainText("¿");
+  await expect(cards.filter({ hasText: "Te la pasó a vos" }).first()).toBeAttached();
 });
 
 test("the question columns move in opposite directions while the page scrolls", async ({ page }) => {
@@ -92,6 +94,8 @@ test("the footer groups the links and points to the landing sections", async ({ 
     await expect(footer.getByRole("navigation", { name: group })).toBeVisible();
   }
   await expect(footer.getByRole("link", { name: "Cómo funciona" })).toHaveAttribute("href", "/#como-funciona");
+  await expect(footer.getByRole("link", { name: "Cómo lo medimos" })).toHaveAttribute("href", "/como-medimos");
+  await expect(footer.getByRole("link", { name: "La beta y el precio" })).toHaveAttribute("href", "/#beta");
   await expect(footer.getByRole("link", { name: "Crear cuenta" })).toHaveAttribute("href", "/auth/sign-up");
   await footer.getByRole("link", { name: "Cómo funciona" }).click();
   await expect(page.locator("#como-funciona")).toBeInViewport();
@@ -103,4 +107,39 @@ test("the landing footer links to both legal pages", async ({ page }) => {
   await expect(page).toHaveURL(/\/privacidad$/);
   await page.getByRole("contentinfo").getByRole("link", { name: "Términos" }).click();
   await expect(page).toHaveURL(/\/terminos$/);
+});
+
+// Spec 013, criteria 1, 2 and 9: the promise first, the titles without the technology, and the
+// sections in the order of docs/posicionamiento.md.
+test("the landing tells the promise, the problem, the proofs and what happens after the beta", async ({ page }) => {
+  await page.goto("/");
+  for (const heading of await page.locator("h1, h2").all()) {
+    await expect(heading).not.toHaveText(/\bIA\b|inteligente|automatiz|24\/7|3 de la mañana/i);
+  }
+  const tops = await Promise.all(
+    ["promesa", "problema", "pruebas", "como-funciona", "beta", "empezar"].map((id) =>
+      page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top + window.scrollY),
+    ),
+  );
+  expect([...tops].sort((a, b) => a - b)).toEqual(tops);
+
+  await page.goto("/#beta");
+  const beta = page.locator("section", { has: page.locator("#beta") });
+  await expect(page.locator("#beta")).toBeInViewport();
+  await expect(beta).toContainText("30 días");
+  await expect(beta).toContainText("no se cobra nada automáticamente");
+  await expect(beta.getByRole("link", { name: "términos" })).toHaveAttribute("href", "/terminos");
+});
+
+// Spec 013, criteria 11 and 12: how the eval works is public, without a session.
+test("/como-medimos explains the method and its limits without a session", async ({ page }) => {
+  const response = await page.goto("/como-medimos");
+  expect(response?.status()).toBe(200);
+  const article = page.getByTestId("how-we-measure");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Cómo medimos si el bot inventa");
+  await expect(article).toContainText(/\d+ consultas/);
+  await expect(article).toContainText("el juez también es una IA");
+  await page.goto("/");
+  await page.getByRole("link", { name: "Cómo lo medimos" }).first().click();
+  await expect(page).toHaveURL(/\/como-medimos$/);
 });

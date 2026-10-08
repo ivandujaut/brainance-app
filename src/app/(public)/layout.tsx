@@ -7,7 +7,7 @@ const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "BrAInance",
-  description: "Chatbots con IA que atienden y captan clientes en tu sitio web",
+  description: "Ningún cliente sin respuesta. Y vos te enterás solo cuando hace falta.",
 };
 
 /** Root layout for public pages (landing and legal, spec 008): static, no Clerk, readable without an account. */
