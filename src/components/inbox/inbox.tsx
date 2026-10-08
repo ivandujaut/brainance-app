@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLiveUpdates, type RealtimeClientConfig } from "@/hooks/use-live-updates";
 import { cn } from "@/lib/utils";
 import { ConversationPane } from "./conversation-pane";
+import type { AttentionReason } from "@/domain/attention";
 import { ATTENTION_REASONS, inboxHref } from "./links";
 
 type Props = {
@@ -123,7 +124,7 @@ export const Inbox = ({ sites, siteId, filter, initialConversations, initialSele
                       {c.site} · {time.format(new Date(c.lastMessageAt))}
                       {c.live && <Badge variant="secondary">Atendiendo</Badge>}
                       {c.needsAttention && (
-                        <Badge variant="destructive" title={ATTENTION_REASONS[c.attentionReason ?? ""]}>
+                        <Badge variant="destructive" title={ATTENTION_REASONS[c.attentionReason as AttentionReason]}>
                           Necesita atención
                         </Badge>
                       )}

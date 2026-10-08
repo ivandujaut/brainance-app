@@ -25,8 +25,11 @@ export type AttentionNoticeInput = {
   attentionNotices: number;
   /** Conversations of the site notified in the last 24 hours. */
   noticesToday: number;
-  /** Whether the site's daily-cap notice already went out today (criterion 4). */
-  capNoticedToday: boolean;
+  /**
+   * For a daily reason (the cap, criterion 4; a model failure, spec 014): whether the site already
+   * got today's notice for it.
+   */
+  reasonNoticedToday: boolean;
   now: Date;
 };
 
@@ -41,6 +44,7 @@ export type AttentionNoticeDecision =
         | "already_notified"
         | "already_reminded"
         | "cap_already_noticed"
+        | "error_already_noticed"
         | "site_daily_limit";
     };
 
@@ -48,7 +52,13 @@ export const decideAttentionNotice = (input: AttentionNoticeInput): AttentionNot
   if (!input.enabled) return { action: "skip", why: "disabled" };
   if (input.liveSince) return { action: "skip", why: "owner_live" };
   if (input.reason === "site_cap") {
-    return input.capNoticedToday ? { action: "skip", why: "cap_already_noticed" } : { action: "notify" };
+    return input.reasonNoticedToday ? { action: "skip", why: "cap_already_noticed" } : { action: "notify" };
+  }
+  // Spec 014: a model failure is usually general; later failures today only flag the conversation.
+  if (input.reason === "model_error") {
+    if (input.reasonNoticedToday) return { action: "skip", why: "error_already_noticed" };
+    if (input.noticesToday >= ATTENTION_NOTICE_LIMITS.perSitePerDay) return { action: "skip", why: "site_daily_limit" };
+    return { action: "notify" };
   }
   // A new episode: the owner attended the last one (the flag was cleared) or the room was never flagged.
   if (!input.needsAttentionBefore || input.attentionNotices === 0) {
@@ -77,7 +87,11 @@ const REASONS: Record<AttentionReason, string> = {
   derivation: "El bot derivó al contacto del negocio.",
   human_request: "El visitante pidió hablar con una persona.",
   site_cap: "El sitio llegó al tope diario: el bot deriva al contacto del negocio en vez de responder.",
+  model_error: "El bot no pudo responder por un problema de nuestro lado y le pasó tu contacto al visitante.",
 };
+
+// Spec 014, criterion 11: the owner gets one email a day for model failures.
+const LATER_FAILURES = "Si vuelve a pasar hoy, las conversaciones quedan marcadas en tu bandeja sin otro email.";
 
 const escapeHtml = (value: string) =>
   value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
@@ -97,16 +111,20 @@ export const buildAttentionEmail = ({
   const subject =
     reason === "site_cap"
       ? `Tu sitio ${site} llegó al tope de hoy`
-      : reminder
+      : reason === "model_error"
+        ? `El bot de ${site} no pudo responder a un cliente`
+        : reminder
         ? `Un cliente de ${site} sigue esperando tu respuesta`
         : `Un cliente de ${site} espera tu respuesta`;
   const intro = reminder ? "El visitante sigue esperando y volvió a escribir." : REASONS[reason];
+  const note = reason === "model_error" ? LATER_FAILURES : null;
   const noMessages = "Todavía no hay mensajes.";
   // Spec 012: the owner may answer by email or WhatsApp; the flag is cleared from the conversation.
   const attendedElsewhere = "¿Ya le respondiste por otro medio? Marcala como atendida desde la conversación.";
 
   const text = [
     intro,
+    ...(note ? [note] : []),
     "",
     ...(exchanges.length
       ? exchanges.flatMap((e) => [`Visitante: ${e.question}`, `Bot: ${e.answer}`, ""])
@@ -126,7 +144,7 @@ export const buildAttentionEmail = ({
     .join("");
   const html = `<div style="font-family:system-ui,sans-serif;font-size:15px;line-height:1.5;color:#0F172A">
 <p>${escapeHtml(intro)}</p>
-${rows || `<p>${noMessages}</p>`}
+${note ? `<p>${escapeHtml(note)}</p>\n` : ""}${rows || `<p>${noMessages}</p>`}
 ${visitorEmail ? `<p>Email del visitante: <strong>${escapeHtml(visitorEmail)}</strong><br>Respondé este email para escribirle directamente.</p>` : ""}
 <p>${escapeHtml(attendedElsewhere)}</p>
 <p><a href="${escapeHtml(conversationUrl)}">Ver la conversación y tomar el control</a></p>

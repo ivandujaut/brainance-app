@@ -48,6 +48,21 @@ describe.skipIf(!url)("adminMetrics", () => {
         call(barato, 5, 600, null, 24 * 10),
       ],
     });
+    // Spec 014: two replies sent because the model failed, one of them outside the last day.
+    const fallbackAt = (hoursAgo: number) => ({
+      role: "assistant" as const,
+      message: "No pude responder tu consulta en este momento.",
+      derivation: true,
+      fallback: true,
+      createdAt: new Date(Date.now() - hoursAgo * 3600 * 1000),
+    });
+    await db.customer.create({
+      data: {
+        domainId: cara,
+        visitorId: crypto.randomUUID(),
+        chatRoom: { create: { message: { create: [fallbackAt(1), fallbackAt(24 * 3)] } } },
+      },
+    });
   });
 
   afterAll(async () => {
@@ -62,8 +77,9 @@ describe.skipIf(!url)("adminMetrics", () => {
       ["cara-admin.com.ar", "Dueña Admin", 3, 1.7],
       ["barato-admin.com.ar", "Dueña Admin", 1, 0.01],
     ]);
-    expect(mine[0]).toMatchObject({ errors: 1, nearCap: true });
-    expect(mine[1].nearCap).toBe(false);
+    expect(mine[0]).toMatchObject({ errors: 1, fallbacks: 1, nearCap: true });
+    expect(mine[1]).toMatchObject({ fallbacks: 0, nearCap: false });
+    expect(m.fallbacks).toBeGreaterThanOrEqual(1);
     expect(m.totalCostUsd).toBeGreaterThanOrEqual(1.71);
     expect(m.latencyP50).not.toBeNull();
     expect(m.errorRate).toBeGreaterThan(0);
@@ -72,5 +88,6 @@ describe.skipIf(!url)("adminMetrics", () => {
   it("widens the window", async () => {
     const m = await adminMetrics(db, { days: 30, capUsd: 2 });
     expect(m.sites.find((s) => s.domainId === barato)?.calls).toBe(2);
+    expect(m.sites.find((s) => s.domainId === cara)?.fallbacks).toBe(2);
   });
 });

@@ -49,7 +49,7 @@ describe.skipIf(!url)("owner notices", () => {
     });
   const flagAndNotify = async (
     id: string,
-    reason: "derivation" | "human_request" | "site_cap" = "derivation",
+    reason: "derivation" | "human_request" | "site_cap" | "model_error" = "derivation",
     now = new Date(),
   ) =>
     notifyAttention(
@@ -124,6 +124,23 @@ describe.skipIf(!url)("owner notices", () => {
     expect(sent[0].subject).toBe("Tu sitio notices-int.com.ar llegó al tope de hoy");
     expect(await flagAndNotify(b, "site_cap")).toBe("skip:cap_already_noticed");
     expect(sent).toHaveLength(1);
+  });
+
+  // Spec 014, criteria 11 and 12: a general failure means one email per owner per day.
+  it("tells about model failures once per site per day, and still flags every conversation", async () => {
+    const a = await room();
+    const b = await room();
+    expect(await flagAndNotify(a, "model_error")).toBe("notify");
+    expect(sent[0].subject).toBe("El bot de notices-int.com.ar no pudo responder a un cliente");
+    expect(await flagAndNotify(b, "model_error")).toBe("skip:error_already_noticed");
+    expect(sent).toHaveLength(1);
+    expect((await state(b)).needsAttention).toBe(true);
+  });
+
+  it("keeps the cap and model failure notices apart (spec 014)", async () => {
+    expect(await flagAndNotify(await room(), "site_cap")).toBe("notify");
+    expect(await flagAndNotify(await room(), "model_error")).toBe("notify");
+    expect(sent).toHaveLength(2);
   });
 
   it("stops at 20 notified conversations per site per day and warns (criterion 5)", async () => {

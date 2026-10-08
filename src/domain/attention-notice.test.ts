@@ -20,7 +20,7 @@ const base: AttentionNoticeInput = {
   attentionNotifiedAt: null,
   attentionNotices: 0,
   noticesToday: 0,
-  capNoticedToday: false,
+  reasonNoticedToday: false,
   now,
 };
 
@@ -65,7 +65,7 @@ describe("decideAttentionNotice", () => {
 
   it("tells the owner about the daily cap once a day per site (criterion 4)", () => {
     expect(decideAttentionNotice({ ...base, reason: "site_cap" })).toEqual({ action: "notify" });
-    expect(decideAttentionNotice({ ...base, reason: "site_cap", capNoticedToday: true })).toEqual({
+    expect(decideAttentionNotice({ ...base, reason: "site_cap", reasonNoticedToday: true })).toEqual({
       action: "skip",
       why: "cap_already_noticed",
     });
@@ -73,6 +73,26 @@ describe("decideAttentionNotice", () => {
     expect(
       decideAttentionNotice({ ...base, reason: "site_cap", needsAttentionBefore: true, attentionNotices: 1 }),
     ).toEqual({ action: "notify" });
+  });
+
+  // Spec 014, criteria 11–13: a model failure is usually general, so one notice per site and day.
+  it("tells the owner about a model failure once a day per site", () => {
+    const failure = { ...base, reason: "model_error" as const };
+    expect(decideAttentionNotice(failure)).toEqual({ action: "notify" });
+    expect(decideAttentionNotice({ ...failure, reasonNoticedToday: true })).toEqual({
+      action: "skip",
+      why: "error_already_noticed",
+    });
+    expect(decideAttentionNotice({ ...failure, needsAttentionBefore: true, attentionNotices: 1 })).toEqual({
+      action: "notify",
+    });
+  });
+
+  it("applies the switch, the owner's presence and the daily limit to model failures (spec 014, criterion 13)", () => {
+    const failure = { ...base, reason: "model_error" as const };
+    expect(decideAttentionNotice({ ...failure, enabled: false })).toEqual({ action: "skip", why: "disabled" });
+    expect(decideAttentionNotice({ ...failure, liveSince: minutesAgo(1) })).toEqual({ action: "skip", why: "owner_live" });
+    expect(decideAttentionNotice({ ...failure, noticesToday: 20 })).toEqual({ action: "skip", why: "site_daily_limit" });
   });
 
   it("stops at the site's daily limit of notices (criterion 5)", () => {
@@ -123,6 +143,7 @@ describe("buildAttentionEmail", () => {
       buildAttentionEmail(input),
       buildAttentionEmail({ ...input, reminder: true }),
       buildAttentionEmail({ ...input, reason: "site_cap" }),
+      buildAttentionEmail({ ...input, reason: "model_error" }),
     ]) {
       expect(email.text).toContain(line);
       expect(email.html).toContain(line);
@@ -138,6 +159,20 @@ describe("buildAttentionEmail", () => {
     expect(cap.subject).toBe("Tu sitio panaderia.com.ar llegó al tope de hoy");
     expect(cap.text).toContain("El sitio llegó al tope diario");
     expect(cap.text).toContain("deriva");
+  });
+
+  // Spec 014, criterion 11.
+  it("says the bot could not answer and that later failures today only flag the conversation", () => {
+    const email = buildAttentionEmail({ ...input, reason: "model_error" });
+    expect(email.subject).toBe("El bot de panaderia.com.ar no pudo responder a un cliente");
+    const reason = "El bot no pudo responder por un problema de nuestro lado y le pasó tu contacto al visitante.";
+    const later = "Si vuelve a pasar hoy, las conversaciones quedan marcadas en tu bandeja sin otro email.";
+    for (const part of [email.text, email.html]) {
+      expect(part).toContain(reason);
+      expect(part).toContain(later);
+    }
+    expect(email.text).toContain("Visitante: ¿Hacen envíos?");
+    expect(email.text).toContain("https://app.example/conversations?c=room-1");
   });
 
   it("replies to the visitor when they left their email (criterion 8)", () => {

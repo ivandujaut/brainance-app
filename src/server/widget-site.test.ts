@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DARK_TEXT, LIGHT_TEXT } from "@/domain/color-contrast";
-import { DEFAULT_CONTACT, siteCapReply, toBusinessKnowledge, toPublicConfig, type WidgetSite } from "./widget-site";
+import { DEFAULT_CONTACT, siteCapReply, siteFallbackReply, toBusinessKnowledge, toPublicConfig, type WidgetSite } from "./widget-site";
 
 type Bot = NonNullable<WidgetSite["chatBot"]>;
 const bot: Bot = {
@@ -91,5 +91,25 @@ describe("siteCapReply", () => {
   it("refers to the owner's contact, or the generic one", () => {
     expect(siteCapReply(site({}))).toContain("WhatsApp +54 9 341 555-0101");
     expect(siteCapReply(site({ contact: null }))).toContain(DEFAULT_CONTACT);
+  });
+
+  // Spec 014, criterion 5: it used to address every visitor as vos.
+  it("follows the business's addressing", () => {
+    expect(siteCapReply(site({ addressing: "usted" }))).toContain("Puede comunicarse");
+    expect(siteCapReply(site({ addressing: "vos" }))).toContain("Podés comunicarte");
+  });
+});
+
+describe("siteFallbackReply", () => {
+  it("refers to the owner's contact in the business's addressing (spec 014, criteria 1 and 5)", () => {
+    expect(siteFallbackReply(site({}))).toBe(
+      "No pude responder su consulta en este momento. Puede comunicarse con el negocio por WhatsApp +54 9 341 555-0101.",
+    );
+  });
+
+  it("uses the generic contact when the owner saved none (spec 014, criterion 6)", () => {
+    expect(siteFallbackReply(site({ contact: null, addressing: "vos" }))).toBe(
+      `No pude responder tu consulta en este momento. Podés comunicarte con el negocio por ${DEFAULT_CONTACT}.`,
+    );
   });
 });

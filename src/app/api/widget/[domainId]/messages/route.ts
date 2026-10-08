@@ -32,7 +32,7 @@ import { flagAttention, resolveVisitorTurn, type FlagResult } from "@/server/liv
 import { ownerEmail } from "@/server/owner-email";
 import { notifyAttention } from "@/server/owner-notices";
 import { notifyRoomChanged } from "@/server/realtime";
-import { getWidgetSite, siteCapReply, toBusinessKnowledge } from "@/server/widget-site";
+import { getWidgetSite, siteCapReply, siteFallbackReply, toBusinessKnowledge } from "@/server/widget-site";
 
 const body = z.object({ visitorId: z.string(), text: z.string() });
 
@@ -104,14 +104,24 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     history,
     question,
     model: resolveAnswerModel(),
+    // Spec 014: if the model fails, times out or answers nothing, the visitor gets the contact.
+    fallbackText: siteFallbackReply(site),
     onSettled: (report) =>
       recordModelCall(client, { domainId, chatRoomId: room, purpose: "answer", requestedModel: answerModelId(), report }),
-    onEnd: async ({ text }) => {
-      const answerId = text.trim() ? await addMessage(client, room, "assistant", text) : null;
+    onEnd: async ({ text, fallback }) => {
+      if (fallback) {
+        // What the visitor saw, stored as a derivation (spec 014, criterion 7).
+        await addMessage(client, room, "assistant", text, { derivation: true, fallback: true });
+        const flagged = await flagAttention(client, room, "model_error");
+        await notifyRoomChanged(client, room);
+        await notifyOwner(room, "model_error", flagged);
+        return;
+      }
+      const answerId = await addMessage(client, room, "assistant", text);
       const reason = detectAttention({ visitorText: question, reply: text, contact: site.chatBot?.contact ?? null });
       if (reason) {
         // Spec 011, criterion 2: the answer that derived counts as such, not the whole conversation.
-        if (reason === "derivation" && answerId) await markDerivation(client, answerId);
+        if (reason === "derivation") await markDerivation(client, answerId);
         const flagged = await flagAttention(client, room, reason);
         await notifyRoomChanged(client, room);
         await notifyOwner(room, reason, flagged);

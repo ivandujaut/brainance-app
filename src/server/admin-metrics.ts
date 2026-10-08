@@ -1,6 +1,6 @@
 import { COST_CAP_WARN_RATIO } from "@/domain/cost-cap";
 import { percentile } from "@/domain/metrics";
-import type { PrismaClient } from "@/generated/prisma/client";
+import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 
 // Operator metrics (spec 007, criteria 14–15). Server-only: never exposed as a server action.
 
@@ -21,7 +21,7 @@ const MAX_LATENCY_SAMPLE = 20_000;
 export const adminMetrics = async (db: PrismaClient, { days, capUsd }: { days: 1 | 7 | 30; capUsd: number }) => {
   const since = new Date(Date.now() - days * DAY_MS);
   const lastDay = new Date(Date.now() - DAY_MS);
-  const [bySite, today, latencies, totals] = await Promise.all([
+  const [bySite, today, latencies, totals, fallbackRows] = await Promise.all([
     db.modelCall.groupBy({
       by: ["domainId"],
       where: { createdAt: { gte: since } },
@@ -36,7 +36,16 @@ export const adminMetrics = async (db: PrismaClient, { days, capUsd }: { days: 1
       take: MAX_LATENCY_SAMPLE,
     }),
     db.modelCall.aggregate({ where: { createdAt: { gte: since } }, _count: { _all: true, error: true }, _sum: { costUsd: true } }),
+    // Spec 014, criterion 16: replies sent because the model failed, per site.
+    db.$queryRaw<{ domainId: string; count: number }[]>(Prisma.sql`
+      SELECT c."domainId" AS "domainId", count(*)::int AS count
+      FROM "ChatMessage" m
+      JOIN "ChatRoom" r ON r.id = m."chatRoomId"
+      JOIN "Customer" c ON c.id = r."customerId"
+      WHERE m.fallback AND m."createdAt" >= ${since}
+      GROUP BY c."domainId"`),
   ]);
+  const fallbacks = new Map(fallbackRows.map((f) => [f.domainId, f.count]));
   const domains = await db.domain.findMany({
     where: { id: { in: bySite.map((s) => s.domainId) } },
     select: { id: true, name: true, User: { select: { fullname: true } } },
@@ -51,6 +60,7 @@ export const adminMetrics = async (db: PrismaClient, { days, capUsd }: { days: 1
       owner: names.get(s.domainId)?.User?.fullname ?? "",
       calls: s._count._all,
       errors: s._count.error,
+      fallbacks: fallbacks.get(s.domainId) ?? 0,
       costUsd: Number(s._sum.costUsd ?? 0),
       spentTodayUsd: spentToday.get(s.domainId) ?? 0,
       nearCap: (spentToday.get(s.domainId) ?? 0) >= capUsd * COST_CAP_WARN_RATIO,
@@ -64,6 +74,7 @@ export const adminMetrics = async (db: PrismaClient, { days, capUsd }: { days: 1
     totalCostUsd: Number(totals._sum.costUsd ?? 0),
     calls: totals._count._all,
     errorRate: totals._count._all ? totals._count.error / totals._count._all : 0,
+    fallbacks: fallbackRows.reduce((sum, f) => sum + f.count, 0),
     latencyP50: percentile(values, 50),
     latencyP95: percentile(values, 95),
     sites,

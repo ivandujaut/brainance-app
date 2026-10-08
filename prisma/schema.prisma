@@ -139,7 +139,7 @@ model ChatRoom {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   liveSince       DateTime?
   needsAttention  Boolean   @default(false)
-  // "derivation" | "human_request" | "site_cap"
+  // "derivation" | "human_request" | "site_cap" | "model_error"
   attentionReason String?
   // Owner notices (spec 010): when the current episode started, when the owner was last emailed
   // and how many notices went out in the episode (first notice + reminder).
@@ -168,6 +168,8 @@ model ChatMessage {
   seen       Boolean   @default(false)
   // Spec 011: a bot answer that referred the visitor to the business instead of answering.
   derivation Boolean   @default(false)
+  // Spec 014: a fixed reply sent because the model failed, timed out or answered nothing.
+  fallback   Boolean   @default(false)
   // Spec 011: on the owner's first message after the room was flagged, when that flag started.
   // Keeps each response time even after a later episode moves ChatRoom.attentionAt.
   answersAttentionAt DateTime?
