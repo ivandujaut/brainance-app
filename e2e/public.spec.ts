@@ -126,6 +126,8 @@ test("the landing tells the promise, the problem, the proofs and what happens af
   await page.goto("/#beta");
   const beta = page.locator("section", { has: page.locator("#beta") });
   await expect(page.locator("#beta")).toBeInViewport();
+  // QA: the kicker above the title stays in view too.
+  await expect(beta.getByText("El precio", { exact: true })).toBeInViewport();
   await expect(beta).toContainText("30 días");
   await expect(beta).toContainText("no se cobra nada automáticamente");
   await expect(beta.getByRole("link", { name: "términos" })).toHaveAttribute("href", "/terminos");

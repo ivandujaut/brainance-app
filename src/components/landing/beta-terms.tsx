@@ -14,7 +14,7 @@ export const BetaTerms = () => (
     <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">El precio</p>
-        <h2 id="beta" className="mt-3 text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+        <h2 id="beta" className="mt-3 scroll-mt-16 text-3xl font-bold leading-tight tracking-tight md:text-4xl">
           Qué pasa cuando termine la beta
         </h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">Hoy es gratis y no te pedimos tarjeta.</p>

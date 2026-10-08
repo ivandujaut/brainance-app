@@ -26,7 +26,7 @@ export const HowItWorks = () => (
   <section aria-labelledby="como-funciona" className="bg-card/60" style={hairlineTheme}>
     <div className="mx-auto max-w-6xl px-4 py-20 md:px-8">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Cómo funciona</p>
-      <h2 id="como-funciona" className="mt-3 max-w-xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+      <h2 id="como-funciona" className="mt-3 scroll-mt-16 max-w-xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
         Tres pasos, una tarde. <span className="text-muted-foreground">Y después atiende solo.</span>
       </h2>
       <ol className="mt-12 grid gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-3">

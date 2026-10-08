@@ -62,6 +62,26 @@ describe.skipIf(!url)("bot settings actions", async () => {
     expect(siteCapReply(site)).toContain("WhatsApp +54 9 341 555-0101");
   });
 
+  // QA of spec 013: our default welcome follows the addressing; the owner's own text does not change.
+  it("onUpdateBusinessInfo: switches our default welcome to the new addressing, never the owner's", async () => {
+    const { defaultWelcome } = await import("@/domain/bot-settings");
+    await db.chatBot.updateMany({ where: { domainId: siteId }, data: { welcomeMessage: defaultWelcome("vos") } });
+    const info = { description: "", contact: "" };
+
+    const toUsted = await bot.onUpdateBusinessInfo(siteId, { ...info, addressing: "usted" });
+    expect(toUsted).toMatchObject({ status: 200, welcomeMessage: defaultWelcome("usted") });
+    expect(toUsted.message).toMatch(/saludo/);
+    expect((await widgetSite()).chatBot?.welcomeMessage).toBe(defaultWelcome("usted"));
+
+    const again = await bot.onUpdateBusinessInfo(siteId, { ...info, addressing: "usted" });
+    expect(again.message).not.toMatch(/saludo/);
+
+    await db.chatBot.updateMany({ where: { domainId: siteId }, data: { welcomeMessage: "¡Hola! ¿Qué te tienta hoy?" } });
+    const custom = await bot.onUpdateBusinessInfo(siteId, { ...info, addressing: "vos" });
+    expect(custom).not.toHaveProperty("welcomeMessage");
+    expect((await widgetSite()).chatBot?.welcomeMessage).toBe("¡Hola! ¿Qué te tienta hoy?");
+  });
+
   it("onUpdateBusinessInfo: rejects invalid data without saving", async () => {
     const result = await bot.onUpdateBusinessInfo(siteId, { description: "x", addressing: "tú", contact: "" });
     expect(result.status).toBe(400);

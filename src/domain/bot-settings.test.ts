@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  defaultWelcome,
+  looksInformal,
+  welcomeNeedsReview,
+  welcomeForAddressing,
   AppearanceSchema,
   BusinessInfoSchema,
   canAddFaq,
@@ -89,5 +93,59 @@ describe("canAddFaq", () => {
     expect(MAX_FAQS).toBe(50);
     expect(canAddFaq(49)).toBe(true);
     expect(canAddFaq(50)).toBe(false);
+  });
+});
+
+// QA of spec 013: with "De usted" the chat still greeted in voseo, because every new site gets our
+// default welcome and the owner rarely changes it.
+describe("welcome and addressing", () => {
+  it("has a default welcome for each addressing", () => {
+    expect(defaultWelcome("vos")).toBe("¡Hola! ¿Tenés alguna consulta? Escribinos acá.");
+    expect(defaultWelcome("usted")).toBe("¡Hola! ¿Tiene alguna consulta? Escríbanos acá.");
+    expect(looksInformal(defaultWelcome("usted"))).toBe(false);
+  });
+
+  it("swaps our own default welcome when the addressing changes, and leaves the owner's text alone", () => {
+    expect(welcomeForAddressing(defaultWelcome("vos"), "usted")).toBe(defaultWelcome("usted"));
+    expect(welcomeForAddressing(defaultWelcome("usted"), "vos")).toBe(defaultWelcome("vos"));
+    // An older default the widget used before.
+    expect(welcomeForAddressing("¡Hola! ¿En qué te puedo ayudar?", "usted")).toBe(defaultWelcome("usted"));
+    expect(welcomeForAddressing(null, "usted")).toBe(defaultWelcome("usted"));
+    expect(welcomeForAddressing("  ", "usted")).toBe(defaultWelcome("usted"));
+    expect(welcomeForAddressing("¡Bienvenido a la panadería! ¿Qué te tienta hoy?", "usted")).toBe(
+      "¡Bienvenido a la panadería! ¿Qué te tienta hoy?",
+    );
+  });
+
+  it.each([
+    "¡Hola! ¿Tenés alguna consulta? Escribinos acá.",
+    "Hola, ¿en qué te ayudo?",
+    "¿Querés saber nuestros horarios?",
+    "Contanos qué necesitás",
+    "Hola! podes escribirnos aca",
+  ])("notices an informal welcome: %j", (text) => {
+    expect(looksInformal(text)).toBe(true);
+  });
+
+  it.each([
+    "¡Hola! ¿Tiene alguna consulta? Escríbanos acá.",
+    "¡Buen día! ¿Qué está buscando?",
+    "Bienvenido. ¿En qué puedo ayudarle?",
+    "Estudio contable Ferreyra: consultas de lunes a viernes.",
+  ])("does not flag a formal or neutral welcome: %j", (text) => {
+    expect(looksInformal(text)).toBe(false);
+  });
+});
+
+describe("welcomeNeedsReview", () => {
+  it("asks the owner to review their own informal welcome when the business is formal", () => {
+    expect(welcomeNeedsReview("¡Hola! ¿Querés ver el menú?", "usted")).toBe(true);
+    expect(welcomeNeedsReview("¡Hola! ¿Querés ver el menú?", "vos")).toBe(false);
+  });
+
+  it("stays quiet about our own default, which follows the addressing on save", () => {
+    expect(welcomeNeedsReview(defaultWelcome("vos"), "usted")).toBe(false);
+    expect(welcomeNeedsReview(defaultWelcome("usted"), "usted")).toBe(false);
+    expect(welcomeNeedsReview("¡Buen día! ¿Qué está buscando?", "usted")).toBe(false);
   });
 });

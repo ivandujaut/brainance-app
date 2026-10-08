@@ -38,6 +38,10 @@ test("the owner configures business data, appearance and FAQs", async ({ page })
   await business.getByTestId("save-business").click();
   await expect(page.getByText("Datos del negocio guardados").first()).toBeVisible();
   await expect(business.getByTestId("business-hint")).toBeHidden();
+  // QA of spec 013: our default welcome followed the switch to "usted".
+  await expect(page.getByText("El saludo del chat ahora es de usted").first()).toBeVisible();
+  await expect(page.getByTestId("bot-preview").getByText("¡Hola! ¿Tiene alguna consulta? Escríbanos acá.")).toBeVisible();
+  await expect(page.getByTestId("welcome-hint")).toHaveCount(0);
 
   // Criteria 8 and 10: the preview follows the color before saving, with readable text.
   const preview = page.getByTestId("bot-preview").locator("header");

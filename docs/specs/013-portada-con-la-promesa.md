@@ -120,6 +120,7 @@ Haiku 4.5, 76 consultas × 2, Opus 5.5 de juez. El umbral se alcanzó en la terc
 
 - Los errores de la corrida 1 eran inventos chicos que acompañaban respuestas correctas ("depende de varios factores", "lo anunciamos en redes", "hoy atendemos hasta las 20") y voseo en negocios de usted.
 - El punto flojo que queda es la consulta cuyo dato no está cargado (83 % sin inventar): el bot a veces supone qué no hace el negocio. Se ve en la tabla por tipo de `/como-medimos`, y uno de sus ejemplos es una respuesta fallada.
+- **Pendiente para el próximo cambio de prompt** (QA en la preview, 2026-10-08): el bot a veces deriva con "No tengo esa información en la base de datos", que suena técnico para un cliente. Pedirle que no nombre la base ni sus instrucciones. No justifica una corrida del eval por sí solo; va junto con el próximo cambio que la necesite.
 - El prompt se ajustó mirando los errores de este mismo set, así que el número puede ser optimista. `/como-medimos` lo dice entre los límites; el próximo paso es sumar consultas que el bot no haya visto, de tráfico real cuando lo haya.
 
 ## Plan de tests

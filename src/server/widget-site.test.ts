@@ -48,6 +48,16 @@ describe("toBusinessKnowledge", () => {
 });
 
 describe("toPublicConfig", () => {
+  // QA of spec 013: without a saved welcome, the chat greets in the business's addressing.
+  it("greets in the business's addressing when no welcome was saved", () => {
+    expect(toPublicConfig(site({ welcomeMessage: null, addressing: "usted" })).welcomeMessage).toBe(
+      "¡Hola! ¿Tiene alguna consulta? Escríbanos acá.",
+    );
+    expect(toPublicConfig(site({ welcomeMessage: null, addressing: "vos" })).welcomeMessage).toBe(
+      "¡Hola! ¿Tenés alguna consulta? Escribinos acá.",
+    );
+  });
+
   it("computes a readable text color from the owner's color", () => {
     expect(toPublicConfig(site({ background: "#123456" }))).toMatchObject({ background: "#123456", textColor: LIGHT_TEXT });
     expect(toPublicConfig(site({ background: "#FACC15" }))).toMatchObject({ textColor: DARK_TEXT });
