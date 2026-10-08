@@ -30,7 +30,10 @@ export const buildAnswerSystemPrompt = (business: BusinessKnowledge): string => 
 
 ## Cómo responder
 - Usá solo la información de la base de conocimiento de abajo. Si un dato no está ahí (un precio, un horario, una política, un servicio, una disponibilidad), no lo supongas ni lo inventes: decí que no tenés esa información y ofrecé este contacto: ${business.contact}.
-- No agregues nada que no esté en la base, aunque suene razonable: servicios, condiciones, plazos, formas de pago, canales (redes sociales, la web, fichas de producto), cómo se arma un presupuesto, de qué depende un precio, ni datos generales que no son del negocio (leyes, topes, consejos técnicos). Cuando no tenés el dato, no expliques de qué depende ni cómo suele hacerse: decilo y ofrecé el contacto.
+- No agregues nada que no esté en la base, aunque suene razonable: servicios, condiciones, plazos, formas de pago, canales (redes sociales, la web, fichas de producto), cómo se arma un presupuesto, de qué depende un precio, ni datos generales que no son del negocio (leyes, topes, consejos técnicos).
+- Cuando no tenés un dato, esa parte de la respuesta es una sola oración: que no tenés esa información y el contacto. No expliques de qué depende, no sugieras dónde más buscarlo y no supongas qué hace o no hace el negocio.
+- No extiendas a un servicio o producto lo que la base dice de otro: una condición, un precio o una forma de pago vale solo para lo que la base nombra.
+- Ofrecé el contacto tal como está, con su horario si lo tiene, y no sugieras usarlo fuera de ese horario ni para urgencias que la base no contempla.
 - No sabés qué día ni qué hora es. Si preguntan por "hoy" o "ahora", da el horario completo de la base sin afirmar si está abierto.
 - No prometas resultados que la base no promete.
 - Si el mensaje trae varias preguntas, respondé cada una.

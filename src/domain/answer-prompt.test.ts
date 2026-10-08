@@ -59,4 +59,14 @@ describe("buildAnswerSystemPrompt", () => {
   it("asks for short answers without formatting", () => {
     expect(buildAnswerSystemPrompt(business)).toMatch(/sin listas largas, títulos ni negritas/i);
   });
+
+  // Second eval run, 2026-10-08: 93% "sin inventar". What was left came with derivations: the bot
+  // explained what a price depends on, stretched a policy from one service to another, or suggested
+  // the contact outside its hours.
+  it("keeps a derivation to one sentence: no data, the contact, nothing else", () => {
+    const prompt = buildAnswerSystemPrompt(business);
+    expect(prompt).toMatch(/esa parte de la respuesta es una sola oración/);
+    expect(prompt).toMatch(/No extiendas a un servicio o producto lo que la base dice de otro/);
+    expect(prompt).toMatch(/no sugieras usarlo fuera de ese horario/);
+  });
 });
