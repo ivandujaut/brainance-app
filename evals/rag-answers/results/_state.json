@@ -81,5 +81,6 @@
     "evals/rag-answers/businesses/tienda-ropa.json",
     "evals/rag-answers/businesses/inmobiliaria.json",
     "evals/rag-answers/businesses/taller-mecanico.json"
-  ]
+  ],
+  "harness_sha": "9e068e20c198bc65de2a790ad1e59e83bf0ffdb8e994018421692ab4c783aae8"
 }

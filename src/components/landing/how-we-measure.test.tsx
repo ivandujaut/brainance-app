@@ -52,6 +52,8 @@ describe("HowWeMeasure", () => {
     expect(page).toMatch(/no salen de conversaciones reales/);
     expect(page).toMatch(/el juez también es una IA/);
     expect(page).toMatch(/±8 puntos/);
+    // The prompt was tuned looking at this same set's failures: the page says so.
+    expect(page).toMatch(/mirando los errores de este mismo set/);
   });
 
   it("shows the results by type and the examples, failures included", () => {

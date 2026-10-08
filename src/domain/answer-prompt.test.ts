@@ -33,4 +33,40 @@ describe("buildAnswerSystemPrompt", () => {
   it("is deterministic so the provider can cache it", () => {
     expect(buildAnswerSystemPrompt(business)).toBe(buildAnswerSystemPrompt(structuredClone(business)));
   });
+
+  // First eval run, 2026-10-08 (evals/rag-answers): 88% "sin inventar" and 76% "tono". The bot filled
+  // gaps with plausible extras and slipped into voseo with formal businesses.
+  it("forbids filling the gaps with extras that sound reasonable", () => {
+    const prompt = buildAnswerSystemPrompt(business);
+    for (const extra of ["servicios", "condiciones", "canales", "depende", "datos generales"]) {
+      expect(prompt).toContain(extra);
+    }
+    // The derivation detector (src/domain/attention.ts) keys on the bot saying it lacks the data.
+    expect(prompt).toContain("decí que no tenés esa información");
+  });
+
+  it("tells the model it does not know today's date or time", () => {
+    expect(buildAnswerSystemPrompt(business)).toMatch(/No sabés qué día ni qué hora es/);
+  });
+
+  it("keeps a formal business formal from the greeting to the closing", () => {
+    const formal = buildAnswerSystemPrompt({ ...business, addressing: "usted" });
+    expect(formal).toMatch(/de usted en todas las oraciones/);
+    for (const informal of ["podés", "tenés", "ayudarte"]) expect(formal).toContain(`«${informal}»`);
+    expect(buildAnswerSystemPrompt(business)).not.toContain("«ayudarte»");
+  });
+
+  it("asks for short answers without formatting", () => {
+    expect(buildAnswerSystemPrompt(business)).toMatch(/sin listas largas, títulos ni negritas/i);
+  });
+
+  // Second eval run, 2026-10-08: 93% "sin inventar". What was left came with derivations: the bot
+  // explained what a price depends on, stretched a policy from one service to another, or suggested
+  // the contact outside its hours.
+  it("keeps a derivation to one sentence: no data, the contact, nothing else", () => {
+    const prompt = buildAnswerSystemPrompt(business);
+    expect(prompt).toMatch(/esa parte de la respuesta es una sola oración/);
+    expect(prompt).toMatch(/No extiendas a un servicio o producto lo que la base dice de otro/);
+    expect(prompt).toMatch(/no sugieras usarlo fuera de ese horario/);
+  });
 });
