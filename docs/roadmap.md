@@ -32,6 +32,7 @@ Cada ítem va a tener su spec en `docs/specs/`.
 - **Portada con la promesa** ([spec 013](specs/013-portada-con-la-promesa.md)): titular "Ningún cliente sin respuesta", las tres pruebas con ejemplos del producto, el eval publicado en `/como-medimos` y qué pasa cuando termina la beta.
 - **Respuesta cuando el modelo falla** ([spec 014](specs/014-respuesta-cuando-el-modelo-falla.md)): si el modelo falla, tarda o vuelve vacío, el visitante recibe el contacto del negocio, la conversación queda "Necesita atención" y el dueño recibe un aviso por día. Cierra el caso que más contradice "Ningún cliente sin respuesta".
 - **Límite por IP en el widget** ([spec 015](specs/015-limite-por-ip.md), [ADR 0009](adr/0009-limites-por-ip-del-widget.md)): una sola IP no puede agotar el tope de un sitio, inventar visitantes ni mandar leads en masa. Se guarda solo una huella de la IP, por hasta 48 horas.
+- **Medir el detector de derivaciones y el caso del dato no cargado** ([spec 016](specs/016-medir-derivaciones-y-dato-no-cargado.md)): el eval mide si el panel cuenta bien las derivaciones; la portada muestra el número de "El dato no está cargado" (83 % hoy) junto al total, y el prompt corrige el patrón de sus fallas.
 
 ## Posicionamiento
 
