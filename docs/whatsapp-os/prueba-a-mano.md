@@ -29,7 +29,12 @@ Dos semanas en las que el sistema sos vos con una planilla. Lo más riesgoso de 
 
 > "Durante dos semanas, contale a este grupo lo que pasa en el taller, como se lo contarías a un empleado: audios, fotos, lo que te salga. Yo lo anoto y cada mañana te mando cómo está todo. Le podés preguntar lo que quieras del taller. Es gratis; lo que me importa es saber si te sirve."
 
-**Privacidad:** los nombres, teléfonos y patentes de sus clientes son datos personales. Pedile por escrito, en el mismo chat, que acepte que los anotes solo para la prueba. Guardalos en una planilla privada, no se los pases a nadie y borralos al terminar si él lo pide.
+**Privacidad:** los nombres, teléfonos y patentes de sus clientes son datos personales, y sus audios también, porque tienen su voz. Pedile por escrito, en el mismo chat, que acepte dos cosas:
+
+1. Que anotes esos datos solo para la prueba.
+2. Que guardes sus audios para probar herramientas de transcripción automática. Esos audios se mandan a servicios que no los usan para entrenar modelos y se borran cuando termina esa prueba.
+
+Guardá todo en un lugar privado, no se lo pases a nadie y borralo al terminar si él lo pide. Los audios son la base del eval de transcripción del [ADR 0101](../adr/0101-proveedor-de-whatsapp.md): sin este permiso no se pueden usar.
 
 ## Qué no hacer
 

@@ -35,8 +35,8 @@ Qué se reutiliza en la línea `whatsapp-os` y qué hay que construir. Es un map
 
 | Pieza | Notas |
 |---|---|
-| Adaptador de WhatsApp | Webhook con verificación de firma, envío de mensajes, plantillas para el resumen de la mañana y descarga de audios y fotos. Hace falta un ADR para elegir entre la Cloud API directa y un BSP |
-| Transcripción de audios | Rioplatense y jerga de taller: homocinética, tren delantero, patentes. Va en el mismo ADR o en otro |
+| Adaptador de WhatsApp | Webhook con verificación de firma, envío de mensajes, plantillas para el resumen de la mañana y descarga de audios y fotos. Propuesta: Cloud API directa en la fase 1 y un BSP con alta alojada para pilotear la coexistencia ([ADR 0101](../adr/0101-proveedor-de-whatsapp.md)) |
+| Transcripción de audios | Rioplatense y jerga de taller: homocinética, tren delantero, patentes. La decide un eval con audios reales ([ADR 0101](../adr/0101-proveedor-de-whatsapp.md)) |
 | Modelo del taller | Taller, cliente, vehículo (con patente), trabajo u orden, presupuesto, estado, cobro y próximo service. Cada registro guarda el mensaje del que salió |
 | Carga con confirmación | La IA propone el registro con herramientas acotadas, el sistema confirma ("Anotado: …") y el dueño corrige en una línea. Sin SQL libre |
 | Consultas | Herramientas de solo lectura ("autos para entregar hoy", "facturación del mes", "historial de una patente"). Lo que no está cargado se dice, no se inventa |
