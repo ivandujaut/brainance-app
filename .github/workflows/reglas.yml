@@ -1,0 +1,33 @@
+name: Reglas del repo
+
+# Checks that hold no matter which AI tool, or person, wrote the change (ADR 0010).
+# It also runs when the PR description is edited, so fixing the description re-runs it.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  sin-atribucion:
+    name: Sin atribución a una IA
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Commits del PR
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/checks/no-ai-attribution.mjs --range "origin/$BASE_REF..$HEAD_SHA"
+
+      - name: Descripción del PR
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node scripts/checks/no-ai-attribution.mjs --env PR_BODY
