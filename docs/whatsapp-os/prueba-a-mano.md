@@ -14,8 +14,8 @@ Dos semanas en las que el sistema sos vos con una planilla. Lo más riesgoso de 
 - **El canal:** un grupo de WhatsApp solo con el dueño y vos, con nombre de sistema (por ejemplo, "Taller · Registro"). Usa tu número, pero separa la prueba de tu chat personal. Todo lo que entra al grupo es dato de la prueba, y al final se exporta (Más opciones → Exportar chat) para contar mensajes, horarios y quién arrancó cada intercambio.
   - **Si después conseguís otra línea** (un chip con WhatsApp Business, aunque sea en el mismo celular con doble SIM), conviene pasar a ese número. Ese número puede ser el del producto, y el dueño seguiría escribiéndole al mismo contacto.
   - **Lo que se pierde con tu número:** el dueño sabe que le escribe a una persona, y puede mandar de más por compromiso o de menos para no molestar. Tenelo en cuenta al leer los resultados.
-- **Duración:** 10 días hábiles.
-- **Lo que hace el dueño:** manda audios, fotos o textos cuando pasa algo: entra un auto, pasa un presupuesto, el cliente aprueba, falta un repuesto, se termina un trabajo, se cobra.
+- **Duración:** 10 días hábiles. La primera semana engaña, porque todo es novedad; la que importa es la segunda. Además, en dos semanas se ven varios autos completar todo el recorrido, de la entrada al cobro. Si al día 10 las señales quedan "en el medio", se puede extender una semana más.
+- **Lo que puede mandar el dueño:** audios, fotos o textos cuando pasa algo: entra un auto, pasa un presupuesto, el cliente aprueba, falta un repuesto, se termina un trabajo, se cobra. Estos ejemplos son para vos, no para él: no se los pasás.
 - **Lo que hacés vos:**
   - Cargás cada mensaje en la planilla dentro de la hora, en un horario que le avisás (por ejemplo, de 8 a 20).
   - Confirmás con un mensaje corto: "Anotado: Gol AB123CD de Pérez, tren delantero."
@@ -30,6 +30,17 @@ Dos semanas en las que el sistema sos vos con una planilla. Lo más riesgoso de 
 > "Durante dos semanas, contale a este grupo lo que pasa en el taller, como se lo contarías a un empleado: audios, fotos, lo que te salga. Yo lo anoto y cada mañana te mando cómo está todo. Le podés preguntar lo que quieras del taller. Es gratis; lo que me importa es saber si te sirve."
 
 **Privacidad:** los nombres, teléfonos y patentes de sus clientes son datos personales. Pedile por escrito, en el mismo chat, que acepte que los anotes solo para la prueba. Guardalos en una planilla privada, no se los pases a nadie y borralos al terminar si él lo pide.
+
+## Qué no hacer
+
+Lo que se prueba es que el dueño no tenga que llenar nada: lo cuenta como le sale y el sistema se encarga. Si le das estructura, se deja de probar eso, y además se pierde el dato más valioso: qué le parece relevante a él.
+
+- **No le mandes formato, lista de datos ni ejemplos** de cómo escribir. El mensaje inicial es todo lo que recibe.
+- **No lo corrijas ni le pidas que lo diga de otra manera.** Un audio de dos minutos que mezcla tres autos es un dato: así le va a hablar al producto real. Anotá en la planilla si se entendió a la primera.
+- **No completes lo que no dijo.** Si falta algo que él va a necesitar (por ejemplo, de quién es un auto, para poder recordarle el service), hacé una sola pregunta corta. Anotá que tuviste que preguntar: los datos que nunca da solo también dicen algo.
+- **No le pidas que mande cosas ni le recuerdes que escriba.** Solo vale lo que manda por su cuenta. La excepción son las charlas del día 3 y del día 10.
+- **No llenes las columnas vacías.** Si al final nunca mencionó plata, ese es el resultado: su dolor no pasa por ahí. Las columnas de la planilla son hipótesis nuestras, no un formulario para él.
+- **No le escribas a sus clientes ni le sugieras qué contestarles.**
 
 ## La planilla
 
