@@ -56,3 +56,7 @@ next-env.d.ts
 
 # landing screenshot intermediates (spec 009)
 /scripts/landing-screens/out/
+
+# Personal agent settings (ADR 0010)
+.claude/settings.local.json
+CLAUDE.local.md

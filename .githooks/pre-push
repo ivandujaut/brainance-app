@@ -1,0 +1,3 @@
+#!/bin/sh
+# Runs the tests when the pushed commits change more than Markdown (ADR 0010).
+exec node scripts/checks/run-hook.mjs pre-push
