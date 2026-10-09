@@ -69,4 +69,13 @@ describe("buildAnswerSystemPrompt", () => {
     expect(prompt).toMatch(/No extiendas a un servicio o producto lo que la base dice de otro/);
     expect(prompt).toMatch(/no sugieras usarlo fuera de ese horario/);
   });
+
+  // Spec 016, criterion 9: the eval's "data not loaded" failures stretched a negative or a policy.
+  it("does not stretch what the base denies, nor invent how prices are set or where data is", () => {
+    const prompt = buildAnswerSystemPrompt(business);
+    expect(prompt).toMatch(/Lo que la base dice que el negocio no hace vale solo para lo que nombra/);
+    expect(prompt).toMatch(/no digas que no lo hacen/);
+    expect(prompt).toMatch(/No digas de qué depende un precio ni cómo se calcula/);
+    expect(prompt).toMatch(/ni que un dato figura en otro lado/);
+  });
 });

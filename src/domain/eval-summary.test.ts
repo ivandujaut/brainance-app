@@ -5,8 +5,12 @@ import {
   formatEvalDate,
   formatRatio,
   meetsPublishThreshold,
+  missedDerivations,
+  promiseCase,
   PUBLISH_THRESHOLD,
+  PublishedEvalSchema,
   publishableEval,
+  summarizeDetector,
   summarizeEval,
   type EvalRow,
 } from "./eval-summary";
@@ -78,6 +82,56 @@ describe("summarizeEval", () => {
   });
 });
 
+// Spec 016, criteria 1–4: the eval also measures the derivation detector the panel relies on.
+describe("summarizeDetector", () => {
+  const judged = (
+    id: string,
+    behavior: string,
+    detector: string | null,
+    { correcta = 1, status = "ok" }: { correcta?: number; status?: string } = {},
+  ): EvalRow => ({
+    ...row(id, behavior === "abstain" ? "no_en_kb" : "respondible", 0, { correcta }, status),
+    meta: { expected: { behavior } },
+    detector,
+  });
+  const detectorRows = [
+    judged("d1", "abstain", "derivation"),
+    judged("d2", "abstain", null),
+    judged("d3", "partial", "derivation"),
+    // The model did not do what was expected: nobody knows what the detector should have said.
+    judged("d4", "abstain", null, { correcta: 0 }),
+    judged("n1", "answer", "derivation"),
+    judged("n2", "answer", null),
+    judged("n3", "redirect", null),
+    judged("n4", "answer", "derivation", { status: "truncated" }),
+  ];
+
+  it("counts how many of the expected derivations the detector caught, and its false alarms (criteria 2, 3)", () => {
+    expect(summarizeDetector(detectorRows)).toEqual({ shouldDerive: 3, counted: 2, shouldNotDerive: 3, falseAlarms: 1 });
+  });
+
+  it("does not count a visitor's request for a person as a derivation", () => {
+    expect(summarizeDetector([judged("h1", "abstain", "human_request")])).toMatchObject({ shouldDerive: 1, counted: 0 });
+  });
+
+  it("is null for a run made before the detector was measured (criterion 7)", () => {
+    expect(summarizeDetector(rows)).toBeNull();
+  });
+
+  it("lists the derivations the detector missed (criterion 4)", () => {
+    expect(missedDerivations(detectorRows)).toEqual([{ prompt_id: "d2", rep: 0, prompt: "¿Pregunta d2?" }]);
+  });
+
+  it("goes into the published summary", () => {
+    expect(summarizeEval({ rows: detectorRows, answers: {}, ranAt: "2026-10-09" }).detector).toEqual({
+      shouldDerive: 3,
+      counted: 2,
+      shouldNotDerive: 3,
+      falseAlarms: 1,
+    });
+  });
+});
+
 describe("publishing", () => {
   const base = summarizeEval({ rows: [row("a1", "respondible", 0)], answers: {}, ranAt: "2026-10-08" });
   const withMetrics = (correcta: number, sinInvento: number) => ({
@@ -89,6 +143,23 @@ describe("publishing", () => {
     expect(meetsPublishThreshold(withMetrics(0.85, 0.95))).toBe(true);
     expect(meetsPublishThreshold(withMetrics(0.84, 0.99))).toBe(false);
     expect(meetsPublishThreshold(withMetrics(0.99, 0.94))).toBe(false);
+  });
+
+  // Spec 016, criterion 8: the promise's own case has a threshold too.
+  it(`needs ${PUBLISH_THRESHOLD.noEnKbSinInvento * 100}% without inventing when the data is not loaded`, () => {
+    const withPromiseCase = (sinInvento: number) => ({
+      ...withMetrics(0.98, 0.96),
+      byType: [{ type: "no_en_kb", label: EVAL_TYPE_LABELS.no_en_kb, cases: 15, answers: 30, correcta: 1, sinInvento }],
+    });
+    expect(meetsPublishThreshold(withPromiseCase(0.9))).toBe(true);
+    expect(meetsPublishThreshold(withPromiseCase(0.83))).toBe(false);
+    expect(promiseCase(withPromiseCase(0.83))).toMatchObject({ type: "no_en_kb", sinInvento: 0.83 });
+    expect(promiseCase(withMetrics(0.98, 0.96))).toBeNull();
+  });
+
+  it("still reads a summary published before the detector was measured (spec 016, criterion 7)", () => {
+    const { detector: _, ...old } = withMetrics(0.9, 0.97);
+    expect(PublishedEvalSchema.safeParse({ summary: old }).success).toBe(true);
   });
 
   it("publishes a valid summary over the threshold, and nothing otherwise", () => {

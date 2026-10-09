@@ -75,6 +75,7 @@
   "harness_paths": [
     "src/server/ai/answer.ts",
     "src/domain/answer-prompt.ts",
+    "src/domain/attention.ts",
     "evals/rag-answers/cases.json",
     "evals/rag-answers/businesses/estudio-contable.json",
     "evals/rag-answers/businesses/clinica-dental.json",

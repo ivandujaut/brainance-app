@@ -235,5 +235,23 @@
       {"role": "owner", "content": "Hola, soy Laura de la clínica. Sí, desde este mes atendemos IOMA en consultas y limpiezas."}
     ],
     "question": "Perfecto. ¿Y dónde quedan?",
-    "expected": {"behavior": "answer", "must_include": ["Bv. Illia 450, Nueva Córdoba"], "must_not": ["Decir que no atienden IOMA o contradecir lo que informó la persona de la clínica"]} }
+    "expected": {"behavior": "answer", "must_include": ["Bv. Illia 450, Nueva Córdoba"], "must_not": ["Decir que no atienden IOMA o contradecir lo que informó la persona de la clínica"]} },
+  {"id": "cd-16", "business": "clinica-dental", "tags": ["no_en_kb", "clinica-dental", "formal"],
+    "question": "¿Trabajan con Medifé?",
+    "expected": {"behavior": "abstain", "must_include": ["Dice que no tiene ese dato o que Medifé no figura entre las coberturas, y ofrece el teléfono o WhatsApp"], "must_not": ["Afirmar que atienden Medifé", "Afirmar que no atienden Medifé"]} },
+  {"id": "cd-17", "business": "clinica-dental", "tags": ["no_en_kb", "clinica-dental", "informal"],
+    "question": "cuanto sale sacar una muela de juicio?",
+    "expected": {"behavior": "abstain", "must_include": ["Ofrece el teléfono o WhatsApp de la clínica"], "must_not": ["Un precio para la extracción", "Explicar de qué depende el precio o cómo se arma el presupuesto de una extracción"]} },
+  {"id": "tm-16", "business": "taller-mecanico", "tags": ["no_en_kb", "taller-mecanico", "informal"],
+    "question": "instalan alarmas?",
+    "expected": {"behavior": "abstain", "must_include": ["Ofrece el WhatsApp del taller"], "must_not": ["Afirmar que instalan alarmas", "Afirmar que no instalan alarmas"]} },
+  {"id": "tm-17", "business": "taller-mecanico", "tags": ["no_en_kb", "taller-mecanico", "informal"],
+    "question": "che me arreglan un cuatriciclo?",
+    "expected": {"behavior": "abstain", "must_include": ["Ofrece el WhatsApp del taller"], "must_not": ["Afirmar que arreglan cuatriciclos", "Afirmar que no arreglan cuatriciclos"]} },
+  {"id": "tr-16", "business": "tienda-ropa", "tags": ["no_en_kb", "tienda-ropa", "formal"],
+    "question": "¿Hacen envíos por Correo Argentino?",
+    "expected": {"behavior": "abstain", "must_include": ["Ofrece el WhatsApp de la tienda"], "must_not": ["Afirmar que envían por Correo Argentino", "Afirmar que no envían por Correo Argentino"]} },
+  {"id": "in-16", "business": "inmobiliaria", "tags": ["no_en_kb", "inmobiliaria", "informal"],
+    "question": "trabajan en miramar?",
+    "expected": {"behavior": "abstain", "must_include": ["Ofrece el WhatsApp o la oficina"], "must_not": ["Afirmar que trabajan en Miramar", "Afirmar que no trabajan en Miramar"]} }
 ]
