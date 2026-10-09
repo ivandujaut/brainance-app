@@ -8,7 +8,7 @@ Cómo está armado el trabajo con agentes de IA en este repo, para que cambiar d
 |---|---|---|---|
 | **1. Conocimiento** | Reglas, arquitectura, convenciones, entorno | Cualquier herramienta y cualquier persona | `AGENTS.md` en la raíz y en cada área; `docs/` |
 | **2. Garantías** | Controles que no dependen de la IA: sin atribución, lint, tipos, tests | Git y el CI, con cualquier herramienta o sin ella | `scripts/checks/`, `.githooks/`, `.github/workflows/reglas.yml` |
-| **3. Adaptadores** | Lo propio de cada herramienta, apuntando a la capa 1 y llamando a la capa 2 | Cada herramienta | `CLAUDE.md`, `.claude/` *(PR 3 y 4)* |
+| **3. Adaptadores** | Lo propio de cada herramienta, apuntando a la capa 1 y llamando a la capa 2 | Cada herramienta | `CLAUDE.md`, `.claude/settings.json`, `.claude/hooks/` (skills en el PR 4) |
 
 **La regla que sostiene todo:** una regla se escribe una sola vez, en la capa 1. Los adaptadores apuntan a ella y no la copian. Lo que no puede fallar no se deja a la memoria de un modelo: va en la capa 2.
 
@@ -27,6 +27,8 @@ Cómo está armado el trabajo con agentes de IA en este repo, para que cambiar d
 | [`docs/agentes/entorno.md`](entorno.md) | Postgres, navegador, Next.js, GitHub desde la nube |
 | [`docs/agentes/otras-herramientas.md`](otras-herramientas.md) | Qué lee cada herramienta de IA y cómo conectarla |
 | [`CLAUDE.md`](../../CLAUDE.md) | Adaptador de Claude Code: importa `AGENTS.md` y suma lo propio |
+| [`.claude/settings.json`](../../.claude/settings.json) | Configuración compartida de Claude Code: atribución apagada, `.env` sin leer, hooks |
+| [`.claude/hooks/`](../../.claude/hooks/) | Envoltorios finos: `session-start.sh` llama a `scripts/dev/setup-sandbox.sh` y `bash-guard.mjs` llama a `scripts/checks/bash-guard.mjs` |
 | `*/CLAUDE.md` de cada área | Una línea, `@AGENTS.md`. Claude Code ignora los `AGENTS.md` de subcarpetas cuando hay un `CLAUDE.md` en la raíz; este adaptador los carga cuando toca un archivo de esa carpeta |
 
 ## Cuando aprendés algo
@@ -42,6 +44,6 @@ La memoria de cada herramienta queda en la cuenta o en la máquina. Lo que la pr
 
 - [x] **PR 1:** ADR 0010 y capa de conocimiento.
 - [x] **PR 2:** garantías (hooks de git y CI).
-- [ ] **PR 3:** adaptador de Claude Code (`.claude/settings.json`, hooks, `SessionStart`).
+- [x] **PR 3:** adaptador de Claude Code (`.claude/settings.json`, hooks, `SessionStart`).
 - [ ] **PR 4:** skills y subagente revisor.
 - [x] **Guía para otras herramientas** ([`otras-herramientas.md`](otras-herramientas.md)).

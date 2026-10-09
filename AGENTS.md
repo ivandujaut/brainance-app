@@ -55,6 +55,7 @@ npm run eval:rag -- --variant <id> --model <gateway-id>   # eval de respuestas (
 
 - **Una rama por cambio:** `feat/NNN-nombre`, `fix/…`, `docs/…` o `chore/…`.
 - **El PR va contra `develop`**, con el template `.github/pull_request_template.md`, y no se mergea con el CI en rojo.
+- **PRs apilados:** si un PR depende de otro, abrilo igual contra `develop`. Su diff incluye los commits del otro hasta que se mergee. No uses la rama del otro PR como base: cuando se mergea y se borra esa rama, GitHub cierra el PR apilado.
 - **El merge lo hace el dueño.** Un agente no mergea, no aprueba y no reescribe la historia de una rama ajena.
 - **QA:** después del merge se prueba en el preview con un agente de navegador, guiado por un prompt. Ese prompt siempre incluye estas tres reglas: no hacer pagos, no pedir ni escribir claves en el chat y no escribir contraseñas.
 - **Migraciones:** el dueño aplica las migraciones a las bases de Neon con el workflow `migrate.yml` de Actions.
@@ -79,6 +80,7 @@ No dependen de la herramienta: corren en git y en GitHub ([ADR 0010](docs/adr/00
 
 ## Entorno
 
+- **Preparar un sandbox o un contenedor nuevo:** `scripts/dev/setup-sandbox.sh` instala dependencias, genera el cliente de Prisma, levanta Postgres, crea y migra `brainance_test` y `brainance_e2e`, y activa los hooks de git. Se puede correr varias veces.
 - **Postgres:** si todos los tests de integración fallan a la vez, lo más probable es que se haya caído. Levantalo con `service postgresql start`. Bases locales:
   - tests: `postgresql://postgres:postgres@localhost:5432/brainance_test`;
   - E2E: `brainance_e2e`.
