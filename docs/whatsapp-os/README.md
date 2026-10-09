@@ -40,3 +40,4 @@ Facturación electrónica, inventario de repuestos, turnos, varios usuarios por 
 
 - [Prueba a mano](prueba-a-mano.md): dos semanas con el taller, sin código.
 - [Inventario](inventario.md): qué se reutiliza de la beta web y qué hay que construir.
+- [ADR 0101](../adr/0101-proveedor-de-whatsapp.md) (propuesto): cómo conectar WhatsApp y transcribir los audios. Sale del [informe "Conexión de WhatsApp para talleres"](../mercado/reports/Conexi%C3%B3n%20de%20WhatsApp%20para%20talleres.md).
