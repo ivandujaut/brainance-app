@@ -1,0 +1,78 @@
+# 0010 — Sistema de trabajo con agentes, independiente de la herramienta
+
+- **Estado:** Propuesto
+- **Fecha:** 2026-10-09
+
+## Contexto
+
+El proyecto se desarrolla con agentes de IA, hoy Claude Code. Hasta ahora, las reglas para trabajar bien estaban repartidas en tres lugares:
+
+- **En el repo:** solo `CLAUDE.md`. Lo lee Claude Code y ninguna otra herramienta.
+- **En la conversación:** reglas que se repitieron en el chat y en ningún archivo. Por ejemplo: "sin atribución en commits y PRs", "los prompts de QA llevan *no pagos, no claves en el chat, no escribir contraseñas*", y los trucos del entorno (Postgres que se cae, `PW_CHROMIUM_PATH`, regex sin la bandera `s`).
+- **En la cuenta o en la máquina:** la memoria automática y la configuración de usuario (`~/.claude`). No viajan con el repo.
+
+Esto trajo problemas concretos:
+
+- La atribución a Claude volvió a aparecer en commits y PRs, aunque `CLAUDE.md` la prohibía, porque `CLAUDE.md` es una sugerencia y no un control.
+- `next dev` reescribe `CLAUDE.md` cuando detecta un agente: agrega un bloque `nextjs-agent-rules` (`node_modules/next/dist/server/lib/generate-agent-files.js`). Por eso había que deshacer `CLAUDE.md` después de cada build.
+- Lo aprendido en una sesión se pierde si cambia la cuenta, la máquina o la herramienta.
+
+El dueño pidió que el sistema sea portable **al punto de que no importe la herramienta**: otra cuenta de Claude, otra herramienta de IA o una persona tienen que poder trabajar con las mismas reglas y los mismos controles.
+
+## Opciones consideradas
+
+1. **Seguir con `CLAUDE.md` y la configuración de la cuenta.**
+   - *Pro:* no hay que hacer nada.
+   - *Contra:* nada es portable y nada está garantizado.
+2. **Todo en la configuración de Claude Code** (`.claude/`, hooks, skills, subagentes).
+   - *Pro:* viaja con el repo y sirve para cualquier cuenta de Claude.
+   - *Contra:* otra herramienta no lo lee, y los controles dependen de que el agente sea Claude.
+3. **Tres capas: conocimiento neutral, garantías que no dependen de la IA y adaptadores finos por herramienta.**
+   - *Pro:* las reglas las lee cualquier herramienta, los controles se aplican igual con cualquier herramienta o con una persona, y cambiar de herramienta es escribir un adaptador.
+   - *Contra:* hay más piezas, y hay que evitar que el adaptador repita reglas en lugar de apuntar a la fuente.
+
+## Decisión
+
+Se elige la opción 3.
+
+**Capa 1: conocimiento neutral.**
+
+- **`AGENTS.md` en la raíz es la fuente única de reglas.** Es el formato abierto que leen la mayoría de las herramientas de código con IA.
+- **Reglas por área en archivos `AGENTS.md` dentro de cada carpeta** (`src/actions/`, `src/domain/`, `prisma/`, `evals/`…). Tienen menos de 200 líneas cada uno.
+- **El bloque de Next.js (`nextjs-agent-rules`) vive en `AGENTS.md`.** Así `next dev` lo encuentra y deja de reescribir archivos.
+- **`docs/agentes/`** explica el sistema: qué archivo hace qué, cómo sumar otra herramienta y qué hacer con lo aprendido.
+- **La memoria es el repo.** Lo que un agente aprende y le sirve a la próxima sesión va a `AGENTS.md` o a `docs/agentes/`, en un PR. No a la memoria de la cuenta.
+
+**Capa 2: garantías que no dependen de la IA.**
+
+- **Scripts de chequeo en Node** (`scripts/checks/`), multiplataforma y sin dependencias nuevas.
+- **Hooks de git versionados** (`.githooks/`), que se activan con `core.hooksPath` desde el script `prepare` de npm:
+  - `commit-msg` rechaza las líneas de atribución a una IA;
+  - `pre-commit` corre lint y typecheck;
+  - `pre-push` corre los tests.
+- **Un job de CI que corre los mismos scripts** sobre los commits y la descripción del PR. El hook local se puede saltear; el CI no.
+
+**Capa 3: adaptadores por herramienta**, finos, que apuntan a la capa 1 y llaman a la capa 2.
+
+- **`CLAUDE.md`:** importa `@AGENTS.md` y suma solo lo propio de Claude Code.
+- **Un `CLAUDE.md` de una línea (`@AGENTS.md`) en cada carpeta que tiene su propio `AGENTS.md`.** Cuando hay un `CLAUDE.md` en la raíz, Claude Code no lee los `AGENTS.md` de las subcarpetas ([docs](https://code.claude.com/docs/en/memory#agents-md)). Los `CLAUDE.md` de subcarpetas, en cambio, se cargan cuando toca un archivo de esa carpeta, y traen el `AGENTS.md` de al lado.
+- **`.claude/settings.json`:** atribución apagada (`attribution`), permisos (por ejemplo, no leer `.env*`) y hooks que llaman a los scripts de la capa 2. También un `SessionStart` que prepara el entorno en la web.
+- **`.claude/skills/`:** los procedimientos (spec, ADR, PR, prompt de QA, eval) en el formato abierto Agent Skills, usando solo las claves portables (`name`, `description`).
+- **`.claude/agents/`:** un subagente revisor que lee la guía de revisión neutral.
+- **Otras herramientas:** `docs/agentes/otras-herramientas.md` dice qué lee cada una y cómo conectarla.
+
+Se implementa en PRs chicos contra `develop`, en este orden: conocimiento, garantías, Claude Code, skills. Después se traen a `whatsapp-os` con merge ([ADR 0100](https://github.com/ivandujaut/brainance-app/blob/whatsapp-os/docs/adr/0100-linea-whatsapp-para-talleres.md)).
+
+## Consecuencias
+
+- **Lo que se gana:**
+  - Cambiar de cuenta no cambia nada.
+  - Cambiar de herramienta es apuntarla a `AGENTS.md`.
+  - Lo que no puede fallar (atribución, lint, tipos, tests) se controla con hooks y CI, no con la memoria de un modelo.
+  - `CLAUDE.md` deja de ensuciarse con cada build.
+- **Lo que cuesta:**
+  - Mantener la regla de una sola fuente: un adaptador que copie reglas en lugar de apuntar a `AGENTS.md` va a quedar desactualizado.
+  - El `pre-commit` hace más lento cada commit, porque corre lint y typecheck.
+- **Lo que no cubre:**
+  - La configuración de cada cuenta (conectores, entornos en la nube, secrets de los proveedores). Eso se documenta en `docs/lanzamiento.md`, no se versiona.
+  - Los controles propios de cada herramienta, como los permisos de Claude Code. Son una ayuda; la garantía son los hooks de git y el CI.
