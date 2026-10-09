@@ -10,7 +10,7 @@ Las reglas del proyecto están en `AGENTS.md`, importado arriba. Esta sección s
 - **`.claude/settings.json`** (versionado) es la configuración compartida:
   - atribución apagada;
   - no leer los `.env` con secretos;
-  - un hook `SessionStart` que, en la web, corre `scripts/dev/setup-sandbox.sh`;
+  - un hook `SessionStart` que, en la web, corre `scripts/dev/setup-sandbox.sh` al arrancar y al reanudar;
   - un hook `PreToolUse` que corre `scripts/checks/bash-guard.mjs` antes de cada comando.
 
   Tu configuración personal va en `.claude/settings.local.json`, que no se commitea.
