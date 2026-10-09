@@ -1,0 +1,3 @@
+#!/bin/sh
+# Rejects commit messages that attribute the work to an AI tool (ADR 0010).
+exec node scripts/checks/no-ai-attribution.mjs --file "$1"

@@ -13,6 +13,10 @@ SaaS de chatbots con IA para sitios web. Un negocio registra sus dominios, entre
 - IA multi-proveedor vía AI SDK y Vercel AI Gateway; ver [ADR 0001](docs/adr/0001-estrategia-de-modelos-de-ia.md)
 - Tests: Vitest (unitarios) y Playwright (E2E)
 
+## Trabajar con agentes de IA
+
+Las reglas para cualquier agente de IA, o persona, están en [`AGENTS.md`](AGENTS.md) y en el de cada carpeta. Cómo está armado el sistema y cómo sumar otra herramienta: [`docs/agentes/`](docs/agentes/README.md).
+
 ## Empezar
 
 ```bash
