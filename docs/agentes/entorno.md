@@ -11,7 +11,7 @@ Lo que hace falta saber para trabajar en este repo desde una máquina nueva, un 
 - **Bases:** crea `brainance_test` y `brainance_e2e` si faltan, y les aplica las migraciones.
 - **Hooks de git:** los activa.
 
-En Claude Code en la web lo corre solo el hook `SessionStart` (`.claude/hooks/session-start.sh`), que además deja `PW_CHROMIUM_PATH` en el entorno de la sesión.
+En Claude Code en la web lo corre solo el hook `SessionStart` (`.claude/hooks/session-start.sh`), que además deja `PW_CHROMIUM_PATH` en el entorno de la sesión. Corre al arrancar y también al **reanudar** una sesión: una sesión reanudada puede caer en un contenedor nuevo, con el repo intacto pero sin Postgres levantado.
 
 ## Postgres local
 
