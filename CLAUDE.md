@@ -2,6 +2,8 @@
 
 BrAInance: SaaS multi-tenant de chatbots con IA para sitios web (Next.js 16, React 19, Clerk 7, Prisma 7 + Postgres). La documentación del proyecto está en español; el código y los comentarios, en inglés.
 
+**Rama `whatsapp-os`:** línea aparte que explora un sistema operativo por WhatsApp para talleres ([ADR 0100](docs/adr/0100-linea-whatsapp-para-talleres.md), `docs/whatsapp-os/`). Sus PRs van contra `whatsapp-os`, no contra `develop`; sus specs se numeran desde 100 y sus ADR desde 0100. `develop` y `main` siguen con la beta web.
+
 ## Antes de escribir código
 
 - Leer `docs/workflow.md`, `docs/principles.md` y `docs/posicionamiento.md` (qué problema resuelve el producto y para quién; los titulares y las specs se contrastan contra eso).
