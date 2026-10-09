@@ -17,10 +17,11 @@ Qué lee cada herramienta y cómo conectarla con las reglas del repo ([ADR 0010]
 ## Lo que no depende de la herramienta
 
 - **Las garantías** (hooks de git y CI, PR 2) valen para cualquier herramienta y para una persona: corren en git y en GitHub, no en el agente.
-- **Los procedimientos** (skills, PR 4) siguen el formato abierto Agent Skills: un `SKILL.md` con `name` y `description`.
+- **Los procedimientos** (`.claude/skills/`) siguen el formato abierto Agent Skills: un `SKILL.md` con `name` y `description`.
   - Claude Code los busca en `.claude/skills/`.
   - Según resúmenes de búsqueda sin verificar, Codex los busca en `.agents/skills/`.
-  - Si una herramienta no los descubre, igual se pueden leer como documentación: son Markdown.
+  - Si una herramienta no los descubre, igual se pueden leer como documentación: son Markdown. `AGENTS.md` los lista en "Procedimientos".
+- **La guía de revisión** ([`revision.md`](revision.md)) es neutral. El subagente `revisor` es solo el envoltorio de Claude Code.
 
 ## Al sumar una herramienta nueva
 

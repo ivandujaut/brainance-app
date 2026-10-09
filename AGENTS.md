@@ -72,6 +72,20 @@ No dependen de la herramienta: corren en git y en GitHub ([ADR 0010](docs/adr/00
 - **Workflow "Reglas del repo"** (`.github/workflows/reglas.yml`): revisa los commits y la descripción de cada PR, y vuelve a correr cuando se edita la descripción.
 - **Los chequeos viven en `scripts/checks/`,** con sus tests. Un control nuevo se agrega ahí y se llama desde el hook, el CI y los adaptadores de cada herramienta, sin duplicar la lógica.
 
+## Procedimientos
+
+Los procedimientos repetibles están en `.claude/skills/<nombre>/SKILL.md`, en el formato abierto Agent Skills. Cualquier herramienta, o una persona, los puede leer como documentación.
+
+| Skill | Cuándo |
+|---|---|
+| `nueva-spec` | Una feature nueva, antes de tocar código |
+| `nuevo-adr` | Una decisión de arquitectura o de proveedor difícil de revertir |
+| `abrir-pr` | Un cambio listo para revisión |
+| `prompt-qa` | Después del merge, para el QA con un agente de navegador |
+| `correr-eval` | Después de cambiar un prompt o un modelo de IA |
+
+Para revisar un diff antes de abrir el PR: [`docs/agentes/revision.md`](docs/agentes/revision.md). En Claude Code la aplica el subagente `revisor` (`.claude/agents/revisor.md`).
+
 ## Seguridad para agentes
 
 - Nunca pidas ni pegues claves o secretos en el chat, en issues ni en commits. Los carga el dueño en cada proveedor.
