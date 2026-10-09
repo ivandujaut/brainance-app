@@ -2,6 +2,17 @@
 
 Lo que hace falta saber para trabajar en este repo desde una máquina nueva, un sandbox o una sesión en la nube. Lo básico (instalar, migrar, levantar) está en el [README](../../README.md).
 
+## Preparar el entorno de una vez
+
+`scripts/dev/setup-sandbox.sh` deja un sandbox o un contenedor listo para trabajar. Se puede correr varias veces, y cuando ya está todo hecho tarda unos segundos:
+
+- **Dependencias:** corre `npm install` si faltan o cambió el lockfile. Si no, regenera el cliente de Prisma.
+- **Postgres:** lo levanta, si el contenedor lo trae.
+- **Bases:** crea `brainance_test` y `brainance_e2e` si faltan, y les aplica las migraciones.
+- **Hooks de git:** los activa.
+
+En Claude Code en la web lo corre solo el hook `SessionStart` (`.claude/hooks/session-start.sh`), que además deja `PW_CHROMIUM_PATH` en el entorno de la sesión.
+
 ## Postgres local
 
 - **Si todos los tests de integración fallan a la vez,** casi seguro Postgres se cayó.

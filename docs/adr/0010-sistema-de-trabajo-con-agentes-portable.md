@@ -56,7 +56,10 @@ Se elige la opción 3.
 
 - **`CLAUDE.md`:** importa `@AGENTS.md` y suma solo lo propio de Claude Code.
 - **Un `CLAUDE.md` de una línea (`@AGENTS.md`) en cada carpeta que tiene su propio `AGENTS.md`.** Cuando hay un `CLAUDE.md` en la raíz, Claude Code no lee los `AGENTS.md` de las subcarpetas ([docs](https://code.claude.com/docs/en/memory#agents-md)). Los `CLAUDE.md` de subcarpetas, en cambio, se cargan cuando toca un archivo de esa carpeta, y traen el `AGENTS.md` de al lado.
-- **`.claude/settings.json`:** atribución apagada (`attribution`), permisos (por ejemplo, no leer `.env*`) y hooks que llaman a los scripts de la capa 2. También un `SessionStart` que prepara el entorno en la web.
+- **`.claude/settings.json`:**
+  - atribución apagada (`attribution`);
+  - permisos (por ejemplo, no leer los `.env` con secretos);
+  - hooks que llaman a scripts neutrales. Un `SessionStart` corre `scripts/dev/setup-sandbox.sh` en la web, y un `PreToolUse` corre `scripts/checks/bash-guard.mjs`, que bloquea saltear los hooks de git y commitear con atribución.
 - **`.claude/skills/`:** los procedimientos (spec, ADR, PR, prompt de QA, eval) en el formato abierto Agent Skills, usando solo las claves portables (`name`, `description`).
 - **`.claude/agents/`:** un subagente revisor que lee la guía de revisión neutral.
 - **Otras herramientas:** `docs/agentes/otras-herramientas.md` dice qué lee cada una y cómo conectarla.
