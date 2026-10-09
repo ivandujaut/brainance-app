@@ -11,7 +11,9 @@ Dos semanas en las que el sistema sos vos con una planilla. Lo más riesgoso de 
 
 ## Cómo funciona
 
-- **El número:** un WhatsApp Business aparte, ni el del taller ni tu número personal, con un nombre de perfil neutro.
+- **El canal:** un grupo de WhatsApp solo con el dueño y vos, con nombre de sistema (por ejemplo, "Taller · Registro"). Usa tu número, pero separa la prueba de tu chat personal. Todo lo que entra al grupo es dato de la prueba, y al final se exporta (Más opciones → Exportar chat) para contar mensajes, horarios y quién arrancó cada intercambio.
+  - **Si después conseguís otra línea** (un chip con WhatsApp Business, aunque sea en el mismo celular con doble SIM), conviene pasar a ese número. Ese número puede ser el del producto, y el dueño seguiría escribiéndole al mismo contacto.
+  - **Lo que se pierde con tu número:** el dueño sabe que le escribe a una persona, y puede mandar de más por compromiso o de menos para no molestar. Tenelo en cuenta al leer los resultados.
 - **Duración:** 10 días hábiles.
 - **Lo que hace el dueño:** manda audios, fotos o textos cuando pasa algo: entra un auto, pasa un presupuesto, el cliente aprueba, falta un repuesto, se termina un trabajo, se cobra.
 - **Lo que hacés vos:**
@@ -25,7 +27,7 @@ Dos semanas en las que el sistema sos vos con una planilla. Lo más riesgoso de 
 
 ## Qué le decís al dueño
 
-> "Durante dos semanas, contale a este número lo que pasa en el taller, como se lo contarías a un empleado: audios, fotos, lo que te salga. Yo lo anoto y cada mañana te mando cómo está todo. Le podés preguntar lo que quieras del taller. Es gratis; lo que me importa es saber si te sirve."
+> "Durante dos semanas, contale a este grupo lo que pasa en el taller, como se lo contarías a un empleado: audios, fotos, lo que te salga. Yo lo anoto y cada mañana te mando cómo está todo. Le podés preguntar lo que quieras del taller. Es gratis; lo que me importa es saber si te sirve."
 
 **Privacidad:** los nombres, teléfonos y patentes de sus clientes son datos personales. Pedile por escrito, en el mismo chat, que acepte que los anotes solo para la prueba. Guardalos en una planilla privada, no se los pases a nadie y borralos al terminar si él lo pide.
 
