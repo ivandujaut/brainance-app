@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [main, develop]
+    branches: [main, develop, whatsapp-os]
 
 concurrency:
   group: ci-${{ github.ref }}
