@@ -42,7 +42,7 @@ npm run eval:rag -- --variant <id> --model <gateway-id>   # eval de respuestas (
 
 - **TDD:** escribir el test, verlo fallar e implementar.
 - **Conventional Commits:** `feat:`, `fix:`, `chore:`, `test:`, `docs:`.
-- **Autoría:** commits y PRs van a nombre de `Ivan Dujaut <dujautivan@gmail.com>` y **sin atribución a ninguna IA**. Eso excluye un `Co-Authored-By` de un modelo, las líneas `Claude-Session` y los pies del tipo "Generated with…" en el PR. Antes de commitear, verificá `git config user.name` y `user.email`.
+- **Autoría:** commits y PRs van a nombre de `Ivan Dujaut <dujautivan@gmail.com>` y **sin atribución a ninguna IA**. Eso excluye un `Co-Authored-By` de un modelo, las líneas `Claude-Session` y los pies del tipo "Generated with…" en el PR. Antes de commitear, verificá `git config user.name` y `user.email`. El hook `commit-msg` y el workflow "Reglas del repo" rechazan la atribución (ver "Controles").
 - **Aislamiento entre clientes (ADR 0004):** todo id que llega del navegador se resuelve con `src/server/tenancy.ts` y se opera sobre el id devuelto (ver `src/actions/AGENTS.md`).
 - **Secretos:** solo en variables de entorno. Las variables nuevas se documentan en `.env.example`. Nunca van secretos en `NEXT_PUBLIC_*`.
 - **IA:** un cambio de prompt o de modelo exige correr el eval (ADR 0001, `evals/AGENTS.md`).
@@ -58,6 +58,18 @@ npm run eval:rag -- --variant <id> --model <gateway-id>   # eval de respuestas (
 - **El merge lo hace el dueño.** Un agente no mergea, no aprueba y no reescribe la historia de una rama ajena.
 - **QA:** después del merge se prueba en el preview con un agente de navegador, guiado por un prompt. Ese prompt siempre incluye estas tres reglas: no hacer pagos, no pedir ni escribir claves en el chat y no escribir contraseñas.
 - **Migraciones:** el dueño aplica las migraciones a las bases de Neon con el workflow `migrate.yml` de Actions.
+
+## Controles
+
+No dependen de la herramienta: corren en git y en GitHub ([ADR 0010](docs/adr/0010-sistema-de-trabajo-con-agentes-portable.md)).
+
+- **Hooks de git** (`.githooks/`). Se activan solos con `npm install`, a través del script `prepare`:
+  - `commit-msg` rechaza la atribución a una IA;
+  - `pre-commit` corre ESLint sobre los archivos en stage y el typecheck, si cambió algo más que Markdown;
+  - `pre-push` corre los tests, si cambió algo más que Markdown.
+- **Saltear un hook** se puede una vez, con `--no-verify`. El CI corre lo mismo y no se puede saltear.
+- **Workflow "Reglas del repo"** (`.github/workflows/reglas.yml`): revisa los commits y la descripción de cada PR, y vuelve a correr cuando se edita la descripción.
+- **Los chequeos viven en `scripts/checks/`,** con sus tests. Un control nuevo se agrega ahí y se llama desde el hook, el CI y los adaptadores de cada herramienta, sin duplicar la lógica.
 
 ## Seguridad para agentes
 
