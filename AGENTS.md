@@ -6,13 +6,19 @@ Instrucciones para cualquier agente de IA, o persona, que trabaje en este repo. 
 
 BrAInance: SaaS multi-tenant de chat con IA para el sitio web de negocios chicos que atienden solos. Stack: Next.js 16, React 19, Clerk 7, Prisma 7 + Postgres (Neon). **La documentación está en español; el código y los comentarios, en inglés.**
 
-**Rama `whatsapp-os`:** es una línea aparte que explora un sistema operativo por WhatsApp para talleres ([ADR 0100](docs/adr/0100-linea-whatsapp-para-talleres.md), `docs/whatsapp-os/`). En esta rama:
+**Dos líneas de trabajo** ([ADR 0100](docs/adr/0100-linea-whatsapp-para-talleres.md)):
 
-- los PRs van contra `whatsapp-os`, no contra `develop`;
-- las specs se numeran desde 100 y los ADR desde 0100;
-- lo que sirve a las dos líneas se arregla en `develop` y se trae acá con un merge.
+- **`develop` y `main`:** la beta web.
+- **`whatsapp-os`:** una línea aparte que explora un sistema operativo por WhatsApp para talleres (`docs/whatsapp-os/`). Sus specs se numeran desde 100 y sus ADR desde 0100.
 
-`develop` y `main` siguen con la beta web.
+Cómo pasan los cambios de una a otra:
+
+- Cada rama sale de una línea, y su PR vuelve a esa misma línea.
+- Lo que sirve a las dos se arregla en `develop` y se trae a `whatsapp-os` con un PR de merge.
+- **Nunca al revés:** nada de `whatsapp-os` entra en `develop` ni en `main`.
+  - Después de un merge en `whatsapp-os`, GitHub ofrece "Compare & pull request" con base `develop`. No hay que usarlo.
+  - La rama `whatsapp-os` no se borra después de un merge.
+  - El workflow "Reglas del repo" frena esos PRs (ver "Controles").
 
 ## Antes de escribir código
 
@@ -62,8 +68,8 @@ npm run eval:rag -- --variant <id> --model <gateway-id>   # eval de respuestas (
 ## Ramas, PRs y QA
 
 - **Una rama por cambio:** `feat/NNN-nombre`, `fix/…`, `docs/…` o `chore/…`.
-- **El PR va contra `develop`**, con el template `.github/pull_request_template.md`, y no se mergea con el CI en rojo.
-- **PRs apilados:** si un PR depende de otro, abrilo igual contra `develop`. Su diff incluye los commits del otro hasta que se mergee. No uses la rama del otro PR como base: cuando se mergea y se borra esa rama, GitHub cierra el PR apilado.
+- **El PR va contra la línea de la que salió la rama** (`develop` o `whatsapp-os`), con el template `.github/pull_request_template.md`, y no se mergea con el CI en rojo.
+- **PRs apilados:** si un PR depende de otro, abrilo igual contra esa línea. Su diff incluye los commits del otro hasta que se mergee. No uses la rama del otro PR como base: cuando se mergea y se borra esa rama, GitHub cierra el PR apilado.
 - **El merge lo hace el dueño.** Un agente no mergea, no aprueba y no reescribe la historia de una rama ajena.
 - **QA:** después del merge se prueba en el preview con un agente de navegador, guiado por un prompt. Ese prompt siempre incluye estas tres reglas: no hacer pagos, no pedir ni escribir claves en el chat y no escribir contraseñas.
 - **Migraciones:** el dueño aplica las migraciones a las bases de Neon con el workflow `migrate.yml` de Actions.
@@ -77,7 +83,9 @@ No dependen de la herramienta: corren en git y en GitHub ([ADR 0010](docs/adr/00
   - `pre-commit` corre ESLint sobre los archivos en stage y el typecheck, si cambió algo más que Markdown;
   - `pre-push` corre los tests, si cambió algo más que Markdown.
 - **Saltear un hook** se puede una vez, con `--no-verify`. El CI corre lo mismo y no se puede saltear.
-- **Workflow "Reglas del repo"** (`.github/workflows/reglas.yml`): revisa los commits y la descripción de cada PR, y vuelve a correr cuando se edita la descripción.
+- **Workflow "Reglas del repo"** (`.github/workflows/reglas.yml`). En cada PR revisa dos cosas, y vuelve a correr cuando se edita la descripción:
+  - que los commits y la descripción no tengan atribución a una IA;
+  - que no lleve nada de `whatsapp-os` a `develop` ni a `main`, ni directo ni con una rama que salió de ahí.
 - **Los chequeos viven en `scripts/checks/`,** con sus tests. Un control nuevo se agrega ahí y se llama desde el hook, el CI y los adaptadores de cada herramienta, sin duplicar la lógica.
 
 ## Procedimientos
