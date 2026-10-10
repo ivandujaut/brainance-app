@@ -1,0 +1,92 @@
+# Prueba a mano: el taller por WhatsApp, sin código
+
+Dos semanas en las que el sistema sos vos con una planilla. Lo más riesgoso de la idea no es técnico: es si el dueño va a contarle al sistema lo que pasa en el taller. Eso se prueba antes de escribir una línea de código.
+
+## Qué queremos saber
+
+1. **Hábito:** ¿el dueño manda lo que pasa en el taller sin que se lo pidan, todos los días?
+2. **Valor:** ¿qué usa? ¿El resumen de la mañana, las consultas, los recordatorios de service?
+3. **Lenguaje y datos:** ¿cómo lo cuenta (audio o texto, con qué palabras) y qué datos aparecen (cliente, auto, patente, trabajo, presupuesto, cobro, repuestos, kilómetros)?
+4. **Dolor principal:** ¿le pesa más contestarles a sus clientes o tener el taller bajo control?
+
+## Cómo funciona
+
+- **El canal:** un grupo de WhatsApp solo con el dueño y vos, con nombre de sistema (por ejemplo, "Taller · Registro"). Usa tu número, pero separa la prueba de tu chat personal. Todo lo que entra al grupo es dato de la prueba, y al final se exporta (Más opciones → Exportar chat) para contar mensajes, horarios y quién arrancó cada intercambio.
+  - **Si después conseguís otra línea** (un chip con WhatsApp Business, aunque sea en el mismo celular con doble SIM), conviene pasar a ese número. Ese número puede ser el del producto, y el dueño seguiría escribiéndole al mismo contacto.
+  - **Lo que se pierde con tu número:** el dueño sabe que le escribe a una persona, y puede mandar de más por compromiso o de menos para no molestar. Tenelo en cuenta al leer los resultados.
+- **Duración:** 10 días hábiles. La primera semana engaña, porque todo es novedad; la que importa es la segunda. Además, en dos semanas se ven varios autos completar todo el recorrido, de la entrada al cobro. Si al día 10 las señales quedan "en el medio", se puede extender una semana más.
+- **Lo que puede mandar el dueño:** audios, fotos o textos cuando pasa algo: entra un auto, pasa un presupuesto, el cliente aprueba, falta un repuesto, se termina un trabajo, se cobra. Estos ejemplos son para vos, no para él: no se los pasás.
+- **Lo que hacés vos:**
+  - Cargás cada mensaje en la planilla dentro de la hora, en un horario que le avisás (por ejemplo, de 8 a 20).
+  - Confirmás con un mensaje corto: "Anotado: Gol AB123CD de Pérez, tren delantero."
+  - Si falta un dato, preguntás uno solo: "¿De quién es el Gol?". Nunca lo completás vos.
+  - Contestás sus consultas ("¿qué autos entrego hoy?") solo con lo que está en la planilla. Si no está, se lo decís.
+  - Le mandás el resumen todos los días a las 8.
+- **Nunca le escribís a los clientes del taller.**
+- **Dos charlas de 10 minutos**, el día 3 y el día 10.
+
+## Qué le decís al dueño
+
+> "Durante dos semanas, contale a este grupo lo que pasa en el taller, como se lo contarías a un empleado: audios, fotos, lo que te salga. Yo lo anoto y cada mañana te mando cómo está todo. Le podés preguntar lo que quieras del taller. Es gratis; lo que me importa es saber si te sirve."
+
+**Privacidad:** los nombres, teléfonos y patentes de sus clientes son datos personales, y sus audios también, porque tienen su voz. Pedile por escrito, en el mismo chat, que acepte dos cosas:
+
+1. Que anotes esos datos solo para la prueba.
+2. Que guardes sus audios para probar herramientas de transcripción automática. Esos audios se mandan a servicios que no los usan para entrenar modelos y se borran cuando termina esa prueba.
+
+Guardá todo en un lugar privado, no se lo pases a nadie y borralo al terminar si él lo pide. Los audios son la base del eval de transcripción del [ADR 0101](../adr/0101-proveedor-de-whatsapp.md): sin este permiso no se pueden usar.
+
+## Qué no hacer
+
+Lo que se prueba es que el dueño no tenga que llenar nada: lo cuenta como le sale y el sistema se encarga. Si le das estructura, se deja de probar eso, y además se pierde el dato más valioso: qué le parece relevante a él.
+
+- **No le mandes formato, lista de datos ni ejemplos** de cómo escribir. El mensaje inicial es todo lo que recibe.
+- **No lo corrijas ni le pidas que lo diga de otra manera.** Un audio de dos minutos que mezcla tres autos es un dato: así le va a hablar al producto real. Anotá en la planilla si se entendió a la primera.
+- **No completes lo que no dijo.** Si falta algo que él va a necesitar (por ejemplo, de quién es un auto, para poder recordarle el service), hacé una sola pregunta corta. Anotá que tuviste que preguntar: los datos que nunca da solo también dicen algo.
+- **No le pidas que mande cosas ni le recuerdes que escriba.** Solo vale lo que manda por su cuenta. La excepción son las charlas del día 3 y del día 10.
+- **No llenes las columnas vacías.** Si al final nunca mencionó plata, ese es el resultado: su dolor no pasa por ahí. Las columnas de la planilla son hipótesis nuestras, no un formulario para él.
+- **No le escribas a sus clientes ni le sugieras qué contestarles.**
+
+## La planilla
+
+Tres pestañas:
+
+| Pestaña | Una fila por | Columnas |
+|---|---|---|
+| **Mensajes** | Cada mensaje del dueño | Fecha y hora; audio (con duración) o texto; qué buscaba (cargar, consultar, otra cosa); si lo mandó él o contestaba algo tuyo; si se entendió a la primera; cuánto tardaste en contestar; resumen o transcripción |
+| **Trabajos** | Cada auto | Patente; auto; cliente; teléfono; qué tiene; presupuesto; si se aprobó; estado; fecha de entrada; fecha de entrega; si se cobró y cuánto; kilómetros; próximo service |
+| **Consultas** | Cada pregunta del dueño | La pregunta textual; si se pudo contestar con la planilla; qué faltaba |
+
+## El resumen de la mañana (modelo)
+
+> Buen día. Hoy hay 4 autos en el taller.
+> - **Para entregar:** Hilux de Gómez (service). Falta cobrar $180.000.
+> - **Esperando repuesto:** Gol de Pérez (embrague), desde el martes.
+> - **Esperando aprobación:** Corsa de Díaz, presupuesto de $350.000 enviado hace 3 días.
+>
+> Ayer entraron 2 y se entregó 1.
+
+Al final de la segunda semana, sumale una línea con los clientes a los que les tocaría el service, si aparecieron los datos.
+
+## Qué medir y cuándo vale
+
+La semana 2 pesa más que la 1, porque al principio todo es novedad.
+
+| Señal | Valida | No valida |
+|---|---|---|
+| Mensajes por día hábil en la semana 2 | 5 o más | Menos de 2 |
+| Días con al menos un mensaje, de 10 | 8 o más | 5 o menos |
+| Mensajes que manda él sin que se los pidas | La mayoría | Casi todos necesitan un empujón |
+| Consultas al sistema en la semana 2 | Al menos una por día | Ninguna |
+| La charla del día 10 | Pregunta si sigue, o pide algo más | "Me olvidaba", "es una cosa más para hacer" |
+| Precio | Dice una cifra y acepta seguir pagando | "Si es gratis, sí" |
+
+## Qué sale de la prueba
+
+- **Si valida:**
+  - **La spec 100**, el canal del dueño, con lo aprendido: qué datos, qué consultas, qué resumen y qué palabras usa.
+  - **Un ADR** para elegir proveedor de WhatsApp y de transcripción de audio.
+  - **Los casos del eval**, sacados de los mensajes reales y anonimizados.
+- **Si no valida:**
+  - Antes de descartar, entender por qué: ¿no le entra en el día, o el problema era otro?
+  - La misma prueba con el negocio de tortas sirve para comparar.

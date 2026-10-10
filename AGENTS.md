@@ -6,6 +6,14 @@ Instrucciones para cualquier agente de IA, o persona, que trabaje en este repo. 
 
 BrAInance: SaaS multi-tenant de chat con IA para el sitio web de negocios chicos que atienden solos. Stack: Next.js 16, React 19, Clerk 7, Prisma 7 + Postgres (Neon). **La documentación está en español; el código y los comentarios, en inglés.**
 
+**Rama `whatsapp-os`:** es una línea aparte que explora un sistema operativo por WhatsApp para talleres ([ADR 0100](docs/adr/0100-linea-whatsapp-para-talleres.md), `docs/whatsapp-os/`). En esta rama:
+
+- los PRs van contra `whatsapp-os`, no contra `develop`;
+- las specs se numeran desde 100 y los ADR desde 0100;
+- lo que sirve a las dos líneas se arregla en `develop` y se trae acá con un merge.
+
+`develop` y `main` siguen con la beta web.
+
 ## Antes de escribir código
 
 - Leer `docs/workflow.md`, `docs/principles.md` y `docs/posicionamiento.md`. Este último dice qué problema resuelve el producto y para quién, y los titulares y las specs se contrastan contra eso.
