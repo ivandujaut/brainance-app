@@ -9,7 +9,7 @@ description: Preparar y abrir un pull request en este repo (rama, chequeos, temp
 
 1. **Rama:** `feat/NNN-nombre`, `fix/…`, `docs/…` o `chore/…`, creada desde la base del PR:
    - `develop`, para la beta web;
-   - `whatsapp-os`, para esa línea (ADR 0100, en esa rama).
+   - `whatsapp-os`, para la línea de WhatsApp (ADR 0100).
 2. **Chequeos locales:** `npm run lint && npm run typecheck && npm test`. Si tocaste acciones, adaptadores o el esquema, corré también los de integración:
 
    ```bash
@@ -23,7 +23,7 @@ description: Preparar y abrir un pull request en este repo (rama, chequeos, temp
 
 ## El PR
 
-- **Base:** `develop` (o `whatsapp-os`). Si depende de otro PR abierto, igual va contra esa base, nunca contra la rama del otro PR.
+- **Base:** la línea de la que salió la rama, `develop` o `whatsapp-os`. Si depende de otro PR abierto, igual va contra esa base, nunca contra la rama del otro PR. Nada de `whatsapp-os` va a `develop`: "Reglas del repo" lo frena.
 - **Título:** el mismo formato que los commits (`feat: …`).
 - **Descripción** con las secciones de [`.github/pull_request_template.md`](../../../.github/pull_request_template.md):
   - **Qué cambia:** en una o dos frases, más una lista si hace falta.

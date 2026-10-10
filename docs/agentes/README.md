@@ -7,7 +7,7 @@ Cómo está armado el trabajo con agentes de IA en este repo, para que cambiar d
 | Capa | Qué tiene | Quién la usa | Dónde |
 |---|---|---|---|
 | **1. Conocimiento** | Reglas, arquitectura, convenciones, entorno | Cualquier herramienta y cualquier persona | `AGENTS.md` en la raíz y en cada área; `docs/` |
-| **2. Garantías** | Controles que no dependen de la IA: sin atribución, lint, tipos, tests | Git y el CI, con cualquier herramienta o sin ella | `scripts/checks/`, `.githooks/`, `.github/workflows/reglas.yml` |
+| **2. Garantías** | Controles que no dependen de la IA: sin atribución, dirección entre líneas, lint, tipos, tests | Git y el CI, con cualquier herramienta o sin ella | `scripts/checks/`, `.githooks/`, `.github/workflows/reglas.yml` |
 | **3. Adaptadores** | Lo propio de cada herramienta, apuntando a la capa 1 y llamando a la capa 2 | Cada herramienta | `CLAUDE.md`, `.claude/settings.json`, `.claude/hooks/`, `.claude/skills/`, `.claude/agents/` |
 
 **La regla que sostiene todo:** una regla se escribe una sola vez, en la capa 1. Los adaptadores apuntan a ella y no la copian. Lo que no puede fallar no se deja a la memoria de un modelo: va en la capa 2.

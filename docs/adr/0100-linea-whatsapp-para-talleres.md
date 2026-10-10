@@ -31,6 +31,8 @@ Se elige la opción 3.
 - **El flujo.** El trabajo nuevo va en ramas que salen de `whatsapp-os` y vuelven a `whatsapp-os` por PR, con el mismo proceso de siempre: spec, ADR, TDD, CI y QA ([workflow](../workflow.md)).
 - **La numeración.** Para no chocar con `develop`, las specs de esta línea se numeran desde 100 y los ADR desde 0100.
 - **Los arreglos compartidos.** Lo que sirve a las dos líneas se arregla en `develop` y se trae a `whatsapp-os` con merge. Nunca al revés, hasta que se decida cuál es la línea principal.
+  - El PR #65 (10 de octubre) llevó `whatsapp-os` a `develop` cuando la línea solo tenía documentación, y la rama se borró después del merge. Se recreó en ese mismo punto.
+  - Desde entonces, el workflow "Reglas del repo" frena cualquier PR que lleve commits de `whatsapp-os` a `develop` o a `main` (`scripts/checks/pr-direction.mjs`).
 - **Qué canal va primero.** Primero el del dueño con el sistema, en un número propio. El de los clientes con el negocio, en el número del taller, queda para cuando el primero esté validado. Un bot que le contesta mal a un cliente que llegó por recomendación puede costarle ese cliente al taller.
 - **Antes de escribir código**, se hace la [prueba a mano](../whatsapp-os/prueba-a-mano.md) de dos semanas con el taller.
 - **La base de datos.** Cuando esta línea cambie `prisma/schema.prisma`, va a tener su propia rama de Neon y sus propias variables en Vercel, para no romper la base de `develop` ni sus previews.
