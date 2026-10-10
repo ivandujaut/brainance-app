@@ -8,7 +8,7 @@
 
 - [ ] **Rotar las credenciales que quedaron en el historial de git** (el `.env` original se commiteó en el repo heredado):
   - Clerk: *Dashboard → API Keys →* regenerar la secret key de la instancia vieja (o borrar esa instancia).
-  - Uploadcare: *Dashboard → API keys →* crear un par nuevo y revocar el viejo.
+  - Uploadcare: *Dashboard → API keys →* crear un par nuevo y revocar el viejo. Ya no se usa ([ADR 0011](adr/0011-iconos-en-vercel-blob.md)), pero las claves publicadas siguen siendo de alguien.
     - 2026-10-06: la cuenta actual se abrió ese día y no tiene el proyecto viejo. Las claves publicadas son de **otra cuenta**: hay que entrar a esa y borrar el proyecto.
   - Base de datos vieja: cambiar la contraseña o borrar esa base.
   - *Verificar:* las claves viejas dejan de funcionar.
@@ -21,7 +21,7 @@
 - [x] *GitHub → Settings → Secrets and variables → Actions:* cargar las cadenas **directas**:
   - `NEON_DIRECT_URL`: branch `production`.
   - `NEON_DEV_DIRECT_URL`: branch `development`.
-- [x] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. Se repite con cada migración nueva (última: 2026-10-08, `rate_limit_hits` de la spec 015). El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
+- [x] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. Se repite con cada migración nueva (última: 2026-10-10, `icon_uploads` del ADR 0011). El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
   - Alternativa desde tu máquina: `DIRECT_URL="<directa>" npx prisma migrate deploy`.
   - Si la base se creó antes con `db push`, primero: `npx prisma migrate resolve --applied 20261001000000_init`.
   - La migración `20261007120000_remove_legacy` se frena sola si `Bookings`, `Campaign` o `Product` tienen filas. En ese caso, exportalas y vaciá las tablas antes.
@@ -94,8 +94,7 @@
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | ✓ | ✓ | Clerk: producción en P y desarrollo en V |
 | `NEXT_PUBLIC_CLERK_SIGN_IN_URL`, `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | ✓ | ✓ | `/auth/sign-in`, `/auth/sign-up` |
 | `NEXT_PUBLIC_APP_URL` | ✓ |   | URL pública de producción (en Preview se usa la URL de la rama, `*-git-develop-*.vercel.app`, que conserva la sesión y sobrevive a cada deploy) |
-| `NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY` | ✓ | ✓ | Uploadcare, proyecto `brainance` → API keys → Public key (*Config*: no es secreta) |
-| `NEXT_PUBLIC_UPLOAD_CARE_CDN_URL` | ✓ | ✓ | Uploadcare → Delivery: el dominio propio del proyecto (`https://4gj75fw3od.ucarecd.net`) |
+| `BLOB_STORE_ID` o `BLOB_READ_WRITE_TOKEN` | ✓ | ✓ | Las carga Vercel al conectar el Blob store (ver "Vercel Blob" abajo). No se pegan a mano |
 | `AI_GATEWAY_API_KEY` |   |   | No hace falta en Vercel (OIDC). Solo en `.env.local` para el eval |
 | `RESEND_API_KEY`, `EMAIL_FROM` | ✓ | ✓ | Resend; `EMAIL_FROM` del dominio verificado |
 | `EMAIL_PROVIDER` |   | ✓ | `log` en V hasta conectar Resend (los emails van al log del deploy) |
@@ -111,14 +110,19 @@
 
 No cargar nunca `AI_ALLOW_MOCK_MODEL` ni `WIDGET_ALLOW_HTTP` en P.
 
-**Uploadcare:**
-- Proyecto `brainance`:
-  - guardado automático activado;
-  - subidas sin firma;
-  - solo imágenes, hasta 2 MB.
-- La cuenta está en una **prueba Pro hasta el 20/10**. Antes de esa fecha hay que revisar qué pasa sin tarjeta: si se agrega una, cobra Pro automáticamente.
+**Vercel Blob** (íconos del sitio y del bot, [ADR 0011](adr/0011-iconos-en-vercel-blob.md)):
 
-Estado al 2026-10-06: cargadas en V las de Neon, Clerk (desarrollo), Uploadcare y `EMAIL_PROVIDER`. P sigue sin variables hasta tener dominio, Clerk de producción y Resend.
+- [ ] Aplicar la migración `icon_uploads` con *Actions → Migrar base*, primero en `development` y después en `production` (ver el paso 1).
+- [ ] *Storage → Create Database → Blob.* Nombre: `brainance-iconos`. Si pregunta el acceso, **público**. Región: la más cercana a São Paulo que ofrezca.
+- [ ] *Connect Project →* `brainance-app`, con **Production**, **Preview** y **Development**, y el prefijo `BLOB`. Vercel carga `BLOB_STORE_ID`, `BLOB_READ_WRITE_TOKEN` o las dos; con cualquiera alcanza.
+- [ ] Borrar las variables de Uploadcare (`NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY`, `NEXT_PUBLIC_UPLOAD_CARE_CDN_URL`) y hacer un redeploy.
+- [ ] *Verificar:* en la configuración de un sitio de la preview, subir un ícono PNG. Aparece en la vista previa y, al guardar, en el chat. En *Storage → brainance-iconos → Browser* aparece el archivo en `icons/`.
+
+Es gratis en Hobby (1 GB y 2.000 subidas por mes). Si se pasa un límite, Vercel no cobra, pero bloquea Blob por 30 días. La app frena antes: 10 subidas por dueño por día y 300 en total cada 30 días. Si llega un aviso de Sentry "Icon uploads reached the monthly cap", revisá el uso en *Storage → brainance-iconos → Usage*.
+
+- [ ] **Uploadcare:** la cuenta está en una prueba Pro hasta el 20/10. **No cargues una tarjeta:** si se agrega una, cobra Pro. Cuando el paso anterior esté verificado, borrá el proyecto `brainance` y la cuenta.
+
+Estado al 2026-10-06: cargadas en V las de Neon, Clerk (desarrollo), Uploadcare (reemplazado por Vercel Blob desde el ADR 0011) y `EMAIL_PROVIDER`. P sigue sin variables hasta tener dominio, Clerk de producción y Resend.
 
 - [ ] *Verificar:* *Deployments →* un redeploy termina sin errores.
 
@@ -145,7 +149,7 @@ Usar una preview con las variables de V y un **sitio de prueba real con HTTPS** 
 
 - [ ] Registro con email; aparece el aviso de términos con enlaces. Registro con Google.
 - [ ] Onboarding: agregar el sitio del dominio de prueba; el dominio inválido se rechaza en español.
-- [ ] Configuración: negocio (descripción, trato, contacto), color, ícono (sube a Uploadcare), bienvenida y tres preguntas frecuentes; la vista previa cambia antes de guardar.
+- [ ] Configuración: negocio (descripción, trato, contacto), color, ícono (sube a Vercel Blob), bienvenida y tres preguntas frecuentes; la vista previa cambia antes de guardar.
 - [ ] Pegar el snippet en el sitio de prueba: aparece el chat y el onboarding marca "Instalado".
 - [ ] Conversar: el bot responde con el modelo real usando las FAQ y deriva al contacto ante algo desconocido; la conversación queda "Necesita atención".
   - 2026-10-06: el bot respondió bien, en unos 2 s, y derivó al WhatsApp. La conversación **no** quedó marcada porque el modelo reformuló el contacto.

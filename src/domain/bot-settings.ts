@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isHexColor } from "./color-contrast";
+import { isStoredIconUrl } from "./icon";
 
 // Rules for the bot settings forms (spec 004). Shared by the client forms and the server actions.
 
@@ -86,8 +87,8 @@ export const AppearanceSchema = z.object({
     .refine(isHexColor, "Ingresá un color en formato #RRGGBB.")
     .transform((value) => value.toUpperCase()),
   welcomeMessage: requiredText(LIMITS.welcomeMessage, "El mensaje de bienvenida"),
-  // Uploadcare file id; null shows the site's initial instead.
-  icon: z.string().uuid("El ícono no es válido.").nullable(),
+  // Public URL from onUploadIcon (ADR 0011); null shows the site's initial instead.
+  icon: z.string().refine(isStoredIconUrl, "El ícono no es válido.").nullable(),
 });
 
 export const FaqSchema = z.object({
