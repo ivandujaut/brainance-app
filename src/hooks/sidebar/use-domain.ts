@@ -27,28 +27,33 @@ export const useDomain = () => {
 
   const onAddDomain = handleSubmit(async (values) => {
     setLoading(true);
-    let icon = "";
-    if (values.image?.[0]) {
-      const form = new FormData();
-      form.append("file", values.image[0]);
-      const uploaded = await onUploadIcon(form);
-      if ("error" in uploaded) {
-        setLoading(false);
-        toast({ title: "No se pudo agregar", description: uploaded.error });
-        return;
+    try {
+      let icon = "";
+      if (values.image?.[0]) {
+        const form = new FormData();
+        form.append("file", values.image[0]);
+        const uploaded = await onUploadIcon(form);
+        if ("error" in uploaded) {
+          toast({ title: "No se pudo agregar", description: uploaded.error });
+          return;
+        }
+        icon = uploaded.url;
       }
-      icon = uploaded.url;
-    }
-    const domain = await onIntegrateDomain(values.domain, icon);
-    if (domain) {
-      reset();
-      setLoading(false);
-      toast({
-        title: domain.status === 200 ? "Listo" : "No se pudo agregar",
-        description: domain.message,
-      });
+      const domain = await onIntegrateDomain(values.domain, icon);
+      if (domain) {
+        reset();
+        toast({
+          title: domain.status === 200 ? "Listo" : "No se pudo agregar",
+          description: domain.message,
+        });
 
-      router.refresh();
+        router.refresh();
+      }
+    } catch {
+      toast({ title: "No se pudo agregar", description: "Revisá tu conexión y probá de nuevo." });
+    } finally {
+      // The form shows a spinner while loading: it must come back whatever happens.
+      setLoading(false);
     }
   });
 

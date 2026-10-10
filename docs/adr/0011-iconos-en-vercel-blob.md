@@ -30,12 +30,19 @@ La beta guarda dos imágenes chicas, el ícono del sitio en el menú y el ícono
   - exige sesión;
   - mira los primeros bytes del archivo para confirmar que es PNG o JPG, sin confiar en lo que dice el navegador;
   - rechaza más de 2 MB;
+  - cuenta la subida contra dos topes (tabla `IconUpload`): 10 por dueño en 24 horas y 300 entre todos en 30 días;
   - lo guarda con `put` en `icons/`, como público y con un sufijo al azar.
+- **Por qué los topes:** el registro es libre, y en Hobby pasarse de la cuota bloquea Blob 30 días para todos los sitios.
+  - Con 300 subidas de hasta 2 MB por mes, el peor caso queda en 600 MB y 300 operaciones, debajo de 1 GB y 2.000.
+  - Si se llega al tope general, nadie puede subir hasta que pasen días, pero los íconos ya guardados se siguen viendo. Llega un aviso a Sentry.
 
   El límite del cuerpo de las server actions sube de 1 a 3 MB (`next.config.mjs`) para que entre un archivo de 2 MB.
 - **`src/server/storage/icons.ts` expone `IconStore.save()`.** Cambiar de proveedor es escribir otro adaptador.
-- **La base guarda la URL pública del archivo.** Las acciones que guardan un ícono solo aceptan una URL de Vercel Blob dentro de `icons/`.
-- **Variable:** `BLOB_READ_WRITE_TOKEN`. Vercel la carga sola al conectar el store al proyecto. Se borran las dos de Uploadcare y el paquete `@uploadcare/upload-client`.
+- **La base guarda la URL pública del archivo.** Las acciones que guardan un ícono solo aceptan una URL del store del proyecto, dentro de `icons/`. Así no entra una imagen de otro store que se saltee los controles.
+- **Variables:** las carga Vercel al conectar el store al proyecto.
+  - `BLOB_STORE_ID`, que se usa con el token OIDC de Vercel, o `BLOB_READ_WRITE_TOKEN`.
+  - El SDK elige solo; el host del store sale de cualquiera de las dos.
+  - Se borran las dos variables de Uploadcare y el paquete `@uploadcare/upload-client`.
 - **Los íconos viejos** (ids de Uploadcare) dejan de mostrarse: el sitio muestra su inicial, como cuando no tiene ícono. Como son de cuentas de prueba, no se migran.
 
 ## Consecuencias
@@ -47,8 +54,9 @@ La beta guarda dos imágenes chicas, el ícono del sitio en el menú y el ícono
   - el almacenamiento para los archivos de WhatsApp queda resuelto.
 - **Lo que cuesta:**
   - **El bloqueo de 30 días en Hobby si se pasa un límite.** Con íconos de hasta 2 MB, 1 GB alcanza para unas 500 subidas; las imágenes se sirven optimizadas por Next, que las cachea. Si la beta crece, se pasa a Pro o se suma un tope de subidas por usuario.
-  - **Los íconos que se reemplazan quedan en el store.** Si el espacio empieza a pesar, se borran los que ninguna fila usa.
+  - **Archivos que ninguna fila usa:** quedan en el store los íconos que se reemplazan, y también el que se sube al agregar un sitio que después el servidor rechaza (ya agregado, o fuera del plan). Si el espacio empieza a pesar, se borran.
   - **Vercel queda con más peso como proveedor.** El adaptador mantiene la salida barata.
 - **Qué hay que hacer:**
-  - El dueño crea el Blob store en Vercel y lo conecta al proyecto ([lanzamiento](../lanzamiento.md), paso 6).
+  - El dueño aplica la migración `icon_uploads` a las dos bases con el workflow `migrate.yml`.
+  - Crea el Blob store en Vercel, público, y lo conecta al proyecto ([lanzamiento](../lanzamiento.md), paso 6).
   - Antes del 20/10, no carga una tarjeta en Uploadcare y borra el proyecto.

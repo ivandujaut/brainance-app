@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkIcon, iconSrc, isStoredIconUrl, MAX_ICON_BYTES } from "./icon";
+import { checkIcon, ICON_UPLOAD_LIMITS, iconSrc, iconUploadProblem, isStoredIconUrl, MAX_ICON_BYTES } from "./icon";
 
 const PNG = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 const JPEG = [0xff, 0xd8, 0xff, 0xe0];
@@ -49,6 +49,40 @@ describe("isStoredIconUrl", () => {
     ]) {
       expect(isStoredIconUrl(value), value).toBe(false);
     }
+  });
+});
+
+describe("isStoredIconUrl with the project's store", () => {
+  it("accepts only that store's host, in any case", () => {
+    expect(isStoredIconUrl(STORED, "abc123xyz.public.blob.vercel-storage.com")).toBe(true);
+    expect(isStoredIconUrl(STORED, "ABC123XYZ.public.blob.vercel-storage.com")).toBe(true);
+    expect(isStoredIconUrl(STORED, "otro999.public.blob.vercel-storage.com")).toBe(false);
+  });
+});
+
+describe("iconUploadProblem", () => {
+  it("lets an owner upload up to the daily limit", () => {
+    expect(iconUploadProblem({ ownerToday: 0, allThisMonth: 0 })).toBeNull();
+    expect(iconUploadProblem({ ownerToday: ICON_UPLOAD_LIMITS.perOwnerPerDay - 1, allThisMonth: 0 })).toBeNull();
+  });
+
+  it("stops an owner at the daily limit", () => {
+    expect(iconUploadProblem({ ownerToday: ICON_UPLOAD_LIMITS.perOwnerPerDay, allThisMonth: 0 })).toEqual({
+      scope: "owner",
+      message: "Llegaste al máximo de íconos que se pueden subir por día. Probá mañana.",
+    });
+  });
+
+  it("stops everyone before the store reaches its monthly quota", () => {
+    expect(iconUploadProblem({ ownerToday: 0, allThisMonth: ICON_UPLOAD_LIMITS.allPerMonth })).toEqual({
+      scope: "all",
+      message: "No podemos subir más íconos por ahora. Probá en unos días.",
+    });
+  });
+
+  it("keeps the worst case under the Hobby plan: 1 GB stored and 2,000 uploads a month (ADR 0011)", () => {
+    expect(ICON_UPLOAD_LIMITS.allPerMonth * MAX_ICON_BYTES).toBeLessThan(1024 ** 3);
+    expect(ICON_UPLOAD_LIMITS.allPerMonth).toBeLessThan(2000);
   });
 });
 

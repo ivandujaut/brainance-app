@@ -19,15 +19,35 @@ export const checkIcon = (bytes: Uint8Array): { ok: true; type: IconType } | { o
 
 const STORE_HOST = /^[a-z0-9]+\.public\.blob\.vercel-storage\.com$/i;
 
-/** A URL our upload produced: a public Vercel Blob file under icons/. */
-export const isStoredIconUrl = (value: string) => {
+/**
+ * A public Vercel Blob file under icons/. Pass the project's store host to accept only files our upload
+ * produced (the server does); without it, any store passes (enough for showing an icon or a form check).
+ */
+export const isStoredIconUrl = (value: string, storeHost?: string) => {
   let url: URL;
   try {
     url = new URL(value);
   } catch {
     return false;
   }
-  return url.protocol === "https:" && STORE_HOST.test(url.hostname) && url.pathname.startsWith("/icons/");
+  const host = storeHost ? url.hostname === storeHost.toLowerCase() : STORE_HOST.test(url.hostname);
+  return url.protocol === "https:" && host && url.pathname.startsWith("/icons/");
+};
+
+/**
+ * Upload caps (ADR 0011). On the Hobby plan, going over the Blob quota locks the store for 30 days, for
+ * every site: the monthly cap keeps the worst case under 1 GB and 2,000 uploads.
+ */
+export const ICON_UPLOAD_LIMITS = { perOwnerPerDay: 10, allPerMonth: 300 };
+
+export const iconUploadProblem = ({ ownerToday, allThisMonth }: { ownerToday: number; allThisMonth: number }) => {
+  if (allThisMonth >= ICON_UPLOAD_LIMITS.allPerMonth) {
+    return { scope: "all" as const, message: "No podemos subir más íconos por ahora. Probá en unos días." };
+  }
+  if (ownerToday >= ICON_UPLOAD_LIMITS.perOwnerPerDay) {
+    return { scope: "owner" as const, message: "Llegaste al máximo de íconos que se pueden subir por día. Probá mañana." };
+  }
+  return null;
 };
 
 /** The icon to show, or null for the site's initial (also for Uploadcare ids saved before ADR 0011). */

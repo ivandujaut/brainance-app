@@ -1,6 +1,6 @@
 "use client";
 import { Check } from "lucide-react";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import { onUpdateAppearance } from "@/actions/settings/bot";
 import { onUploadIcon } from "@/actions/settings/icon";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { useActionToast } from "@/hooks/use-action-toast";
 
 export type Look = { background: string; welcomeMessage: string; icon: string | null };
 
-type Props = { siteId: string; look: Look; onChange: (look: Look) => void; addressing: Addressing };
+type Props = { siteId: string; look: Look; onChange: Dispatch<SetStateAction<Look>>; addressing: Addressing };
 type Errors = Partial<Record<keyof Look, string>>;
 
 export const AppearanceForm = ({ siteId, look, onChange, addressing }: Props) => {
@@ -25,7 +25,8 @@ export const AppearanceForm = ({ siteId, look, onChange, addressing }: Props) =>
   const [errors, setErrors] = useState<Errors>({});
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const set = (patch: Partial<Look>) => onChange({ ...look, ...patch });
+  // From the latest look: an upload that finishes later must not undo what was edited meanwhile.
+  const set = (patch: Partial<Look>) => onChange((current) => ({ ...current, ...patch }));
 
   const validColor = isHexColor(look.background);
   const textColor = validColor ? readableTextColor(look.background) : null;

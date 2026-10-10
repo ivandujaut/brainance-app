@@ -21,7 +21,7 @@
 - [x] *GitHub → Settings → Secrets and variables → Actions:* cargar las cadenas **directas**:
   - `NEON_DIRECT_URL`: branch `production`.
   - `NEON_DEV_DIRECT_URL`: branch `development`.
-- [x] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. Se repite con cada migración nueva (última: 2026-10-08, `rate_limit_hits` de la spec 015). El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
+- [x] Aplicar las migraciones: *Actions → Migrar base → Run workflow*, primero con `development` y después con `production`. Se repite con cada migración nueva (última: 2026-10-10, `icon_uploads` del ADR 0011). El workflow (`.github/workflows/migrate.yml`) rechaza una cadena con pooler y oculta el host en el log.
   - Alternativa desde tu máquina: `DIRECT_URL="<directa>" npx prisma migrate deploy`.
   - Si la base se creó antes con `db push`, primero: `npx prisma migrate resolve --applied 20261001000000_init`.
   - La migración `20261007120000_remove_legacy` se frena sola si `Bookings`, `Campaign` o `Product` tienen filas. En ese caso, exportalas y vaciá las tablas antes.
@@ -94,7 +94,7 @@
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | ✓ | ✓ | Clerk: producción en P y desarrollo en V |
 | `NEXT_PUBLIC_CLERK_SIGN_IN_URL`, `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | ✓ | ✓ | `/auth/sign-in`, `/auth/sign-up` |
 | `NEXT_PUBLIC_APP_URL` | ✓ |   | URL pública de producción (en Preview se usa la URL de la rama, `*-git-develop-*.vercel.app`, que conserva la sesión y sobrevive a cada deploy) |
-| `BLOB_READ_WRITE_TOKEN` | ✓ | ✓ | La carga Vercel al conectar el Blob store (ver "Vercel Blob" abajo). No se pega a mano |
+| `BLOB_STORE_ID` o `BLOB_READ_WRITE_TOKEN` | ✓ | ✓ | Las carga Vercel al conectar el Blob store (ver "Vercel Blob" abajo). No se pegan a mano |
 | `AI_GATEWAY_API_KEY` |   |   | No hace falta en Vercel (OIDC). Solo en `.env.local` para el eval |
 | `RESEND_API_KEY`, `EMAIL_FROM` | ✓ | ✓ | Resend; `EMAIL_FROM` del dominio verificado |
 | `EMAIL_PROVIDER` |   | ✓ | `log` en V hasta conectar Resend (los emails van al log del deploy) |
@@ -112,14 +112,15 @@ No cargar nunca `AI_ALLOW_MOCK_MODEL` ni `WIDGET_ALLOW_HTTP` en P.
 
 **Vercel Blob** (íconos del sitio y del bot, [ADR 0011](adr/0011-iconos-en-vercel-blob.md)):
 
-1. *Storage → Create Database → Blob.* Nombre: `brainance-iconos`. Región: la más cercana a São Paulo que ofrezca.
-2. *Connect Project →* `brainance-app`, con **Production**, **Preview** y **Development**. El prefijo de la variable queda en `BLOB`, así se llama `BLOB_READ_WRITE_TOKEN`.
-3. Borrar las variables de Uploadcare (`NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY`, `NEXT_PUBLIC_UPLOAD_CARE_CDN_URL`) y hacer un redeploy.
-4. *Verificar:* en la configuración de un sitio de la preview, subir un ícono PNG. Aparece en la vista previa y, al guardar, en el chat. En *Storage → brainance-iconos → Browser* aparece el archivo en `icons/`.
+- [ ] Aplicar la migración `icon_uploads` con *Actions → Migrar base*, primero en `development` y después en `production` (ver el paso 1).
+- [ ] *Storage → Create Database → Blob.* Nombre: `brainance-iconos`. Si pregunta el acceso, **público**. Región: la más cercana a São Paulo que ofrezca.
+- [ ] *Connect Project →* `brainance-app`, con **Production**, **Preview** y **Development**, y el prefijo `BLOB`. Vercel carga `BLOB_STORE_ID`, `BLOB_READ_WRITE_TOKEN` o las dos; con cualquiera alcanza.
+- [ ] Borrar las variables de Uploadcare (`NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY`, `NEXT_PUBLIC_UPLOAD_CARE_CDN_URL`) y hacer un redeploy.
+- [ ] *Verificar:* en la configuración de un sitio de la preview, subir un ícono PNG. Aparece en la vista previa y, al guardar, en el chat. En *Storage → brainance-iconos → Browser* aparece el archivo en `icons/`.
 
-Es gratis en Hobby (1 GB y 2.000 subidas por mes). Si se pasa un límite, Vercel no cobra, pero bloquea Blob por 30 días: revisá el uso en *Storage → brainance-iconos → Usage*.
+Es gratis en Hobby (1 GB y 2.000 subidas por mes). Si se pasa un límite, Vercel no cobra, pero bloquea Blob por 30 días. La app frena antes: 10 subidas por dueño por día y 300 en total cada 30 días. Si llega un aviso de Sentry "Icon uploads reached the monthly cap", revisá el uso en *Storage → brainance-iconos → Usage*.
 
-**Uploadcare:** la cuenta está en una prueba Pro hasta el 20/10. **No cargues una tarjeta:** si se agrega una, cobra Pro. Cuando el paso anterior esté verificado, borrá el proyecto `brainance` y la cuenta.
+- [ ] **Uploadcare:** la cuenta está en una prueba Pro hasta el 20/10. **No cargues una tarjeta:** si se agrega una, cobra Pro. Cuando el paso anterior esté verificado, borrá el proyecto `brainance` y la cuenta.
 
 Estado al 2026-10-06: cargadas en V las de Neon, Clerk (desarrollo), Uploadcare (reemplazado por Vercel Blob desde el ADR 0011) y `EMAIL_PROVIDER`. P sigue sin variables hasta tener dominio, Clerk de producción y Resend.
 

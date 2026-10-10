@@ -236,3 +236,14 @@ model RateLimitHit {
   @@index([domainId, kind, createdAt])
   @@index([createdAt])
 }
+
+// ADR 0011: one row per icon upload, to cap uploads per owner and per month before the Blob quota
+// locks the store. Keyed by the Clerk id because the first icon is uploaded before its site exists.
+model IconUpload {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  clerkId   String
+
+  @@index([clerkId, createdAt])
+  @@index([createdAt])
+}
