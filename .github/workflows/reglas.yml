@@ -31,3 +31,22 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: node scripts/checks/no-ai-attribution.mjs --env PR_BODY
+
+  direccion:
+    name: Dirección entre líneas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # whatsapp-os never goes into develop or main (ADR 0100), not even through a branch made from it.
+      - name: La línea de WhatsApp no entra en develop ni en main
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/checks/check-pr-direction.mjs
