@@ -1,6 +1,6 @@
 # 0011 — Íconos en Vercel Blob, en lugar de Uploadcare
 
-- **Estado:** Propuesto
+- **Estado:** Aceptado
 - **Fecha:** 2026-10-10
 
 ## Contexto

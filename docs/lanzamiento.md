@@ -112,11 +112,14 @@ No cargar nunca `AI_ALLOW_MOCK_MODEL` ni `WIDGET_ALLOW_HTTP` en P.
 
 **Vercel Blob** (íconos del sitio y del bot, [ADR 0011](adr/0011-iconos-en-vercel-blob.md)):
 
-- [ ] Aplicar la migración `icon_uploads` con *Actions → Migrar base*, primero en `development` y después en `production` (ver el paso 1).
-- [ ] *Storage → Create Database → Blob.* Nombre: `brainance-iconos`. Si pregunta el acceso, **público**. Región: la más cercana a São Paulo que ofrezca.
-- [ ] *Connect Project →* `brainance-app`, con **Production**, **Preview** y **Development**, y el prefijo `BLOB`. Vercel carga `BLOB_STORE_ID`, `BLOB_READ_WRITE_TOKEN` o las dos; con cualquiera alcanza.
-- [ ] Borrar las variables de Uploadcare (`NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY`, `NEXT_PUBLIC_UPLOAD_CARE_CDN_URL`) y hacer un redeploy.
-- [ ] *Verificar:* en la configuración de un sitio de la preview, subir un ícono PNG. Aparece en la vista previa y, al guardar, en el chat. En *Storage → brainance-iconos → Browser* aparece el archivo en `icons/`.
+- [x] Aplicar la migración `icon_uploads` con *Actions → Migrar base*, primero en `development` y después en `production` (ver el paso 1).
+- [x] *Storage → Create Database → Blob.* Nombre: `brainance-iconos`. Si pregunta el acceso, **público**. Región: la más cercana a São Paulo que ofrezca.
+- [x] *Connect Project →* `brainance-app`, con **Production**, **Preview** y **Development**, y el prefijo `BLOB`. Vercel carga `BLOB_STORE_ID`, `BLOB_READ_WRITE_TOKEN` o las dos; con cualquiera alcanza.
+  - 2026-10-10: se conectó con OIDC. Cargó `BLOB_STORE_ID` y `BLOB_WEBHOOK_PUBLIC_KEY` (no se usa), sin `BLOB_READ_WRITE_TOKEN`, en Production y Preview.
+- [x] Borrar las variables de Uploadcare (`NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY`, `NEXT_PUBLIC_UPLOAD_CARE_CDN_URL`) y hacer un redeploy.
+- [x] *Verificar:* en la configuración de un sitio de la preview, subir un ícono PNG. Aparece en la vista previa y, al guardar, en el chat. En *Storage → brainance-iconos → Browser* aparece el archivo en `icons/`.
+  - El ícono está en *Configuración del sitio* (clic en el sitio, bajo "SITIOS") → *Apariencia*, no en *Cuenta*.
+  - 2026-10-10: verificado en la preview de `develop`. Producción lo toma cuando `develop` se mergee en `main`: hasta entonces no se redeploya.
 
 Es gratis en Hobby (1 GB y 2.000 subidas por mes). Si se pasa un límite, Vercel no cobra, pero bloquea Blob por 30 días. La app frena antes: 10 subidas por dueño por día y 300 en total cada 30 días. Si llega un aviso de Sentry "Icon uploads reached the monthly cap", revisá el uso en *Storage → brainance-iconos → Usage*.
 
