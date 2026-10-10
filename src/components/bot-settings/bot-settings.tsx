@@ -5,6 +5,7 @@ import type { SiteSettings, SiteUsage } from "@/actions/settings/bot";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { defaultWelcome, WIDGET_DEFAULT_COLOR, type Addressing } from "@/domain/bot-settings";
+import { iconSrc } from "@/domain/icon";
 import { AppearanceForm, type Look } from "./appearance-form";
 import { BusinessForm } from "./business-form";
 import { FaqSection } from "./faq-section";
@@ -33,7 +34,8 @@ export const BotSettings = ({ settings, usage }: { settings: SiteSettings; usage
   const [look, setLook] = useState<Look>({
     background: bot?.background || WIDGET_DEFAULT_COLOR,
     welcomeMessage: bot?.welcomeMessage || defaultWelcome(addressing),
-    icon: bot?.icon || null,
+    // Uploadcare ids saved before ADR 0011 become no icon, so the form still saves.
+    icon: iconSrc(bot?.icon),
   });
   const preview = <Preview siteId={settings.id} name={settings.name} look={look} addressing={addressing} />;
 

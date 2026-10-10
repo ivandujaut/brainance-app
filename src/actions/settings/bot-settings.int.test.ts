@@ -89,7 +89,7 @@ describe.skipIf(!url)("bot settings actions", async () => {
   });
 
   it("onUpdateAppearance: saves color, icon and welcome message", async () => {
-    const icon = "8d3c1f9e-0a6b-4a8e-9c1a-2f7f6b0e5d41";
+    const icon = "https://abc123xyz.public.blob.vercel-storage.com/icons/icon-Xy9aBc.png"; // ADR 0011
     const result = await bot.onUpdateAppearance(siteId, { background: "#123456", welcomeMessage: "¡Buen día!", icon });
     expect(result.status).toBe(200);
     expect(toPublicConfig(await widgetSite())).toMatchObject({

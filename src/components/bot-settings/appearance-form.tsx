@@ -1,8 +1,8 @@
 "use client";
-import { UploadClient } from "@uploadcare/upload-client";
 import { Check } from "lucide-react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { onUpdateAppearance } from "@/actions/settings/bot";
+import { onUploadIcon } from "@/actions/settings/icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,10 +41,15 @@ export const AppearanceForm = ({ siteId, look, onChange, addressing }: Props) =>
     }
     setUploading(true);
     try {
-      const upload = new UploadClient({ publicKey: process.env.NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY as string });
-      const uploaded = await upload.uploadFile(file);
+      const form = new FormData();
+      form.append("file", file);
+      const result = await onUploadIcon(form);
+      if ("error" in result) {
+        setErrors((e) => ({ ...e, icon: result.error }));
+        return;
+      }
       setErrors((e) => ({ ...e, icon: undefined }));
-      set({ icon: uploaded.uuid });
+      set({ icon: result.url });
     } catch {
       setErrors((e) => ({ ...e, icon: "No pudimos subir la imagen. Probá de nuevo." }));
     } finally {

@@ -58,11 +58,13 @@ describe("AppearanceSchema", () => {
     expect(AppearanceSchema.safeParse({ ...valid, welcomeMessage: "a".repeat(301) }).success).toBe(false);
   });
 
-  it("accepts an uploaded icon id or no icon", () => {
-    expect(AppearanceSchema.parse({ ...valid, icon: "8d3c1f9e-0a6b-4a8e-9c1a-2f7f6b0e5d41" }).icon).toBe(
-      "8d3c1f9e-0a6b-4a8e-9c1a-2f7f6b0e5d41",
-    );
-    expect(AppearanceSchema.safeParse({ ...valid, icon: "../otro" }).success).toBe(false);
+  it("accepts an uploaded icon URL or no icon (ADR 0011)", () => {
+    const icon = "https://abc123xyz.public.blob.vercel-storage.com/icons/icon-Xy9aBc.png";
+    expect(AppearanceSchema.parse({ ...valid, icon }).icon).toBe(icon);
+    expect(AppearanceSchema.parse({ ...valid, icon: null }).icon).toBeNull();
+    for (const other of ["../otro", "https://evil.example.com/icons/x.png", "8d3c1f9e-0a6b-4a8e-9c1a-2f7f6b0e5d41"]) {
+      expect(AppearanceSchema.safeParse({ ...valid, icon: other }).success).toBe(false);
+    }
   });
 
   it("suggests only valid colors", () => {
