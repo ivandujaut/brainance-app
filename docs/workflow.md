@@ -50,6 +50,7 @@ Ciclo: escribir el test → verlo fallar → implementar lo mínimo → refactor
 
 ## 7. Merge y deploy
 
+- **Por ahora, todo el trabajo sale de `whatsapp-os` y vuelve ahí;** `develop` y `main` están quietas (ver `AGENTS.md` y el ADR 0100).
 - `develop` → integración continua y preview estable.
 - `main` → producción. Las migraciones de Prisma corren en el pipeline de deploy (`prisma migrate deploy`).
 
