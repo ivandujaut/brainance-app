@@ -17,7 +17,7 @@ Cómo se trabaja, por ahora:
 - **`whatsapp-os` es la rama por defecto del repo.** El botón "Compare & pull request" de GitHub, `gh pr create` y los botones para abrir un PR de las herramientas la proponen como base. Si alguno propone `develop` o `main`, no es para esta línea: se cierra sin mergear.
 - **Nunca al revés:** nada de `whatsapp-os` entra en `develop` ni en `main`, tampoco una rama que salió de `whatsapp-os`.
   - La rama `whatsapp-os` no se borra ni se reescribe: la protege un ruleset de GitHub.
-  - El workflow "Reglas del repo" marca esos PRs en rojo (ver "Controles"). Todavía no es un chequeo obligatorio: GitHub deja mergearlos igual, y no hay que hacerlo.
+  - El workflow "Reglas del repo" marca esos PRs en rojo, y el ruleset `develop y main` de GitHub no deja mergearlos (ver "Controles").
 - **Un arreglo urgente de la beta web,** solo si el dueño lo pide: sale de `develop`, su PR vuelve a `develop` y después se trae a `whatsapp-os` con un PR de merge. El tag `beta-web` marca el último estado de la beta web antes de que entrara la línea WhatsApp.
 
 ## Antes de escribir código
@@ -87,7 +87,14 @@ No dependen de la herramienta: corren en git y en GitHub ([ADR 0010](docs/adr/00
   - que los commits y la descripción no tengan atribución a una IA;
   - que no lleve nada de `whatsapp-os` a `develop` ni a `main`, ni directo ni con una rama que salió de ahí.
 
-  Los dos chequeos todavía no son obligatorios en GitHub: un PR en rojo se puede mergear igual, y el merge no espera a que terminen. Para que frenen de verdad hace falta una regla de rama que los exija.
+  Qué exige GitHub en cada rama:
+
+  - **`develop` y `main`** (ruleset `develop y main`):
+    - todo cambio entra por PR, sin aprobaciones, porque el dueño trabaja solo;
+    - no se mergea sin estos dos chequeos y el CI (`Lint, typecheck, tests, build`) en verde;
+    - el merge espera a que terminen;
+    - nadie puede saltearlos: no hay excepciones.
+  - **`whatsapp-os`** (ruleset `whatsapp-os`): solo impide borrar la rama o reescribir su historia. Ahí los chequeos todavía son un aviso.
 - **Los chequeos viven en `scripts/checks/`,** con sus tests. Un control nuevo se agrega ahí y se llama desde el hook, el CI y los adaptadores de cada herramienta, sin duplicar la lógica.
 
 ## Procedimientos
