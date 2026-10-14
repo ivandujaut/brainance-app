@@ -99,6 +99,7 @@ Los procedimientos repetibles están en `.claude/skills/<nombre>/SKILL.md`, en e
 | `abrir-pr` | Un cambio listo para revisión |
 | `prompt-qa` | Después del merge, para el QA con un agente de navegador |
 | `correr-eval` | Después de cambiar un prompt o un modelo de IA |
+| `diagramas` | Un diagrama de arquitectura, de un recorrido, de estados o del modelo de datos en un documento |
 
 Para revisar un diff antes de abrir el PR: [`docs/agentes/revision.md`](docs/agentes/revision.md). En Claude Code la aplica el subagente `revisor` (`.claude/agents/revisor.md`).
 
