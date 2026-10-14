@@ -26,7 +26,7 @@ Cómo está armado el trabajo con agentes de IA en este repo, para que cambiar d
 | [`e2e/AGENTS.md`](../../e2e/AGENTS.md) | Cómo correr y escribir los E2E |
 | [`docs/agentes/entorno.md`](entorno.md) | Postgres, navegador, Next.js, GitHub desde la nube |
 | [`docs/agentes/revision.md`](revision.md) | Qué revisar en un diff: lo que bloquea y lo que conviene arreglar |
-| [`.claude/skills/`](../../.claude/skills/) | Procedimientos en formato Agent Skills: `nueva-spec`, `nuevo-adr`, `abrir-pr`, `prompt-qa`, `correr-eval` |
+| [`.claude/skills/`](../../.claude/skills/) | Procedimientos en formato Agent Skills: `nueva-spec`, `nuevo-adr`, `abrir-pr`, `prompt-qa`, `correr-eval`, `diagramas` |
 | [`.claude/agents/revisor.md`](../../.claude/agents/revisor.md) | Subagente de Claude Code que aplica `revision.md` |
 | [`docs/agentes/otras-herramientas.md`](otras-herramientas.md) | Qué lee cada herramienta de IA y cómo conectarla |
 | [`CLAUDE.md`](../../CLAUDE.md) | Adaptador de Claude Code: importa `AGENTS.md` y suma lo propio |
