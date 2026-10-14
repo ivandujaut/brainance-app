@@ -79,13 +79,14 @@ Cada criterio se convierte en al menos un test. Los criterios 9 y 10 se verifica
 - **Runner** (`evals/rag-answers/run-eval.mjs`):
   - importa `detectAttention` de `src/domain/attention.ts` y lo aplica en `runCase` con `business.contact`;
   - guarda `detector` en la fila;
+  - `src/domain/attention.ts` pasa a formar parte del harness (`_state.json`): cambiar el detector obliga a revisar y volver a correr el eval;
   - cambiar el runner cambia el harness, así que la primera corrida lleva **Aprobar el harness**.
 - **Resumen** (`src/domain/eval-summary.ts`):
   - `EvalRow` suma `detector?: string | null` y `meta.expected.behavior` (ya está en las filas).
   - `summarizeEval` calcula `detector: { shouldDerive, counted, shouldNotDerive, falseAlarms } | null`, que es null si ninguna fila tiene el campo.
   - `EvalSummarySchema` lo suma como opcional, para leer el archivo publicado hoy (criterio 7).
   - `meetsPublishThreshold` suma el umbral del criterio 8 sobre `byType`.
-- **`summarize.mjs`:** imprime cobertura y falsas alarmas, y la lista del criterio 4.
+- **`summarize.mjs`:** imprime cobertura y falsas alarmas, y la lista del criterio 4. Se corre con `npm run eval:summary` (con `tsx`), para reusar el cálculo de `src/domain/eval-summary.ts` en vez de duplicarlo; el workflow del eval lo usa igual.
 - **Prompt** (`src/domain/answer-prompt.ts`): dos reglas nuevas en "Cómo responder", con su test en `answer-prompt.test.ts`. El texto exacto se ajusta con el piloto del eval antes de la corrida completa.
 - **Casos** (`evals/rag-answers/cases.json`): seis casos nuevos, uno o dos por negocio, con `behavior: "abstain"` y `must_not` con la negativa inventada. `npm run eval:rag:cases` valida el set y regenera `cases.md`.
 - **Corridas:** cada corrida completa cuesta unos US$ 2 a 4 y se lanza desde *Actions → Correr eval de respuestas*. Se espera una para medir y, si hace falta, una o dos más para ajustar. El resultado se publica con el PR que abre el workflow.
