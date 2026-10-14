@@ -32,8 +32,15 @@ Se elige la opción 3.
 - **La numeración.** Para no chocar con `develop`, las specs de esta línea se numeran desde 100 y los ADR desde 0100.
 - **Los arreglos compartidos.** Lo que sirve a las dos líneas se arregla en `develop` y se trae a `whatsapp-os` con merge. Nunca al revés, hasta que se decida cuál es la línea principal.
   - El PR #65 (10 de octubre) llevó `whatsapp-os` a `develop` cuando la línea solo tenía documentación, y la rama se borró después del merge. Se recreó en ese mismo punto.
-  - Desde entonces, el workflow "Reglas del repo" frena cualquier PR que lleve commits de `whatsapp-os` a `develop` o a `main` (`scripts/checks/pr-direction.mjs`).
+  - Desde entonces, el workflow "Reglas del repo" marca en rojo cualquier PR que lleve commits de `whatsapp-os` a `develop` o a `main` (`scripts/checks/pr-direction.mjs`). No es un chequeo obligatorio: avisa, pero no frena el merge.
   - **13 de octubre de 2026:** por decisión del dueño, por ahora todo el trabajo sale de `whatsapp-os`, también lo que serviría a las dos líneas. `develop` y `main` quedan quietas con la beta web. El último merge de `develop` a `whatsapp-os` es el PR #73, que trae los PRs #69 y #70 (íconos en Vercel Blob, ADR 0011). Esto todavía no convierte a `whatsapp-os` en la línea principal: eso sigue esperando a la prueba a mano y a un ADR que reemplace a este.
+  - **14 de octubre de 2026:**
+    - **Qué pasó.** El PR #80 llevó a `develop` una rama que había salido de `whatsapp-os`, y con ella toda la línea: 15 commits. GitHub había propuesto ese PR con base `develop` porque era la rama por defecto del repo.
+    - **Por qué no lo frenó el control.** El PR se mergeó antes de que terminara el chequeo de dirección, que de todos modos no era obligatorio.
+    - **El #76.** GitHub lo marcó como mergeado solo, porque sus commits ya estaban en `develop`: era el PR que llevaba `whatsapp-os` a `develop`.
+    - **El efecto.** Ninguno en la beta web: la línea solo tenía documentación y herramientas, y las dos ramas quedaron con el mismo contenido. El tag `beta-web` (`b870d23`) marca el último estado de `develop` antes del #80.
+    - **Qué cambió desde ese día.** La rama por defecto del repo es `whatsapp-os`, y el #81, que repetía el #76, se cerró sin mergear.
+    - **Cuándo sí hace falta llevar `whatsapp-os` a `develop`.** Una sola vez, si la línea pasa a ser el producto, con el ADR que reemplace a este. Quizás ni eso, si la línea publica desde su propio proyecto de Vercel (ADR 0102).
 - **Qué canal va primero.** Primero el del dueño con el sistema, en un número propio. El de los clientes con el negocio, en el número del taller, queda para cuando el primero esté validado. Un bot que le contesta mal a un cliente que llegó por recomendación puede costarle ese cliente al taller.
 - **Antes de escribir código**, se hace la [prueba a mano](../whatsapp-os/prueba-a-mano.md) de dos semanas con el taller.
 - **La base de datos.** Cuando esta línea cambie `prisma/schema.prisma`, va a tener su propia rama de Neon y sus propias variables en Vercel, para no romper la base de `develop` ni sus previews.
