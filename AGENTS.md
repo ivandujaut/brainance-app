@@ -94,7 +94,12 @@ No dependen de la herramienta: corren en git y en GitHub ([ADR 0010](docs/adr/00
     - no se mergea sin estos dos chequeos y el CI (`Lint, typecheck, tests, build`) en verde;
     - el merge espera a que terminen;
     - nadie puede saltearlos: no hay excepciones.
-  - **`whatsapp-os`** (ruleset `whatsapp-os`): solo impide borrar la rama o reescribir su historia. Ahí los chequeos todavía son un aviso.
+  - **`whatsapp-os`** (ruleset `whatsapp-os`):
+    - no se puede borrar ni reescribir;
+    - todo cambio entra por PR, sin aprobaciones;
+    - no se mergea sin `Sin atribución a una IA` y el CI en verde, sin excepciones.
+
+    `Dirección entre líneas` no hace falta ahí: un PR contra `whatsapp-os` siempre lo pasa.
 - **Los chequeos viven en `scripts/checks/`,** con sus tests. Un control nuevo se agrega ahí y se llama desde el hook, el CI y los adaptadores de cada herramienta, sin duplicar la lógica.
 
 ## Procedimientos

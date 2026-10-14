@@ -43,6 +43,7 @@ Se elige la opción 3.
       - La rama por defecto del repo es `whatsapp-os`.
       - El #81, que repetía el #76, se cerró sin mergear.
       - El ruleset `develop y main` de GitHub exige un PR y los chequeos de dirección, de atribución y de CI antes de mergear en esas ramas. El merge espera a que terminen, y no hay excepciones.
+      - El ruleset `whatsapp-os` también exige un PR, el chequeo de atribución y el CI. Antes solo impedía borrar la rama o reescribirla.
     - **Cuándo sí hace falta llevar `whatsapp-os` a `develop`.** Una sola vez, si la línea pasa a ser el producto, con el ADR que reemplace a este. Quizás ni eso, si la línea publica desde su propio proyecto de Vercel (ADR 0102).
 - **Qué canal va primero.** Primero el del dueño con el sistema, en un número propio. El de los clientes con el negocio, en el número del taller, queda para cuando el primero esté validado. Un bot que le contesta mal a un cliente que llegó por recomendación puede costarle ese cliente al taller.
 - **Antes de escribir código**, se hace la [prueba a mano](../whatsapp-os/prueba-a-mano.md) de dos semanas con el taller.
