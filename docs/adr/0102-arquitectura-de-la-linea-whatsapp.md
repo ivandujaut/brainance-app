@@ -182,6 +182,6 @@ flowchart TD
 
 **Lo que sigue:**
 
-1. Probar el webhook con el número de prueba de Meta. No necesita al taller.
+1. Probar el webhook con el número de prueba de Meta ([guía](../whatsapp-os/prueba-webhook-meta.md)). No necesita al taller.
 2. Armar vacíos los evals de transcripción, extracción y fotos, para cargar los casos apenas haya material con consentimiento.
 3. Con la prueba a mano validada, escribir la spec 100.

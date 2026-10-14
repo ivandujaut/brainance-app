@@ -60,3 +60,6 @@ next-env.d.ts
 # Personal agent settings (ADR 0010)
 .claude/settings.local.json
 CLAUDE.local.md
+
+# Raw webhook captures from the Meta test (docs/whatsapp-os/prueba-webhook-meta.md)
+/capturas-meta/
