@@ -15,6 +15,7 @@ import {
 } from "@/domain/bot-settings";
 import { client } from "@/lib/prisma";
 import { countSiteAnswersSince } from "@/server/conversations";
+import { isOwnIconUrl } from "@/server/storage/icons";
 import { findOwnedFaq, findOwnedFilterQuestion, findOwnedSite } from "@/server/tenancy";
 import { captureError } from "@/server/observability";
 
@@ -26,6 +27,7 @@ export type ActionResult = { status: 200 | 400 | 404 | 500; message: string };
 const NOT_FOUND: ActionResult = { status: 404, message: "No encontramos ese sitio." };
 const QUESTION_NOT_FOUND: ActionResult = { status: 404, message: "No encontramos esa pregunta." };
 const FAILED: ActionResult = { status: 500, message: "No pudimos guardar los cambios. Probá de nuevo." };
+const INVALID_ICON: ActionResult = { status: 400, message: "El ícono no es válido. Subilo de nuevo." };
 
 const firstError = (error: z.ZodError): ActionResult => ({
   status: 400,
@@ -113,6 +115,8 @@ export const onUpdateAppearance = async (id: string, input: unknown) => {
   if (!site) return NOT_FOUND;
   const parsed = AppearanceSchema.safeParse(input);
   if (!parsed.success) return firstError(parsed.error);
+  // The schema takes any Blob URL so the form can check it; only the project's store gets saved (ADR 0011).
+  if (parsed.data.icon && !isOwnIconUrl(parsed.data.icon)) return INVALID_ICON;
   return attempt(site.id, () => saveBot(site.id, parsed.data), "Apariencia guardada");
 };
 

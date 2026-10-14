@@ -4,6 +4,7 @@ import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { canAddDomain, domainLimitFor } from "@/domain/plans";
 import { defaultWelcome } from "@/domain/bot-settings";
 import { isValidDomain } from "@/domain/domains";
+import { isOwnIconUrl } from "@/server/storage/icons";
 import { findOwnedSite } from "@/server/tenancy";
 import { captureError } from "@/server/observability";
 
@@ -14,6 +15,8 @@ export const onIntegrateDomain = async (domain: string, icon: string) => {
   if (!isValidDomain(name)) {
     return { status: 400, message: "El dominio no es válido. Ingresá algo como minegocio.com.ar" };
   }
+  // Empty means no icon; anything else must come from onUploadIcon (ADR 0011).
+  if (icon && !isOwnIconUrl(icon)) return { status: 400, message: "El ícono no es válido. Subilo de nuevo." };
   try {
     const account = await client.user.findUnique({
       where: { clerkId: user.id },

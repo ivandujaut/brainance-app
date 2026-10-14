@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type
 import { MAX_MESSAGE_LENGTH } from "@/domain/widget-limits";
 import { LOCAL_ID_PREFIX as LOCAL, mergeMessages, type WidgetMessage as Message } from "@/domain/widget-messages";
 import { useLiveUpdates, type RealtimeClientConfig } from "@/hooks/use-live-updates";
-import { uploadcareUrl } from "@/lib/uploadcare";
+import { iconSrc } from "@/domain/icon";
 import { cn } from "@/lib/utils";
 import { LeadCard, type LeadQuestion } from "./lead-card";
 
@@ -260,6 +260,7 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
   };
 
   const accent = { backgroundColor: config.background, color: config.textColor };
+  const icon = iconSrc(config.icon);
 
   return (
     <div
@@ -269,8 +270,8 @@ export const WidgetChat = ({ domainId, config, preview = false }: Props) => {
       )}
     >
       <header className="flex items-center gap-3 px-4 py-3" style={accent}>
-        {config.icon ? (
-          <Image src={uploadcareUrl(config.icon)} alt="" width={32} height={32} className="rounded-full" />
+        {icon ? (
+          <Image src={icon} alt="" width={32} height={32} className="rounded-full" />
         ) : (
           <span className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center font-bold uppercase">
             {config.name[0]}

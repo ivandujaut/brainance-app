@@ -81,7 +81,7 @@ test("the landing stays light even with a saved dark preference", async ({ page 
 test("the privacy policy names the roles, the providers and the AAIP", async ({ page }) => {
   await page.goto("/privacidad");
   const policy = page.getByTestId("legal-privacidad");
-  for (const text of ["el dueño del sitio es el responsable", "BrAInance actúa como encargado", "Neon", "Clerk", "Resend", "Sentry", "Anthropic", "Uploadcare", "AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA"]) {
+  for (const text of ["el dueño del sitio es el responsable", "BrAInance actúa como encargado", "Neon", "Clerk", "Resend", "Sentry", "Anthropic", "almacenamiento de los íconos", "AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA"]) {
     await expect(policy).toContainText(text);
   }
 });
