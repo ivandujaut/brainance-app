@@ -8,13 +8,12 @@ BrAInance: SaaS multi-tenant de chat con IA para el sitio web de negocios chicos
 
 **Dos líneas de trabajo** ([ADR 0100](docs/adr/0100-linea-whatsapp-para-talleres.md)):
 
-- **`develop` y `main`:** la beta web.
-- **`whatsapp-os`:** una línea aparte que explora un sistema operativo por WhatsApp para talleres (`docs/whatsapp-os/`). Sus specs se numeran desde 100 y sus ADR desde 0100.
+- **`whatsapp-os`:** la línea de trabajo actual. Explora un sistema operativo por WhatsApp para talleres (`docs/whatsapp-os/`). Sus specs se numeran desde 100 y sus ADR desde 0100.
+- **`develop` y `main`:** la beta web. **Por ahora están quietas:** no se abren ramas ni PRs contra ellas hasta que el dueño lo decida.
 
-Cómo pasan los cambios de una a otra:
+Cómo se trabaja, por ahora:
 
-- Cada rama sale de una línea, y su PR vuelve a esa misma línea.
-- Lo que sirve a las dos se arregla en `develop` y se trae a `whatsapp-os` con un PR de merge.
+- **Toda rama nueva sale de `whatsapp-os`, y su PR vuelve a `whatsapp-os`.** También lo que serviría a las dos líneas: ya no pasa por `develop`.
 - **Nunca al revés:** nada de `whatsapp-os` entra en `develop` ni en `main`.
   - Después de un merge en `whatsapp-os`, GitHub ofrece "Compare & pull request" con base `develop`. No hay que usarlo.
   - La rama `whatsapp-os` no se borra después de un merge.
@@ -68,8 +67,8 @@ npm run eval:rag -- --variant <id> --model <gateway-id>   # eval de respuestas (
 ## Ramas, PRs y QA
 
 - **Una rama por cambio:** `feat/NNN-nombre`, `fix/…`, `docs/…` o `chore/…`.
-- **El PR va contra la línea de la que salió la rama** (`develop` o `whatsapp-os`), con el template `.github/pull_request_template.md`, y no se mergea con el CI en rojo.
-- **PRs apilados:** si un PR depende de otro, abrilo igual contra esa línea. Su diff incluye los commits del otro hasta que se mergee. No uses la rama del otro PR como base: cuando se mergea y se borra esa rama, GitHub cierra el PR apilado.
+- **El PR va contra `whatsapp-os`,** la rama de la que sale todo el trabajo por ahora (ver "Dos líneas de trabajo"), con el template `.github/pull_request_template.md`, y no se mergea con el CI en rojo.
+- **PRs apilados:** si un PR depende de otro, abrilo igual contra `whatsapp-os`. Su diff incluye los commits del otro hasta que se mergee. No uses la rama del otro PR como base: cuando se mergea y se borra esa rama, GitHub cierra el PR apilado.
 - **El merge lo hace el dueño.** Un agente no mergea, no aprueba y no reescribe la historia de una rama ajena.
 - **QA:** después del merge se prueba en el preview con un agente de navegador, guiado por un prompt. Ese prompt siempre incluye estas tres reglas: no hacer pagos, no pedir ni escribir claves en el chat y no escribir contraseñas.
 - **Migraciones:** el dueño aplica las migraciones a las bases de Neon con el workflow `migrate.yml` de Actions.
@@ -99,6 +98,7 @@ Los procedimientos repetibles están en `.claude/skills/<nombre>/SKILL.md`, en e
 | `abrir-pr` | Un cambio listo para revisión |
 | `prompt-qa` | Después del merge, para el QA con un agente de navegador |
 | `correr-eval` | Después de cambiar un prompt o un modelo de IA |
+| `diagramas` | Un diagrama de arquitectura, de un recorrido, de estados o del modelo de datos en un documento |
 
 Para revisar un diff antes de abrir el PR: [`docs/agentes/revision.md`](docs/agentes/revision.md). En Claude Code la aplica el subagente `revisor` (`.claude/agents/revisor.md`).
 

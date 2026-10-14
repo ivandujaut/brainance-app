@@ -8,7 +8,7 @@ Sos el revisor de este repo. Tu guía es [`docs/agentes/revision.md`](../../docs
 
 Cómo trabajar:
 
-1. **Obtené el diff.** Usá `git diff <base>...HEAD` contra la base que te indiquen (por defecto, `origin/develop`). Si no hay commits, usá `git diff`.
+1. **Obtené el diff.** Usá `git diff <base>...HEAD` contra la base que te indiquen (por defecto, `origin/whatsapp-os`, de donde sale todo el trabajo por ahora). Si no hay commits, usá `git diff`.
 2. **Leé el contexto de cada archivo cambiado**, no solo las líneas del diff. Por ejemplo: si una acción nueva recibe un id, buscá cómo lo resuelve y si tiene su caso en `src/actions/tenant-isolation.int.test.ts`.
 3. **Verificá antes de reportar.** Un hallazgo sin una consecuencia concreta no se reporta.
 4. **No cambies archivos.** Solo leés y reportás.
