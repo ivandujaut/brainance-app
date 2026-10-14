@@ -40,7 +40,7 @@ Hechos que pesan en la decisión (los marcados con * todavía hay que confirmarl
 - **Mensajes:** un mensaje saliente por cada mensaje del dueño, sin un "anotado" aparte. Es la variable que más mueve el costo y va como requisito de la spec 100.
 - **Webhook:**
   - verifica la firma (`X-Hub-Signature-256`), deduplica por `wamid` y responde 200 enseguida;
-  - la descarga y la transcripción van en `after()`, con una tabla de trabajos y un cron que reintenta;
+  - la descarga y la transcripción van en segundo plano, con reintentos. El [ADR 0102](0102-arquitectura-de-la-linea-whatsapp.md) propone un flujo durable (Vercel Workflow) en lugar de `after()` y un cron, porque en el plan Hobby el cron corre una vez por día;
   - el audio se copia a almacenamiento propio, porque la URL de Meta dura 5 minutos y el media ID, 7 días.
 - **Resumen diario:** como texto libre mientras la ventana esté abierta y quede cupo. Si no, como plantilla utility.
 - **Transcripción:** la decide un eval con 50 a 100 audios reales de la prueba a mano, que mide si salen bien la patente, el modelo, el repuesto y el monto. Arranca por los modelos que ya ofrece el AI Gateway, sin dependencias nuevas, y solo con proveedores que no entrenen con los datos.
