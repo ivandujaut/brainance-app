@@ -49,7 +49,7 @@
 
 ## Decisión
 
-**Opción 3**, con seis reglas:
+**Opción 3**, con siete reglas:
 
 1. **El panel es el sistema de registro y WhatsApp es un canal.** Todo vive en Postgres. Si WhatsApp se cae o Meta cierra el número, los datos y el panel siguen.
 2. **El webhook solo recibe:**
@@ -58,7 +58,10 @@
    - guarda el evento crudo y responde 200.
 
    Todo lo demás pasa en segundo plano.
-3. **El procesamiento es durable.** Cada mensaje recorre sus etapas en un flujo con reintentos, no en `after()` con un cron diario. La primera opción es [Vercel Workflow](https://vercel.com/docs/workflows) y la alternativa, Vercel Queues. Esta regla reemplaza la parte de orquestación del ADR 0101.
+3. **El procesamiento es durable.** Cada mensaje recorre sus etapas en un flujo con reintentos, no en `after()` con un cron diario.
+   - Se usa [Vercel Workflow](https://vercel.com/docs/workflow). Está construido sobre [Vercel Queues](https://vercel.com/docs/queues) y suma lo que este recorrido necesita: cada paso se reintenta solo, un fallo retoma desde el último paso terminado y un paso puede esperar horas sin gastar cómputo ([guía de Vercel](https://vercel.com/kb/guide/how-to-run-background-jobs-in-nextjs-on-vercel)).
+   - Queues queda para cuando haga falta mucho volumen o consumidores propios.
+   - Esta regla reemplaza la parte de orquestación del ADR 0101.
 4. **La IA propone, no escribe.**
    - Con salida estructurada, el modelo devuelve operaciones: crear un cliente, abrir un trabajo, registrar un cobro.
    - El dominio (`src/domain/`, código puro) valida los formatos y resuelve a qué cliente o auto se refiere.
@@ -66,6 +69,10 @@
    - No hay SQL libre.
 5. **Cada dato guarda de dónde salió.** Cada registro apunta al mensaje que lo originó, y la transcripción y el archivo se conservan durante un plazo. Eso permite auditar, corregir y armar el eval.
 6. **Un mensaje saliente por cada mensaje del dueño:** la confirmación ("Anotado: Gol de Pérez, tren delantero"), la respuesta a una consulta o la pregunta. Una corrección es otro mensaje del dueño: edita el registro, que guarda su historial.
+7. **Cada paso se puede repetir sin duplicar nada.**
+   - Meta puede mandar el mismo evento dos veces, y Workflow puede reintentar un paso que ya había escrito: los dos entregan "al menos una vez".
+   - Por eso cada operación lleva una clave única (el `wamid` del mensaje y el número de la operación), y la base rechaza la que ya existe.
+   - Así, un reintento no anota dos veces el mismo cobro.
 
 ### Quién habla con quién
 
@@ -127,12 +134,42 @@ flowchart TD
   responde -.->|"el dueño contesta o corrige"| entra
 ```
 
+### El protocolo con Meta
+
+El recorrido no muestra los tiempos. Con Meta, son los que más pesan:
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant D as Dueño
+  participant M as WhatsApp de Meta
+  participant W as Webhook
+  participant F as Procesamiento
+  participant IA as IA
+
+  D->>M: audio
+  M->>W: evento firmado
+  W-->>M: 200, en el momento
+  W->>F: encola el mensaje
+  F->>M: pide el audio
+  M-->>F: el archivo, con una URL que dura 5 minutos
+  F->>IA: transcribir y proponer
+  IA-->>F: la propuesta
+  F->>F: el dominio valida y guarda
+  F->>M: Anotado: Gol de Pérez, tren delantero
+  M->>D: la respuesta
+```
+
+- **El 200 sale antes de procesar nada.** Si tarda, Meta reintenta, y el mismo evento llega dos veces (regla 7).
+- **El archivo se baja apenas llega el evento,** porque la URL vence a los 5 minutos.
+- **La respuesta va como texto libre** si el dueño escribió en las últimas 24 horas. Si no, solo se le puede escribir con una plantilla aprobada por Meta, como el resumen de las 8 de un lunes (ADR 0101).
+
 ### Cada pieza
 
 | Pieza | Elección inicial | Se confirma con |
 |---|---|---|
 | Canal | Cloud API directa con número propio (ADR 0101) | El número de prueba de Meta: el formato real del webhook de un audio y de una foto |
-| Procesamiento | Vercel Workflow | Una prueba de concepto: reintentos, tiempos y costo por mensaje |
+| Procesamiento | Vercel Workflow, con pasos idempotentes (regla 7) | Una prueba de concepto: reintentos, tiempos y costo por mensaje |
 | Voz a texto | Transcribir y después interpretar, con el vocabulario de cada taller: sus clientes, sus modelos y la jerga. Mandar el audio directo a un modelo multimodal queda como candidato | El eval con los audios de la prueba a mano (ADR 0101) |
 | Separar hablantes | No en la fase 1: cada audio es del dueño, y WhatsApp dice quién escribe | Si aparecen audios reenviados de clientes |
 | Texto a datos | Un modelo con salida estructurada, y el dominio que valida | Un eval de extracción: precisión por campo y que no invente |
@@ -165,6 +202,7 @@ flowchart TD
 - **Vercel Pro,** US$ 20 por usuario y por mes. Lo pide el uso comercial (también para la beta web), y además habilita el cron cada minuto.
 - **Workflow:** en Hobby incluye 50.000 eventos por mes, y por encima cuesta US$ 0,02 cada 1.000 ([Vercel](https://vercel.com/docs/workflows/pricing)). Cuántos eventos genera un mensaje se mide en la prueba de concepto.
 - **Más piezas** que un bot directo, y unos segundos de demora en cada confirmación.
+- **Un proyecto más en Vercel** para la línea, con sus variables, su base y su tope de IA (ver "Lo que se resolvió").
 
 **Lo que no cubre:**
 
@@ -172,16 +210,34 @@ flowchart TD
 - el modelo de datos del taller (spec 100);
 - el canal con los clientes del taller (fase 2).
 
-**Lo que queda abierto, para iterar:**
+**Lo que se resolvió en la segunda iteración** (13 de octubre de 2026):
 
-1. **Workflow o Queues.** Se decide con la prueba de concepto.
-2. **Que una línea no deje sin IA a la otra.** El crédito del AI Gateway se agotó el 8 de octubre durante un eval, y la cuenta es una sola: sin crédito, se queda sin IA todo lo que la use. Hay que separar el crédito y el tope de gasto por línea.
-3. **Uno o varios números.** Repartir los talleres en varios números reparte el riesgo de bloqueo y multiplica el cupo gratis de Meta. Falta saber si Meta lo acepta.
-4. **Cuántos días se guarda el audio crudo.**
-5. **Fotos o audios.** Si el dueño manda más fotos que audios (la primera señal de la prueba fue una foto), la foto pasa a ser el camino principal y no el secundario.
+1. **Workflow o Queues: Workflow** (regla 3). Antes de construir, hay que confirmar en la documentación de Vercel si ya está disponible para todos o sigue en beta. La prueba de concepto confirma los tiempos y el costo por mensaje.
+2. **Que una línea no deje sin IA a la otra.** El AI Gateway admite topes de gasto por equipo, por proyecto y por API key. Al pasarse, responde 402 y no llama al modelo ([Vercel, topes](https://vercel.com/docs/ai-gateway/observability-and-spend/budgets); [changelog](https://vercel.com/changelog/ai-gateway-spend-budgets-and-alerts)). La decisión:
+   - la línea WhatsApp tiene su propio proyecto en Vercel, con su tope mensual. Igual iba a necesitar variables y base propias (ADR 0100);
+   - el eval usa una API key propia, con su tope;
+   - el saldo prepago es uno solo para todo el equipo, y tiene que cubrir la suma de los topes. Si no, una línea igual puede dejar sin saldo a la otra, como pasó el 8 de octubre.
+3. **Uno o varios números: se arranca con uno.**
+   - Un portfolio de Meta sin verificar admite 2 números, y uno verificado, 20.
+   - Desde octubre de 2025, el límite de mensajes es del portfolio y no de cada número. Lo dicen proveedores ([Wati](https://www.wati.io/en/blog/gcr-seo-whatsapp-business-multiple-numbers-complete-guide-to-options-limits-and-the-right-setup-2026/)), y hay que confirmarlo en la documentación de Meta ([límites](https://developers.facebook.com/documentation/business-messaging/whatsapp/throughput)).
+   - Una sanción por la cláusula de IA es sobre la cuenta, no sobre un número (ADR 0101), así que alcanza a todos los números de esa cuenta. Varios números no protegen contra el riesgo principal: lo que protege es que WhatsApp sea solo un canal (regla 1).
+   - El segundo número que permite Meta queda para pruebas.
+   - Solo puede cambiar la decisión el cupo gratis de 1.000 mensajes: si es por número, conviene repartir los talleres desde el quinto (ADR 0101, "Antes de aceptar").
+4. **Cuánto se guarda.** Es una propuesta, a confirmar con el abogado:
+   - el audio crudo, 30 días; después queda la transcripción;
+   - las fotos y las transcripciones, mientras exista el registro del que salieron;
+   - si un taller se da de baja, todo lo suyo se borra a los 30 días;
+   - para el eval, solo con consentimiento explícito, y se borra al terminar, como en la prueba a mano.
+
+**Lo que sigue abierto:**
+
+1. **Fotos o audios.** Si el dueño manda más fotos que audios (la primera señal de la prueba fue una foto), la foto pasa a ser el camino principal y no el secundario.
+2. **Qué ve el dueño si la IA no está disponible,** por un tope de gasto o una caída del proveedor. El mensaje queda guardado y el flujo lo reintenta. Falta decidir si se le avisa y cómo, sin gastar un mensaje de más. Se define en la spec 100.
+3. **El cupo gratis de Meta: por número o por cuenta** (ver el punto 3 de arriba).
 
 **Lo que sigue:**
 
 1. Probar el webhook con el número de prueba de Meta. No necesita al taller.
 2. Armar vacíos los evals de transcripción, extracción y fotos, para cargar los casos apenas haya material con consentimiento.
 3. Con la prueba a mano validada, escribir la spec 100.
+4. Cuando la línea tenga código, el dueño crea su proyecto en Vercel, con su tope de gasto en el AI Gateway y una API key propia para el eval (punto 2 de arriba).
