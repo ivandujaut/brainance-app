@@ -7,7 +7,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { siteSettingsPath } from "@/lib/routes";
-import { uploadcareUrl } from "@/lib/uploadcare";
+import { iconSrc } from "@/domain/icon";
 
 type Props = {
   min?: boolean;
@@ -42,29 +42,32 @@ const DomainMenu = ({ domains, min }: Props) => {
       </div>
       <div className="flex flex-col gap-1 text-muted-foreground font-medium">
         {domains &&
-          domains.map((domain) => (
-            <Link
-              href={siteSettingsPath(domain.id)}
-              key={domain.id}
-              // Minimized, only the initial or the icon shows: the domain names the link.
-              aria-label={min ? domain.name : undefined}
-              title={min ? domain.name : undefined}
-              className={cn(
-                "flex gap-3 items-center justify-center hover:bg-background hover:text-foreground rounded-full transition duration-100 ease-in-out cursor-pointer ",
-                !min ? "p-2" : "py-2",
-                domain.id === isDomain && "bg-background text-foreground"
-              )}
-            >
-              {domain.icon ? (
-                <Image src={uploadcareUrl(domain.icon)} alt="logo" width={20} height={20} />
-              ) : (
-                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center uppercase">
-                  {domain.name[0]}
-                </span>
-              )}
-              {!min && <p className="text-sm">{domain.name}</p>}
-            </Link>
-          ))}
+          domains.map((domain) => {
+            const icon = iconSrc(domain.icon);
+            return (
+              <Link
+                href={siteSettingsPath(domain.id)}
+                key={domain.id}
+                // Minimized, only the initial or the icon shows: the domain names the link.
+                aria-label={min ? domain.name : undefined}
+                title={min ? domain.name : undefined}
+                className={cn(
+                  "flex gap-3 items-center justify-center hover:bg-background hover:text-foreground rounded-full transition duration-100 ease-in-out cursor-pointer ",
+                  !min ? "p-2" : "py-2",
+                  domain.id === isDomain && "bg-background text-foreground"
+                )}
+              >
+                {icon ? (
+                  <Image src={icon} alt="logo" width={20} height={20} />
+                ) : (
+                  <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center uppercase">
+                    {domain.name[0]}
+                  </span>
+                )}
+                {!min && <p className="text-sm">{domain.name}</p>}
+              </Link>
+            );
+          })}
       </div>
     </div>
   );

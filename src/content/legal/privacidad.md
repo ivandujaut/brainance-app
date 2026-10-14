@@ -41,13 +41,12 @@ No vendemos datos personales ni los usamos para publicidad. No usamos las conver
 
 Para prestar el servicio usamos proveedores que tratan datos por nuestra cuenta:
 
-- **Neon** (base de datos) y **Vercel** (alojamiento de la aplicación).
+- **Neon** (base de datos) y **Vercel** (alojamiento de la aplicación y almacenamiento de los íconos que sube el dueño).
 - **Clerk** (cuentas e ingreso de los dueños).
 - **Vercel AI Gateway** y el proveedor del modelo de inteligencia artificial (Anthropic): reciben la conversación y la información del negocio para generar cada respuesta.
 - **Resend** (envío del email al dueño cuando llega un contacto, que incluye el email y las respuestas del visitante).
 - **Sentry** (registro de errores, configurado para no enviar el texto de las conversaciones, emails ni respuestas).
 - **Pusher** (avisos en tiempo real de que una conversación cambió, sin su contenido), cuando está activado.
-- **Uploadcare** (almacenamiento del ícono del bot que sube el dueño).
 
 Algunos de estos proveedores procesan datos fuera de la Argentina. Además, el dueño del sitio recibe los datos de los visitantes que conversan en su sitio.
 

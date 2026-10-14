@@ -4,6 +4,8 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 // is covered in src/actions/tenant-isolation.int.test.ts.
 const url = process.env.TEST_DATABASE_URL;
 if (url) process.env.DATABASE_URL = url;
+// The project's store (ADR 0011): the appearance only takes icons from this host.
+process.env.BLOB_STORE_ID = "store_abc123xyz";
 
 const OWNER = "user_int_bot_settings";
 vi.mock("@clerk/nextjs/server", () => ({ currentUser: async () => ({ id: OWNER }), clerkClient: async () => ({}) }));
@@ -89,7 +91,7 @@ describe.skipIf(!url)("bot settings actions", async () => {
   });
 
   it("onUpdateAppearance: saves color, icon and welcome message", async () => {
-    const icon = "8d3c1f9e-0a6b-4a8e-9c1a-2f7f6b0e5d41";
+    const icon = "https://abc123xyz.public.blob.vercel-storage.com/icons/icon-Xy9aBc.png"; // ADR 0011
     const result = await bot.onUpdateAppearance(siteId, { background: "#123456", welcomeMessage: "¡Buen día!", icon });
     expect(result.status).toBe(200);
     expect(toPublicConfig(await widgetSite())).toMatchObject({
@@ -99,6 +101,13 @@ describe.skipIf(!url)("bot settings actions", async () => {
       background: "#123456",
       textColor: "#FFFFFF",
     });
+  });
+
+  it("onUpdateAppearance: rejects an icon from another Blob store", async () => {
+    const icon = "https://otro999.public.blob.vercel-storage.com/icons/icon.gif";
+    const result = await bot.onUpdateAppearance(siteId, { background: "#123456", welcomeMessage: "Hola", icon });
+    expect(result.status).toBe(400);
+    expect(toPublicConfig(await widgetSite()).icon).toBeNull();
   });
 
   it("onUpdateAppearance: rejects a color that is not #RRGGBB", async () => {
