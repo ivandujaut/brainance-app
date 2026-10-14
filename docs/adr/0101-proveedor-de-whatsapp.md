@@ -64,7 +64,7 @@ Hay que confirmar en la fuente oficial lo que el informe leyó a través de frag
 - si la coexistencia funciona para números +54;
 - los parámetros de Embedded Signup v4;
 - el texto vigente de la cláusula "AI Providers";
-- el formato real del webhook de un audio. Se confirma con el número de prueba de Meta.
+- el formato real del webhook de un texto, un audio y una foto. Se confirma con el número de prueba de Meta ([guía](../whatsapp-os/prueba-webhook-meta.md)).
 
 ## Consecuencias
 

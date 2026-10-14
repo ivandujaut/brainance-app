@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
-    include: ["src/**/*.test.ts", "src/**/*.test.tsx", "scripts/checks/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx", "scripts/checks/**/*.test.ts", "scripts/dev/**/*.test.ts"],
     environment: "node",
     coverage: {
       provider: "v8",
