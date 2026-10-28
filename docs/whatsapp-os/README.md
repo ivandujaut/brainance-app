@@ -40,6 +40,7 @@ Facturación electrónica, inventario de repuestos, turnos, varios usuarios por 
 
 - [Prueba a mano](prueba-a-mano.md): dos semanas con el taller, sin código.
 - [Resultados de la prueba a mano](prueba-a-mano-resultados.md): el primer taller, del 11 al 27 de octubre de 2026.
+- [Segunda etapa de la prueba a mano](prueba-a-mano-segunda-etapa.md): el sistema pregunta y confirma, para bajar la barrera del olvido. Del 28 de octubre al 10 de noviembre de 2026.
 - [Inventario](inventario.md): qué se reutiliza de la beta web y qué hay que construir.
 - [ADR 0101](../adr/0101-proveedor-de-whatsapp.md) (propuesto): cómo conectar WhatsApp y transcribir los audios. Sale del [informe "Conexión de WhatsApp para talleres"](../mercado/reports/Conexi%C3%B3n%20de%20WhatsApp%20para%20talleres.md).
 - [Prueba del webhook de Meta](prueba-webhook-meta.md): con el número de prueba, sin el taller. Muestra cómo llegan un texto, un audio y una foto.
