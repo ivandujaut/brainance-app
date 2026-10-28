@@ -20,9 +20,9 @@
 **Restricciones:**
 
 - **WhatsApp es un canal que no controlamos.** Meta puede bloquear el número o clasificar el producto como "AI Provider" (ADR 0101). El producto tiene que seguir funcionando sin WhatsApp.
-- **Cada respuesta cuesta:** unos USD 0,026 desde el 1 de octubre de 2026 (ADR 0101). Un mensaje de más por cada mensaje del dueño duplica el costo.
-- **Los archivos de Meta vencen:** la URL de un audio o de una foto dura 5 minutos (ADR 0101).
-- **Meta reintenta el webhook** si no recibe un 200 rápido, así que el mismo evento puede llegar más de una vez.
+- **Cada respuesta puede costar:** unos USD 0,026 desde el 1 de octubre de 2026, según proveedores. La prueba del webhook la marcó como no cobrable, y está en duda (ADR 0101). Si se cobra, un mensaje de más por cada mensaje del dueño duplica el costo.
+- **Los archivos de Meta vencen:** la URL que trae el evento vence a los pocos minutos, y el media ID, a los 7 días. Con el media ID se pide una URL nueva (ADR 0101).
+- **Meta reintenta el webhook** si no recibe un 200 rápido, así que el mismo evento puede llegar más de una vez. En la prueba, los reintentos llegaron en menos de 2 segundos, con el mismo cuerpo.
 - **Datos de terceros:** nombres, teléfonos, patentes y la voz de los clientes del taller (Ley 25.326). Además, Meta prohíbe entrenar modelos con lo que pasa por WhatsApp.
 - **Lo que cuenta el dueño es ambiguo:** "el Gol de Pérez", patentes dictadas, tres autos en un mismo audio. En el arranque de la prueba, su primer mensaje fue una foto sin texto.
 - **El plan Hobby de Vercel:**
@@ -54,7 +54,7 @@
 1. **El panel es el sistema de registro y WhatsApp es un canal.** Todo vive en Postgres. Si WhatsApp se cae o Meta cierra el número, los datos y el panel siguen.
 2. **El webhook solo recibe:**
    - verifica la firma (`X-Hub-Signature-256`);
-   - descarta los duplicados por `wamid`;
+   - descarta los duplicados por `wamid`, con un índice único en la base. Un chequeo previo no alcanza: dos reintentos pueden llegar casi a la vez;
    - guarda el evento crudo y responde 200.
 
    Todo lo demás pasa en segundo plano.
@@ -68,7 +68,9 @@
    - Si falta un dato o hay dudas, hace una sola pregunta.
    - No hay SQL libre.
 5. **Cada dato guarda de dónde salió.** Cada registro apunta al mensaje que lo originó, y la transcripción y el archivo se conservan durante un plazo. Eso permite auditar, corregir y armar el eval.
-6. **Un mensaje saliente por cada mensaje del dueño:** la confirmación ("Anotado: Gol de Pérez, tren delantero"), la respuesta a una consulta o la pregunta. Una corrección es otro mensaje del dueño: edita el registro, que guarda su historial.
+6. **Una respuesta por cada tanda de mensajes del dueño:** la confirmación ("Anotado: Gol de Pérez, tren delantero"), la respuesta a una consulta o la pregunta. Una corrección es otro mensaje del dueño: edita el registro, que guarda su historial.
+   - Una tanda es lo que el dueño manda junto. Un álbum llega como varias fotos sueltas (antes, un evento `unsupported` que se ignora) y una ráfaga, como eventos separados por 1 a 4 segundos ([resultados de la prueba](../whatsapp-os/webhook-ejemplos/README.md)).
+   - Cuánto se espera para cerrar una tanda se define en la spec 100.
 7. **Cada paso se puede repetir sin duplicar nada.**
    - Meta puede mandar el mismo evento dos veces, y Workflow puede reintentar un paso que ya había escrito: los dos entregan "al menos una vez".
    - Por eso cada operación lleva una clave única (el `wamid` del mensaje y el número de la operación), y la base rechaza la que ya existe.
@@ -152,7 +154,7 @@ sequenceDiagram
   W-->>M: 200, en el momento
   W->>F: encola el mensaje
   F->>M: pide el audio
-  M-->>F: el archivo, con una URL que dura 5 minutos
+  M-->>F: el archivo, con una URL que vence en minutos
   F->>IA: transcribir y proponer
   IA-->>F: la propuesta
   F->>F: el dominio valida y guarda
@@ -161,14 +163,14 @@ sequenceDiagram
 ```
 
 - **El 200 sale antes de procesar nada.** Si tarda, Meta reintenta, y el mismo evento llega dos veces (regla 7).
-- **El archivo se baja apenas llega el evento,** porque la URL vence a los 5 minutos.
+- **El archivo se baja en el flujo, con el media ID.** La URL del evento vence en minutos, pero el media ID dura 7 días y da una URL nueva. Así, un reintento del flujo no pierde el archivo.
 - **La respuesta va como texto libre** si el dueño escribió en las últimas 24 horas. Si no, solo se le puede escribir con una plantilla aprobada por Meta, como el resumen de las 8 de un lunes (ADR 0101).
 
 ### Cada pieza
 
 | Pieza | Elección inicial | Se confirma con |
 |---|---|---|
-| Canal | Cloud API directa con número propio (ADR 0101) | El número de prueba de Meta: el formato real del webhook de un audio y de una foto |
+| Canal | Cloud API directa con número propio (ADR 0101) | Confirmado con el número de prueba de Meta ([ejemplos](../whatsapp-os/webhook-ejemplos/README.md)) |
 | Procesamiento | Vercel Workflow, con pasos idempotentes (regla 7) | Una prueba de concepto: reintentos, tiempos y costo por mensaje |
 | Voz a texto | Transcribir y después interpretar, con el vocabulario de cada taller: sus clientes, sus modelos y la jerga. Mandar el audio directo a un modelo multimodal queda como candidato | El eval con los audios de la prueba a mano (ADR 0101) |
 | Separar hablantes | No en la fase 1: cada audio es del dueño, y WhatsApp dice quién escribe | Si aparecen audios reenviados de clientes |
@@ -180,8 +182,9 @@ sequenceDiagram
 
 ### Seguridad y privacidad
 
-- **Cada taller ve solo lo suyo** (ADR 0004). El taller sale del número que escribe y se resuelve en el servidor. Las herramientas de la IA lo reciben del contexto, nunca como un argumento que el modelo pueda inventar.
-- **Un número desconocido** recibe una respuesta fija y no accede a ningún dato. El número del dueño se vincula a su taller con un código en el alta.
+- **Cada taller ve solo lo suyo** (ADR 0004). El taller sale de quién escribe y se resuelve en el servidor. Las herramientas de la IA lo reciben del contexto, nunca como un argumento que el modelo pueda inventar.
+- **El dueño se identifica por su BSUID** (`from_user_id`), no por su número. Si el dueño adopta un nombre de usuario de WhatsApp, el evento llega sin el número y solo trae el BSUID ([ejemplos](../whatsapp-os/webhook-ejemplos/README.md#nombres-de-usuario)). El número se guarda cuando viene, como un dato más.
+- **Un remitente desconocido** recibe una respuesta fija y no accede a ningún dato. El dueño se vincula a su taller con un código que manda por WhatsApp en el alta: así se vincula aunque oculte su número.
 - **Lo que llega es un dato, no una instrucción.** Las herramientas de la IA son de solo lectura o pasan por la validación del dominio.
 - **Solo proveedores que no entrenan con los datos,** con contrato de encargado y retención cero donde exista. Lo exigen Meta y la ley.
 - **Retención corta:** el audio crudo se borra a los N días y queda la transcripción. N se define en la spec 100.
@@ -195,7 +198,7 @@ sequenceDiagram
 - El producto no depende de WhatsApp.
 - Cada dato se puede auditar.
 - Cada etapa se evalúa y se reemplaza por separado.
-- El costo queda en un mensaje saliente por cada mensaje del dueño.
+- El costo queda en una respuesta por cada tanda de mensajes del dueño.
 
 **Lo que cuesta:**
 
@@ -233,11 +236,12 @@ sequenceDiagram
 
 1. **Fotos o audios.** Si el dueño manda más fotos que audios (la primera señal de la prueba fue una foto), la foto pasa a ser el camino principal y no el secundario.
 2. **Qué ve el dueño si la IA no está disponible,** por un tope de gasto o una caída del proveedor. El mensaje queda guardado y el flujo lo reintenta. Falta decidir si se le avisa y cómo, sin gastar un mensaje de más. Se define en la spec 100.
-3. **El cupo gratis de Meta: por número o por cuenta** (ver el punto 3 de arriba).
+3. **El cupo gratis de Meta: por número o por cuenta** (ver el punto 3 de arriba), y si las respuestas dentro de la ventana se cobran (ADR 0101).
+4. **Si Meta manda el número de un usuario con nombre de usuario** cuando ya hubo una conversación con el negocio. No cambia la regla de identificar por BSUID.
 
 **Lo que sigue:**
 
-1. Probar el webhook con el número de prueba de Meta ([guía](../whatsapp-os/prueba-webhook-meta.md)). No necesita al taller.
+1. ~~Probar el webhook con el número de prueba de Meta~~. Hecho el 14 de octubre ([guía](../whatsapp-os/prueba-webhook-meta.md), [resultados](../whatsapp-os/webhook-ejemplos/README.md)).
 2. Armar vacíos los evals de transcripción, extracción y fotos, para cargar los casos apenas haya material con consentimiento.
 3. Con la prueba a mano validada, escribir la spec 100.
 4. Cuando la línea tenga código, el dueño crea su proyecto en Vercel, con su tope de gasto en el AI Gateway y una API key propia para el eval (punto 2 de arriba).

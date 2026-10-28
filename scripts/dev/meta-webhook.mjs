@@ -4,13 +4,16 @@
 // every event is saved raw in capturas-meta/ (git-ignored), with the owner's own test messages.
 //
 //   npm run webhook:meta -- [--port 3333] [--out capturas-meta] [--fail 3] [--download]
+//   npm run webhook:meta -- --subscribe WABA_ID
 //
-//   --fail N     answers 500 to the next N events, to watch Meta retry (ADR 0102, rule 7)
-//   --download   downloads each file right away and asks for the same URL again 6 minutes later
+//   --fail N            answers 500 to the next N events, to watch Meta retry (ADR 0102, rule 7)
+//   --download          downloads each file right away and asks for the same URL again 6 minutes later
+//   --subscribe WABA_ID subscribes this app to the WhatsApp account and exits: Meta sends real
+//                       messages only to subscribed apps, while the panel's test reaches any app
 //
-// Reads META_VERIFY_TOKEN, META_APP_SECRET and, for --download, META_ACCESS_TOKEN (optionally
-// META_GRAPH_VERSION) from the environment or from .env.local. No dependencies: Node 20 or later.
-import { createHmac, timingSafeEqual } from "node:crypto";
+// Reads META_VERIFY_TOKEN, META_APP_SECRET and, for --download and --subscribe, META_ACCESS_TOKEN
+// (optionally META_GRAPH_VERSION) from the environment or from .env.local. No dependencies: Node 20 or later.
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { join } from "node:path";
@@ -36,14 +39,21 @@ export function verificationChallenge(searchParams, verifyToken) {
 
 const changesOf = (body) => (body?.entry ?? []).flatMap((entry) => entry.changes ?? []);
 const lastDigits = (phone) => (phone ? `…${String(phone).slice(-4)}` : "?");
+// With a username the number can be missing: only the business-scoped user id (BSUID) arrives.
+const sender = (m) => (m.from || !m.from_user_id ? lastDigits(m.from) : `usuario ${lastDigits(m.from_user_id)}`);
 
-/** One line per message or status in a webhook body: what arrived, without the full number or the text. */
+/** A short, stable stand-in for a WhatsApp id: a wamid carries the sender's number inside, in base64. */
+export function shortId(id) {
+  return `#${createHash("sha256").update(String(id)).digest("hex").slice(0, 6)}`;
+}
+
+/** One line per message or status in a webhook body: what arrived, without the number, the ids or the text. */
 export function describeEvent(body) {
   const lines = [];
   for (const change of changesOf(body)) {
     const value = change.value ?? {};
     for (const m of value.messages ?? []) {
-      const parts = [`mensaje ${m.type}`, `de ${lastDigits(m.from)}`, `id ${m.id}`];
+      const parts = [`mensaje ${m.type}`, `de ${sender(m)}`, shortId(m.id)];
       if (m.type === "text") parts.push(`${m.text?.body?.length ?? 0} caracteres`);
       if (MEDIA_TYPES.includes(m.type)) {
         const media = m[m.type] ?? {};
@@ -51,12 +61,13 @@ export function describeEvent(body) {
         if (media.voice) parts.push("nota de voz");
         if (media.caption) parts.push("con texto");
       }
-      if (m.type === "reaction") parts.push(`reacción ${m.reaction?.emoji || "quitada"} a ${m.reaction?.message_id}`);
-      if (m.context?.id) parts.push(`responde a ${m.context.id}`);
+      if (m.type === "unsupported") parts.push(m.unsupported?.type ?? "sin tipo");
+      if (m.type === "reaction") parts.push(`reacción ${m.reaction?.emoji || "quitada"} a ${shortId(m.reaction?.message_id)}`);
+      if (m.context?.id) parts.push(`responde a ${shortId(m.context.id)}`);
       if (m.context?.forwarded || m.context?.frequently_forwarded) parts.push("reenviado");
       lines.push(parts.join(" · "));
     }
-    for (const s of value.statuses ?? []) lines.push(`estado ${s.status} · id ${s.id}`);
+    for (const s of value.statuses ?? []) lines.push(`estado ${s.status} · ${shortId(s.id)}`);
     if (!value.messages && !value.statuses) lines.push(`cambio ${change.field ?? "sin campo"} sin mensajes ni estados`);
   }
   return lines;
@@ -72,22 +83,38 @@ export function mediaToDownload(body) {
 
 // --- server (manual use; not covered by tests) ------------------------------------------------
 
-const log = (text) => console.log(`${new Date().toLocaleTimeString("es-AR")}  ${text}`);
+const log = (text) => console.log(`${new Date().toLocaleTimeString("es-AR", { hour12: false })}  ${text}`);
 
 function parseArgs(argv) {
-  const opts = { port: 3333, out: "capturas-meta", fail: 0, download: false };
+  const opts = { port: 3333, out: "capturas-meta", fail: 0, download: false, subscribe: null };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
     if (flag === "--download") opts.download = true;
     else if (flag === "--port") opts.port = Number(argv[++i]);
     else if (flag === "--fail") opts.fail = Number(argv[++i]);
     else if (flag === "--out") opts.out = argv[++i];
+    else if (flag === "--subscribe") opts.subscribe = argv[++i] ?? "";
     else throw new Error(`Opción desconocida: ${flag}`);
   }
-  if (!Number.isInteger(opts.port) || !Number.isInteger(opts.fail) || opts.fail < 0 || !opts.out) {
-    throw new Error("Uso: npm run webhook:meta -- [--port 3333] [--out capturas-meta] [--fail N] [--download]");
+  const badSubscribe = opts.subscribe !== null && !/^\d+$/.test(opts.subscribe);
+  if (!Number.isInteger(opts.port) || !Number.isInteger(opts.fail) || opts.fail < 0 || !opts.out || badSubscribe) {
+    throw new Error(
+      "Uso: npm run webhook:meta -- [--port 3333] [--out capturas-meta] [--fail N] [--download] | --subscribe WABA_ID",
+    );
   }
   return opts;
+}
+
+async function subscribe(wabaId, { token, version }) {
+  const url = `https://graph.facebook.com${version ? `/${version}` : ""}/${wabaId}/subscribed_apps`;
+  const headers = { Authorization: `Bearer ${token}` };
+  const done = await fetch(url, { method: "POST", headers });
+  if (!done.ok) {
+    console.error(`Meta no aceptó la suscripción (${done.status}): ${JSON.stringify(await done.json().catch(() => ({})))}`);
+    process.exit(1);
+  }
+  const { data = [] } = await (await fetch(url, { headers })).json();
+  console.log(`Apps suscriptas a la cuenta ${wabaId}: ${data.map((app) => app.whatsapp_business_api_data?.name).join(", ")}`);
 }
 
 const EXTENSIONS = { ogg: ".ogg", mpeg: ".mp3", mp4: ".mp4", jpeg: ".jpg", png: ".png", webp: ".webp", pdf: ".pdf" };
@@ -129,6 +156,13 @@ function main() {
   }
   const opts = parseArgs(process.argv.slice(2));
   const { META_VERIFY_TOKEN: verifyToken, META_APP_SECRET: appSecret, META_ACCESS_TOKEN: token } = process.env;
+  if (opts.subscribe !== null) {
+    if (!token) {
+      console.error("--subscribe necesita META_ACCESS_TOKEN.");
+      process.exit(1);
+    }
+    return void subscribe(opts.subscribe, { token, version: process.env.META_GRAPH_VERSION });
+  }
   if (!verifyToken || !appSecret) {
     console.error("Faltan META_VERIFY_TOKEN y META_APP_SECRET (ver docs/whatsapp-os/prueba-webhook-meta.md).");
     process.exit(1);

@@ -13,7 +13,8 @@ La línea `whatsapp-os` ([ADR 0100](0100-linea-whatsapp-para-talleres.md)) tiene
 
 Hechos que pesan en la decisión (los marcados con * todavía hay que confirmarlos en la fuente oficial):
 
-- **Desde el 1 de octubre de 2026, Meta cobra las respuestas dentro de la ventana de 24 h.** Las paga como utility: unos USD 0,026 por mensaje en Argentina (ARS 37,68)*. Cada número trae 1.000 mensajes de servicio gratis por mes*. En la fase 1 todos los talleres comparten ese cupo, así que el costo de Meta va de USD 0,81 por taller y por mes (hasta 4 talleres) a USD 6,01 (50 talleres), a precio de lista y sin impuestos.
+- **Desde el 1 de octubre de 2026, Meta cobraría las respuestas dentro de la ventana de 24 h.** Las pagaría como utility: unos USD 0,026 por mensaje en Argentina (ARS 37,68)*. Cada número traería 1.000 mensajes de servicio gratis por mes*. En la fase 1 todos los talleres comparten ese cupo, así que el costo de Meta iría de USD 0,81 por taller y por mes (hasta 4 talleres) a USD 6,01 (50 talleres), a precio de lista y sin impuestos.
+  - **Está en duda.** Lo dicen proveedores, pero la página de precios de Meta dice que los mensajes que no son plantilla son gratis, y la respuesta de la prueba del webhook (14 de octubre) llegó con `billable: false` y `type: free_customer_service` ([resultados](../whatsapp-os/webhook-ejemplos/README.md)). Puede ser que la respuesta haya entrado en el cupo gratis. Se confirma con la primera factura de un número real.
 - **La coexistencia (fase 2) solo se puede hacer con Embedded Signup v4,** operado por un Tech Provider o un BSP. Un número en coexistencia no se migra entre proveedores: cambiar de proveedor obliga a cada taller a repetir el alta.
 - **La cláusula "AI Providers"** de los términos de Meta (vigente desde el 15 de enero de 2026) prohíbe los asistentes de IA de uso general. La fase 2 es el caso que Meta declaró permitido. La fase 1 queda en zona gris. Argentina no tiene la protección regulatoria que lograron Italia, Brasil y la UE.
 - **Meta prohíbe entrenar modelos con los datos que pasan por WhatsApp.**
@@ -37,11 +38,11 @@ Hechos que pesan en la decisión (los marcados con * todavía hay que confirmarl
 
 **Fase 1: Cloud API directa, con un número propio nuevo** (SIM prepaga que nunca estuvo en WhatsApp).
 
-- **Mensajes:** un mensaje saliente por cada mensaje del dueño, sin un "anotado" aparte. Es la variable que más mueve el costo y va como requisito de la spec 100.
+- **Mensajes:** una respuesta por cada tanda de mensajes del dueño, sin un "anotado" aparte. Una tanda es lo que manda junto: un álbum llega como varias fotos sueltas y una ráfaga, como varios eventos separados por segundos. Es la variable que más mueve el costo, si las respuestas se cobran, y va como requisito de la spec 100.
 - **Webhook:**
-  - verifica la firma (`X-Hub-Signature-256`), deduplica por `wamid` y responde 200 enseguida;
+  - verifica la firma (`X-Hub-Signature-256`), deduplica por `wamid` con un índice único y responde 200 enseguida. Meta reintenta en menos de 2 segundos, con el mismo cuerpo;
   - la descarga y la transcripción van en segundo plano, con reintentos. El [ADR 0102](0102-arquitectura-de-la-linea-whatsapp.md) propone un flujo durable (Vercel Workflow) en lugar de `after()` y un cron, porque en el plan Hobby el cron corre una vez por día;
-  - el audio se copia a almacenamiento propio, porque la URL de Meta dura 5 minutos y el media ID, 7 días.
+  - el audio se copia a almacenamiento propio, porque el media ID dura 7 días. La URL que trae el evento vence a los pocos minutos (en la prueba, antes de los 6), pero con el media ID se pide una nueva: el flujo no tiene que bajar el archivo en el momento.
 - **Resumen diario:** como texto libre mientras la ventana esté abierta y quede cupo. Si no, como plantilla utility.
 - **Transcripción:** la decide un eval con 50 a 100 audios reales de la prueba a mano, que mide si salen bien la patente, el modelo, el repuesto y el monto. Arranca por los modelos que ya ofrece el AI Gateway, sin dependencias nuevas, y solo con proveedores que no entrenen con los datos.
 - **Barandas por la cláusula de IA:** un bot acotado al taller, el panel web como sistema de registro, un camino a una persona y el producto presentado como software de gestión. WhatsApp es un canal: si Meta lo cierra, el producto sigue.
@@ -64,7 +65,8 @@ Hay que confirmar en la fuente oficial lo que el informe leyó a través de frag
 - si la coexistencia funciona para números +54;
 - los parámetros de Embedded Signup v4;
 - el texto vigente de la cláusula "AI Providers";
-- el formato real del webhook de un texto, un audio y una foto. Se confirma con el número de prueba de Meta ([guía](../whatsapp-os/prueba-webhook-meta.md)).
+- ~~el formato real del webhook de un texto, un audio y una foto~~. **Confirmado** el 14 de octubre con el número de prueba ([guía](../whatsapp-os/prueba-webhook-meta.md), [resultados y ejemplos](../whatsapp-os/webhook-ejemplos/README.md));
+- si las respuestas dentro de la ventana de 24 h se cobran: la prueba las marcó como no cobrables (ver "Contexto").
 
 ## Consecuencias
 
