@@ -1,0 +1,47 @@
+{
+  "pedido": {
+    "messaging_product": "whatsapp",
+    "recipient_type": "individual",
+    "to": "5491155550101",
+    "context": {
+      "message_id": "wamid.HBgNNTQ5MTE1NTU1MDEwMRUCABIYFDNBMDAwMDAwMDAwMDAwMDAwMDAxAA=="
+    },
+    "type": "text",
+    "text": {
+      "body": "Prueba del sistema: recibí tu mensaje."
+    }
+  },
+  "rechazado": {
+    "estado": 400,
+    "cuerpo": {
+      "error": {
+        "message": "(#131030) Recipient phone number not in allowed list",
+        "code": 131030,
+        "type": "OAuthException",
+        "error_data": {
+          "messaging_product": "whatsapp",
+          "details": "Número de teléfono del destinatario no incluido en la lista de autorizados: Añade el número de teléfono del destinatario a la lista de destinatarios y vuelve a intentarlo."
+        },
+        "fbtrace_id": "AbCdEfGhIjKlMnOpQrStUvW"
+      }
+    }
+  },
+  "aceptado": {
+    "estado": 200,
+    "cuerpo": {
+      "messaging_product": "whatsapp",
+      "contacts": [
+        {
+          "input": "541155550101",
+          "wa_id": "5491155550101"
+        }
+      ],
+      "messages": [
+        {
+          "id": "wamid.HBgNNTQ5MTE1NTU1MDEwMRUCABEYEkFCMDAwMDAwMDAwMDAwMDAwMgA="
+        }
+      ]
+    },
+    "nota": "Mandado al número sin el 9: 541155550101"
+  }
+}

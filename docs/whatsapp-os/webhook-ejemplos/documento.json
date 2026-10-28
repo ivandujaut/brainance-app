@@ -1,0 +1,45 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1234567890123456",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15550000000",
+              "phone_number_id": "6543210987654321"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dueño de prueba"
+                },
+                "wa_id": "5491155550101",
+                "user_id": "AR.1000000000000001"
+              }
+            ],
+            "messages": [
+              {
+                "from": "5491155550101",
+                "from_user_id": "AR.1000000000000001",
+                "id": "wamid.HBgNNTQ5MTE1NTU1MDEwMRUCABIYFDNBMDAwMDAwMDAwMDAwMDAwMDEzAA==",
+                "timestamp": "1792007958",
+                "type": "document",
+                "document": {
+                  "filename": "presupuesto-gol.pdf",
+                  "mime_type": "application/pdf",
+                  "sha256": "nX2hmdjsGVmpZjksKZaTgpeIEngyx0UhIVHHXKIc5bw=",
+                  "id": "1000000000000109",
+                  "url": "https://lookaside.fbsbx.com/whatsapp_business/attachments/?mid=1000000000000109&source=webhook&ext=1792008260&hash=ejemplo"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}

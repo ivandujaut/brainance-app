@@ -7,6 +7,8 @@ Esta prueba confirma dos cosas:
 - el último punto de "Antes de aceptar" del [ADR 0101](../adr/0101-proveedor-de-whatsapp.md): el formato real del webhook;
 - las reglas del [ADR 0102](../adr/0102-arquitectura-de-la-linea-whatsapp.md): el webhook responde 200 y descarta duplicados, el archivo se baja antes de 5 minutos y un paso se puede repetir sin duplicar nada.
 
+**Se hizo el 14 de octubre de 2026.** Los resultados y los ejemplos anonimizados están en [`webhook-ejemplos/`](webhook-ejemplos/README.md).
+
 No necesita al taller ni un número propio, porque Meta da un número de prueba gratis. Lleva más o menos una hora. Los nombres del panel de Meta cambian seguido: si alguno no coincide, buscá el producto WhatsApp dentro de tu app.
 
 ## Qué se quiere saber
@@ -75,16 +77,18 @@ npm run webhook:meta -- --download
 En otra terminal:
 
 ```bash
-cloudflared tunnel --url http://localhost:3333
+caffeinate -i cloudflared tunnel --url http://localhost:3333
 ```
 
 `cloudflared` muestra una dirección `https://….trycloudflare.com`. El capturador escucha en `/webhook`.
+
+El túnel es temporal: se cae si la Mac pierde la red o entra en reposo, y cada vez que arranca cambia la dirección. `caffeinate -i` evita el reposo mientras corre. Para una prueba de varios días conviene un túnel con nombre, que mantiene la dirección (necesita cuenta de Cloudflare).
 
 Qué hace el capturador (`scripts/dev/meta-webhook.mjs`):
 
 - responde la verificación de Meta;
 - comprueba la firma de cada evento (`X-Hub-Signature-256`) y guarda cada uno crudo en `capturas-meta/`;
-- muestra una línea por mensaje, con el tipo, los últimos 4 dígitos del número y el largo del texto, nunca el texto;
+- muestra una línea por mensaje, con el tipo, los últimos 4 dígitos del número (o del BSUID, si el número no viene), un id corto y el largo del texto. Nunca el texto ni el `wamid` entero, que lleva el número adentro;
 - con `--download`, baja cada archivo apenas llega el evento y vuelve a pedir la misma URL a los 6 minutos.
 
 ## 5. Conectar el webhook en Meta
@@ -94,7 +98,16 @@ En el producto WhatsApp, en **Configuración**:
 1. **URL de callback:** `https://….trycloudflare.com/webhook`.
 2. **Token de verificación:** el mismo de `META_VERIFY_TOKEN`.
 3. **Verificar y guardar.** El capturador muestra `verificación ok`.
-4. En **Campos del webhook**, suscribí `messages`.
+4. En **Campos del webhook**, suscribí `messages`. El botón **Test** de esa fila manda un ejemplo inventado por Meta: si el capturador muestra `firma ok`, la conexión anda.
+5. **Suscribí la app a la cuenta de WhatsApp.** Sin este paso, el botón Test llega pero los mensajes reales no. Con el token temporal en `.env.local`:
+
+   ```bash
+   npm run webhook:meta -- --subscribe WHATSAPP_BUSINESS_ACCOUNT_ID
+   ```
+
+   Al final lista las apps suscriptas: tiene que aparecer la tuya.
+
+El modo desarrollo alcanza: los mensajes reales llegan aunque el panel avise que la app no está publicada.
 
 ## 6. Los mensajes del dueño
 
@@ -105,8 +118,8 @@ Desde tu celular, mandale al número de prueba un mensaje por vez. Después de c
 | 1 | Un texto corto, como lo diría el dueño: "Entró el Gol de Pérez, hace ruido el tren delantero" | Que llegue como `text`, y cuánto tarda |
 | 2 | Un texto largo, en varios renglones y con emojis | Que llegue entero, con los saltos de línea |
 | 3 | Una respuesta citando el mensaje 1 | El campo `context.id`: a qué mensaje responde |
-| 4 | El mensaje 1, editado | Si llega algo, y de qué tipo |
-| 5 | Un texto borrado "para todos" | Si llega algo, y de qué tipo |
+| 4 | El mensaje 1, editado | Si llega algo, y de qué tipo. En el iPhone, WhatsApp no ofreció editar en este chat |
+| 5 | Un texto borrado "para todos" | Si llega algo, y de qué tipo. En el iPhone, solo ofreció borrar "para mí" |
 | 6 | Una nota de voz de unos 15 segundos | Que llegue como `audio`, con su formato y la marca de nota de voz |
 | 7 | Una nota de voz de unos 2 minutos | El tamaño del archivo y cuánto tarda en bajar |
 | 8 | Un audio reenviado desde otro chat | La marca de reenviado: es lo que pasaría si el dueño reenvía el audio de un cliente |
@@ -116,6 +129,7 @@ Desde tu celular, mandale al número de prueba un mensaje por vez. Después de c
 | 12 | Un PDF, como si fuera un presupuesto | Que llegue como `document`, con el nombre del archivo |
 | 13 | Una reacción 👍 al `hello_world` | Que llegue como `reaction`: si el dueño confirma con un pulgar, el sistema lo puede leer |
 | 14 | Una ráfaga: un texto, un audio y una foto en menos de 10 segundos | En qué orden llegan, y si alguno viene en el mismo evento que otro |
+| 15 | Una foto reenviada desde otro chat | La marca de reenviado en una foto |
 
 ## 7. Las pruebas del lado del sistema
 
@@ -154,7 +168,10 @@ Tenés dos caminos:
 | Qué pasa | Causa probable |
 |---|---|
 | "Verificar y guardar" falla | El túnel no está levantado, la URL no termina en `/webhook` o el token no coincide con `META_VERIFY_TOKEN` |
+| El botón Test llega, pero los mensajes reales no | La app no está suscripta a la cuenta de WhatsApp: paso 5, punto 5 |
 | No llegan eventos | No suscribiste `messages`, o le escribís desde un número que no está entre los destinatarios confirmados |
 | Dice `FIRMA INVÁLIDA` | `META_APP_SECRET` no es el de esta app |
 | La descarga da 401 | Venció el token temporal: generá otro y reiniciá el capturador |
 | Meta dejó de llegar después de reiniciar el túnel | `cloudflared` da una dirección nueva cada vez que arranca: actualizala en el paso 5 |
+| Meta dejó de llegar sin que reiniciaras nada | El túnel se cayó porque la Mac perdió la red o entró en reposo. `cloudflared` muestra "Tunnel not found": levantalo de nuevo y actualizá la dirección |
+| Mandarle al número del dueño falla con 131030 | Los celulares argentinos llegan como `549…`: mandale al número sin el 9 (`54…`) |
