@@ -7,7 +7,7 @@
 
 **Resumen:** la prueba no alcanza para validar ni para descartar la línea.
 
-- **El hábito no se sostuvo solo.** El taller pasó casi 10 días sin autos, pero además el dueño reconoció que se olvida y que no manda los trabajos chicos. La tanda más grande llegó después de una charla en persona.
+- **El hábito no se sostuvo solo.** El taller pasó casi 10 días sin autos, pero además el dueño reconoció, en una charla en persona, que se olvida y que no manda los trabajos chicos.
 - **El valor no se midió,** porque el sistema no respondió nunca: no hubo resúmenes, confirmaciones ni planilla.
 - **Lo que sí dejó es mucho material** sobre cómo cuenta el dueño su trabajo, y una señal fuerte sobre su dolor: conseguir clientes.
 
@@ -37,7 +37,7 @@ Por eso esta prueba midió algo distinto de lo que se quería medir: si el dueñ
 | Lunes 12/10 | 12:32 | Una foto sin texto: un auto en el elevador |
 | Miércoles 14/10 | 9:44–10:01 | El "sí" al consentimiento, la respuesta a la pregunta (en menos de un minuto), una tarjeta de contacto y la misma foto dos veces, con el modelo y el trabajo como texto |
 | Domingo 18/10 | 19:38–19:52 | 4 audios y 2 textos: dos trabajos ya terminados, contados de punta a punta |
-| Martes 27/10 | 19:22–19:43 | Después de una charla en persona (ver abajo). 7 audios, 3 tarjetas de contacto, 1 texto y 1 mensaje borrado: dos trabajos del día, uno en curso y cómo pasó los días sin trabajo |
+| Martes 27/10 | 19:22–19:43 | 7 audios, 3 tarjetas de contacto, 1 texto y 1 mensaje borrado: dos trabajos del día, uno en curso y cómo pasó los días sin trabajo |
 
 **Totales:**
 
@@ -56,9 +56,9 @@ Desde el consentimiento hubo 10 días hábiles (del 14 al 27).
 |---|---|---|
 | Días con mensajes, de 10 | 2, más un domingo | No valida, pero el taller estuvo casi 10 días sin autos |
 | Mensajes por día hábil, semana 2 | Unos 2, todos el mismo día | En el medio |
-| Mensajes que manda solo | Los del 12, 14 y 18. La tanda del 27, la más grande, llegó después de una charla en persona | En el medio |
+| Mensajes que manda solo | Todos, salvo la respuesta a la pregunta. Antes del 27 hubo una charla en persona en la que se le pidió que mande todo (ver abajo) | Valida, con reservas |
 | Consultas al sistema | Ninguna | No valida, pero el sistema no tenía nada que mostrarle |
-| La charla del día 10 | No se hizo como estaba prevista. El 27 hubo una charla en persona: dijo que se olvida o que los trabajos chicos no los manda | No valida |
+| La charla del día 10 | No se hizo como estaba prevista. Hubo una charla en persona, sin fecha precisa: dijo que se olvida o que los trabajos chicos no los manda | No valida |
 | Precio | No se habló | Sin dato |
 
 **Los criterios suponen un taller con movimiento todos los días.** En un taller que pasa días sin autos, "días con mensajes" mide el trabajo, no el hábito. Una medida mejor es **qué parte de los trabajos llegó al sistema**. Acá no llegaron todos: el dueño dijo que los trabajos chicos no los manda.
@@ -142,7 +142,7 @@ Apoya lo que propone el ADR 0102: transcribir con el vocabulario de cada taller,
 
 ## Qué sigue
 
-**Propuesta: extender la prueba con este taller dos semanas más, esta vez haciendo de sistema:**
+**Propuesta: extender la prueba con este taller dos semanas más, esta vez haciendo de sistema.** Se tomó: es la [segunda etapa](prueba-a-mano-segunda-etapa.md), que arrancó el 28 de octubre.
 
 - **Una pregunta a la noche, solo los días sin mensajes:** "¿Entró algún auto hoy?". Mide si un recordatorio sostiene el hábito.
 - **Una confirmación por tanda,** corta: "Anotado: Corsa, pérdida de agua, entregado, $25.000".
@@ -164,11 +164,14 @@ Apoya lo que propone el ADR 0102: transcribir con el vocabulario de cada taller,
 
 ## Por qué no mandaba
 
-Antes de la tanda del 27 hubo una charla en persona: se le preguntó por qué no mandaba mensajes. Contestó que, o se olvida, o no tuvo nada que contar ese día, o los trabajos fueron muy chicos, de un solo auto, y no le parece que valga la pena. Se le pidió que mande todo igual, y esa misma tarde mandó la tanda más grande de la prueba.
+En algún momento antes del 27 (no se registró la fecha) hubo una charla en persona: se le preguntó por qué no mandaba mensajes. Contestó que, o se olvida, o no tuvo nada que contar ese día, o los trabajos fueron muy chicos, de un solo auto, y no le parece que valga la pena.
+
+Se le pidió que mande todo igual, y se le presentó el canal como **la bitácora del taller**: un cuaderno del día a día donde poner lo que le parezca relevante. No se le dijo qué poner ni cómo.
 
 Lo que dice esto:
 
 - **Olvidarse es el riesgo de hábito que la guía quería medir,** y apareció. Lo que lo destrabó fue una persona que le preguntó, no el sistema.
 - **El dueño decide qué vale la pena contar.** Un trabajo chico le parece poco para el sistema, aunque ahí estén los datos de los clientes que después habría que contactar: el cambio de aceite que vuelve en unos meses.
 - **Un recordatorio puede servir,** si no es un mensaje más que pagar: por ejemplo, una pregunta a la noche, solo los días en que no mandó nada ("¿Entró algún auto hoy?"). Va a la extensión de la prueba.
-- **Desde el 27 la prueba ya no es la misma:** el dueño sabe que se espera que mande todo. Lo que mande desde ahí cuenta como pedido, no como espontáneo.
+- **Desde esa charla la prueba ya no es la misma:** el dueño sabe que se espera que mande todo. No se sabe si la tanda del 27 salió de la charla o del trabajo de ese día.
+- **Las charlas en persona se anotan con fecha.** Sin eso no se puede separar lo que manda solo de lo que manda porque se lo pidieron.
