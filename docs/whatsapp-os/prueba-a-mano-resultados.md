@@ -1,7 +1,7 @@
 # Resultados de la prueba a mano: primer taller
 
 - **Taller:** un mecánico que trabaja solo, con poco movimiento.
-- **Fechas:** del 11 al 27 de octubre de 2026, 17 días. El consentimiento llegó el 14.
+- **Fechas:** del 11 al 27 de octubre de 2026, 17 días. El consentimiento llegó el 14. Siguió sin sistema hasta el 1 de noviembre (ver al final).
 - **Canal:** un grupo de WhatsApp con el dueño, como dice la [guía](prueba-a-mano.md).
 - **Material:** el chat exportado y 11 audios, transcriptos en una máquina local con Whisper (large-v3-turbo). El dueño aceptó por escrito que se anoten los datos y se guarden los audios. Acá no van nombres, teléfonos ni patentes; el material crudo queda fuera del repo.
 
@@ -142,7 +142,7 @@ Apoya lo que propone el ADR 0102: transcribir con el vocabulario de cada taller,
 
 ## Qué sigue
 
-**Propuesta: extender la prueba con este taller dos semanas más, esta vez haciendo de sistema.** Se tomó: es la [segunda etapa](prueba-a-mano-segunda-etapa.md), que arrancó el 28 de octubre.
+**Propuesta: extender la prueba con este taller dos semanas más, esta vez haciendo de sistema.** Se tomó: es la [segunda etapa](prueba-a-mano-segunda-etapa.md), que arranca el 2 de noviembre.
 
 - **Una pregunta a la noche, solo los días sin mensajes:** "¿Entró algún auto hoy?". Mide si un recordatorio sostiene el hábito.
 - **Una confirmación por tanda,** corta: "Anotado: Corsa, pérdida de agua, entregado, $25.000".
@@ -175,3 +175,21 @@ Lo que dice esto:
 - **Un recordatorio puede servir,** si no es un mensaje más que pagar: por ejemplo, una pregunta a la noche, solo los días en que no mandó nada ("¿Entró algún auto hoy?"). Va a la extensión de la prueba.
 - **Desde esa charla la prueba ya no es la misma:** el dueño sabe que se espera que mande todo. No se sabe si la tanda del 27 salió de la charla o del trabajo de ese día.
 - **Las charlas en persona se anotan con fecha.** Sin eso no se puede separar lo que manda solo de lo que manda porque se lo pidieron.
+
+## Del 28 de octubre al 1 de noviembre, sin sistema
+
+La segunda etapa iba a arrancar el 28, pero el mensaje para retomar no se mandó. Estos días siguen siendo de la primera etapa: el dueño cuenta sin recibir nada a cambio.
+
+- **Miércoles 28/10, 14:48:** una foto del auto, de atrás y con la patente a la vista, y un audio de 33 segundos. Es un trabajo nuevo, contado el mismo día en que entró:
+  - la tarde anterior lo llamaron para pedir presupuesto;
+  - lo mandó;
+  - a la mañana le trajeron el auto.
+
+  La entrega estaba pactada para esa tarde.
+- **No se le contestó.** Del 29/10 al 1/11 no mandó nada más.
+
+Lo que dice esto:
+
+- **Por primera vez, un trabajo llegó el mismo día en que entró, al mediodía,** y no a la noche y días después. Fue al día siguiente de la tanda del 27: no se sabe si es un hábito o todavía el efecto de la charla.
+- **Quedaron cosas abiertas y nadie preguntó por ellas:** si se entregó, el monto y quién compró los repuestos. Después vinieron cuatro días sin mensajes, y no se sabe si hubo trabajo. Lo pregunta el primer resumen de la segunda etapa.
+- **Por primera vez aparece cómo llegó el cliente:** una llamada, un presupuesto y el auto al día siguiente. Es el recorrido que quiere alimentar la palanca de los clientes.
