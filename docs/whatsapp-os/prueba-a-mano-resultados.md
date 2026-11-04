@@ -142,7 +142,7 @@ Apoya lo que propone el ADR 0102: transcribir con el vocabulario de cada taller,
 
 ## Qué sigue
 
-**Propuesta: extender la prueba con este taller dos semanas más, esta vez haciendo de sistema.** Se tomó: es la [segunda etapa](prueba-a-mano-segunda-etapa.md), que arrancó el 28 de octubre.
+**Propuesta: extender la prueba con este taller dos semanas más, esta vez haciendo de sistema.** Se tomó: es la [segunda etapa](prueba-a-mano-segunda-etapa.md), que arrancó el 2 de noviembre. Cómo va, [al final](#segunda-etapa-en-curso).
 
 - **Una pregunta a la noche, solo los días sin mensajes:** "¿Entró algún auto hoy?". Mide si un recordatorio sostiene el hábito.
 - **Una confirmación por tanda,** corta: "Anotado: Corsa, pérdida de agua, entregado, $25.000".
@@ -175,3 +175,61 @@ Lo que dice esto:
 - **Un recordatorio puede servir,** si no es un mensaje más que pagar: por ejemplo, una pregunta a la noche, solo los días en que no mandó nada ("¿Entró algún auto hoy?"). Va a la extensión de la prueba.
 - **Desde esa charla la prueba ya no es la misma:** el dueño sabe que se espera que mande todo. No se sabe si la tanda del 27 salió de la charla o del trabajo de ese día.
 - **Las charlas en persona se anotan con fecha.** Sin eso no se puede separar lo que manda solo de lo que manda porque se lo pidieron.
+
+## Segunda etapa (en curso)
+
+**Actualizado al miércoles 4 de noviembre,** con el chat de ese día completo, hasta la noche, y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 16 con la charla. Es un registro parcial: el veredicto va al cierre.
+
+### Día por día
+
+| Día | El sistema | El dueño |
+|---|---|---|
+| Lunes 2/11 | El resumen, a las 11:21, pregunta si se entregó un auto. La confirmación sale a las 18:25 y pregunta de quién es un auto nuevo | Contesta el resumen en 5 minutos, con 3 audios, una foto y un texto: la entrega, un auto que entró el viernes y un cliente que no volvió. La pregunta de la confirmación queda sin respuesta |
+| Martes 3/11 | El resumen, a las 8:48, y tres confirmaciones. Una pide el contacto del cliente, "así te aviso cuando le toque el service" | Contesta el resumen en 5 minutos: un auto se había entregado y se olvidó de avisar. Avisa solo un auto nuevo, con foto y audio. Pasa el contacto en 17 minutos |
+| Miércoles 4/11 | El resumen, a las 9:55, pregunta si se entregó un auto que tenía que salir el día anterior. La confirmación sale casi 10 horas después de la respuesta y pregunta los kilómetros de un auto, "para el aviso del service" | Contesta el resumen al minuto, con un saludo y 4 textos cortos: dos entregas del día anterior, que queda un solo auto y que un cliente pasó a avisar que vuelve. A la noche contesta la confirmación en una hora: confirma que queda un solo auto y pasa los kilómetros |
+
+### Los números, hasta ahora
+
+| Medida | Valor |
+|---|---|
+| Autos nuevos que llegaron al canal | 2, los dos solos. La pregunta del viernes dirá si entró alguno más |
+| Llegaron el mismo día | 1 de 2. El otro entró un viernes y llegó el lunes, en la respuesta al resumen |
+| Entregas avisadas sin que se preguntara | 0 de 4 |
+| Resúmenes contestados | 3 de 3, en 5, 5 y 1 minuto |
+| Preguntas contestadas | 5 de 6 |
+| Días sin mensajes (los de la pregunta de la noche) | Ninguno |
+| Consultas | Ninguna |
+| Minutos hasta que contesta al sistema | 18 en promedio, entre 1 y 71. El de 71 fue a la noche, después del trabajo |
+| Mensajes del sistema que habrían necesitado una plantilla paga | 1 de 8: el primer resumen, porque el dueño no escribía desde el 28/10 |
+
+### Lo que muestra, por ahora
+
+1. **Las entradas llegan solas; las entregas, solo con el resumen.**
+   - Los autos nuevos llegaron sin que nadie preguntara, con foto, cliente y trabajo.
+   - Las 4 entregas se supieron porque el resumen las preguntó o las listó. En una, el dueño dijo que se había olvidado de avisar.
+   - Para el producto: el resumen no es un extra, es lo que cierra los trabajos. Sin él, el registro tendría autos en el taller que ya se fueron. El borrador de la spec 100 ya lo pide: los pendientes vencidos van al resumen "sin confirmar".
+2. **El resumen es el mensaje que más se contesta,** y en minutos.
+3. **El seguimiento del resumen funcionó.** El resumen del lunes recordó al cliente que volvía a fin de mes. El dueño contestó que todavía no había vuelto, y el miércoles avisó que pasó y vuelve en unos días.
+4. **Un pedido con un para qué se contestó; uno sin para qué, no.**
+   - "¿Me pasás el contacto? Así te aviso cuando le toque el service" se contestó en 17 minutos.
+   - "¿Cuántos kilómetros tenía? Para el aviso del service" se contestó en una hora, a la noche.
+   - "¿De quién es este auto?" quedó sin respuesta, pero además llegó 7 horas después de la tanda.
+
+   Son dos casos contra uno: no alcanza para una regla, pero apunta a que el para qué ayuda, sobre todo si es el aviso a sus clientes.
+5. **Saluda antes de contestar y cierra con un "Ok".** No hace falta contestar ninguno de los dos.
+6. **El que falló fue el sistema, no el dueño.**
+   - El dueño contesta en minutos.
+   - Dos de los tres días, el sistema contestó horas tarde: 7 horas el lunes y casi 10 el miércoles, porque la respuesta no se leyó a tiempo.
+   - Los resúmenes salieron a las 11:21, a las 8:48 y a las 9:55: solo uno cerca de las 8.
+
+   Para el producto, es un argumento para que la confirmación sea automática. Para la prueba, desde el 5/11 hay recordatorios en el calendario (ver [Cambios al plan](prueba-a-mano-segunda-etapa.md#cambios-al-plan)).
+
+### Qué falta
+
+- **Jueves 5/11:** la regla de la foto. Desde ahí se puede medir si llegan los autos chicos.
+- **Viernes 6/11:**
+  - los números de la semana;
+  - "¿Entró algún auto que no me contaste?";
+  - la oferta del mensaje para sus clientes.
+- **Viernes 13/11:** los números de la segunda semana.
+- **Lunes 16/11:** la charla de cierre, con la pregunta de precio.
