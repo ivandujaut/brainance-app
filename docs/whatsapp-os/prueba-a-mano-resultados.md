@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al miércoles 4 de noviembre,** con el chat de ese día completo y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 16 con la charla. Es un registro parcial: el veredicto va al cierre.
+**Actualizado al miércoles 4 de noviembre,** con el chat de ese día completo, hasta la noche, y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 16 con la charla. Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -186,7 +186,7 @@ Lo que dice esto:
 |---|---|---|
 | Lunes 2/11 | El resumen, a las 11:21, pregunta si se entregó un auto. La confirmación sale a las 18:25 y pregunta de quién es un auto nuevo | Contesta el resumen en 5 minutos, con 3 audios, una foto y un texto: la entrega, un auto que entró el viernes y un cliente que no volvió. La pregunta de la confirmación queda sin respuesta |
 | Martes 3/11 | El resumen, a las 8:48, y tres confirmaciones. Una pide el contacto del cliente, "así te aviso cuando le toque el service" | Contesta el resumen en 5 minutos: un auto se había entregado y se olvidó de avisar. Avisa solo un auto nuevo, con foto y audio. Pasa el contacto en 17 minutos |
-| Miércoles 4/11 | El resumen, a las 9:55, pregunta si se entregó un auto que tenía que salir el día anterior. La confirmación sale casi 10 horas después de la respuesta y pregunta los kilómetros de un auto, "para el aviso del service" | Contesta el resumen al minuto, con un saludo y 4 textos cortos: dos entregas del día anterior, que queda un solo auto y que un cliente pasó a avisar que vuelve. La pregunta de la confirmación sigue sin respuesta |
+| Miércoles 4/11 | El resumen, a las 9:55, pregunta si se entregó un auto que tenía que salir el día anterior. La confirmación sale casi 10 horas después de la respuesta y pregunta los kilómetros de un auto, "para el aviso del service" | Contesta el resumen al minuto, con un saludo y 4 textos cortos: dos entregas del día anterior, que queda un solo auto y que un cliente pasó a avisar que vuelve. A la noche contesta la confirmación en una hora: confirma que queda un solo auto y pasa los kilómetros |
 
 ### Los números, hasta ahora
 
@@ -196,10 +196,10 @@ Lo que dice esto:
 | Llegaron el mismo día | 1 de 2. El otro entró un viernes y llegó el lunes, en la respuesta al resumen |
 | Entregas avisadas sin que se preguntara | 0 de 4 |
 | Resúmenes contestados | 3 de 3, en 5, 5 y 1 minuto |
-| Preguntas contestadas | 4 de 5, sin contar la del miércoles a la noche, que todavía puede contestar |
+| Preguntas contestadas | 5 de 6 |
 | Días sin mensajes (los de la pregunta de la noche) | Ninguno |
 | Consultas | Ninguna |
-| Minutos hasta que contesta al sistema | 10 en promedio. Entre 1 y 27 |
+| Minutos hasta que contesta al sistema | 18 en promedio, entre 1 y 71. El de 71 fue a la noche, después del trabajo |
 | Mensajes del sistema que habrían necesitado una plantilla paga | 1 de 8: el primer resumen, porque el dueño no escribía desde el 28/10 |
 
 ### Lo que muestra, por ahora
@@ -212,9 +212,10 @@ Lo que dice esto:
 3. **El seguimiento del resumen funcionó.** El resumen del lunes recordó al cliente que volvía a fin de mes. El dueño contestó que todavía no había vuelto, y el miércoles avisó que pasó y vuelve en unos días.
 4. **Un pedido con un para qué se contestó; uno sin para qué, no.**
    - "¿Me pasás el contacto? Así te aviso cuando le toque el service" se contestó en 17 minutos.
+   - "¿Cuántos kilómetros tenía? Para el aviso del service" se contestó en una hora, a la noche.
    - "¿De quién es este auto?" quedó sin respuesta, pero además llegó 7 horas después de la tanda.
 
-   Es un caso de cada uno: no alcanza para una regla. La pregunta del miércoles a la noche también lleva el para qué (los kilómetros, "para el aviso del service"): va a ser el segundo caso.
+   Son dos casos contra uno: no alcanza para una regla, pero apunta a que el para qué ayuda, sobre todo si es el aviso a sus clientes.
 5. **Saluda antes de contestar y cierra con un "Ok".** No hace falta contestar ninguno de los dos.
 6. **El que falló fue el sistema, no el dueño.**
    - El dueño contesta en minutos.
