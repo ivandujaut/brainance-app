@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al miércoles 4 de noviembre,** con el chat exportado y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 16 con la charla. Es un registro parcial: el veredicto va al cierre.
+**Actualizado al miércoles 4 de noviembre,** con el chat de ese día completo y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 16 con la charla. Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -186,7 +186,7 @@ Lo que dice esto:
 |---|---|---|
 | Lunes 2/11 | El resumen, a las 11:21, pregunta si se entregó un auto. La confirmación sale a las 18:25 y pregunta de quién es un auto nuevo | Contesta el resumen en 5 minutos, con 3 audios, una foto y un texto: la entrega, un auto que entró el viernes y un cliente que no volvió. La pregunta de la confirmación queda sin respuesta |
 | Martes 3/11 | El resumen, a las 8:48, y tres confirmaciones. Una pide el contacto del cliente, "así te aviso cuando le toque el service" | Contesta el resumen en 5 minutos: un auto se había entregado y se olvidó de avisar. Avisa solo un auto nuevo, con foto y audio. Pasa el contacto en 17 minutos |
-| Miércoles 4/11 | El resumen pregunta si se entregó el auto del día anterior. La confirmación sale 10 horas después de la respuesta | Contesta con 5 textos cortos: dos entregas del día anterior, que queda un solo auto y que un cliente pasó a avisar que vuelve |
+| Miércoles 4/11 | El resumen, a las 9:55, pregunta si se entregó un auto que tenía que salir el día anterior. La confirmación sale casi 10 horas después de la respuesta y pregunta los kilómetros de un auto, "para el aviso del service" | Contesta el resumen al minuto, con un saludo y 4 textos cortos: dos entregas del día anterior, que queda un solo auto y que un cliente pasó a avisar que vuelve. La pregunta de la confirmación sigue sin respuesta |
 
 ### Los números, hasta ahora
 
@@ -195,10 +195,11 @@ Lo que dice esto:
 | Autos nuevos que llegaron al canal | 2, los dos solos. La pregunta del viernes dirá si entró alguno más |
 | Llegaron el mismo día | 1 de 2. El otro entró un viernes y llegó el lunes, en la respuesta al resumen |
 | Entregas avisadas sin que se preguntara | 0 de 4 |
-| Resúmenes contestados | 3 de 3, en 5 minutos los que tienen hora |
-| Preguntas contestadas | 4 de 6. Una quedó sin respuesta y otra salió el miércoles a la noche |
+| Resúmenes contestados | 3 de 3, en 5, 5 y 1 minuto |
+| Preguntas contestadas | 4 de 5, sin contar la del miércoles a la noche, que todavía puede contestar |
 | Días sin mensajes (los de la pregunta de la noche) | Ninguno |
 | Consultas | Ninguna |
+| Minutos hasta que contesta al sistema | 10 en promedio. Entre 1 y 27 |
 | Mensajes del sistema que habrían necesitado una plantilla paga | 1 de 8: el primer resumen, porque el dueño no escribía desde el 28/10 |
 
 ### Lo que muestra, por ahora
@@ -213,12 +214,12 @@ Lo que dice esto:
    - "¿Me pasás el contacto? Así te aviso cuando le toque el service" se contestó en 17 minutos.
    - "¿De quién es este auto?" quedó sin respuesta, pero además llegó 7 horas después de la tanda.
 
-   Es un caso de cada uno: no alcanza para una regla.
+   Es un caso de cada uno: no alcanza para una regla. La pregunta del miércoles a la noche también lleva el para qué (los kilómetros, "para el aviso del service"): va a ser el segundo caso.
 5. **Saluda antes de contestar y cierra con un "Ok".** No hace falta contestar ninguno de los dos.
 6. **El que falló fue el sistema, no el dueño.**
    - El dueño contesta en minutos.
-   - Dos de los tres días, el sistema contestó horas tarde: 7 horas el lunes y 10 el miércoles, porque la respuesta no se leyó a tiempo.
-   - El resumen del lunes salió a las 11:21, no a las 8.
+   - Dos de los tres días, el sistema contestó horas tarde: 7 horas el lunes y casi 10 el miércoles, porque la respuesta no se leyó a tiempo.
+   - Los resúmenes salieron a las 11:21, a las 8:48 y a las 9:55: solo uno cerca de las 8.
 
    Para el producto, es un argumento para que la confirmación sea automática. Para la prueba, desde el 5/11 hay recordatorios en el calendario (ver [Cambios al plan](prueba-a-mano-segunda-etapa.md#cambios-al-plan)).
 
