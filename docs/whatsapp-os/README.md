@@ -45,3 +45,4 @@ Facturación electrónica, inventario de repuestos, turnos, varios usuarios por 
 - [ADR 0101](../adr/0101-proveedor-de-whatsapp.md) (propuesto): cómo conectar WhatsApp y transcribir los audios. Sale del [informe "Conexión de WhatsApp para talleres"](../mercado/reports/Conexi%C3%B3n%20de%20WhatsApp%20para%20talleres.md).
 - [Prueba del webhook de Meta](prueba-webhook-meta.md): con el número de prueba, sin el taller. Muestra cómo llegan un texto, un audio y una foto.
 - [ADR 0102](../adr/0102-arquitectura-de-la-linea-whatsapp.md) (propuesto): la arquitectura de la línea, con diagramas. La IA propone, el dominio valida y el dueño confirma.
+- [Spec 100](../specs/100-canal-del-dueno.md) (borrador anticipado): el canal del dueño. Qué tiene que hacer el sistema que hoy se hace a mano en la prueba: confirmar cada tanda, el resumen de las 8 con los pendientes vencidos, las consultas y los clientes que tienen que volver.

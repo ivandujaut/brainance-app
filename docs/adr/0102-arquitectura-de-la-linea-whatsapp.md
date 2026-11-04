@@ -6,7 +6,7 @@
   - [ADR 0100](0100-linea-whatsapp-para-talleres.md): la línea.
   - [ADR 0101](0101-proveedor-de-whatsapp.md): proveedor de WhatsApp y transcripción.
   - [Inventario](../whatsapp-os/inventario.md): qué se reutiliza de la beta web.
-  - La spec 100 todavía no existe: sale de la prueba a mano.
+  - [Spec 100](../specs/100-canal-del-dueno.md): el canal del dueño, en borrador mientras corre la prueba a mano.
 
 ## Contexto
 
