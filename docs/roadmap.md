@@ -34,6 +34,10 @@ Cada ítem va a tener su spec en `docs/specs/`.
 - **Límite por IP en el widget** ([spec 015](specs/015-limite-por-ip.md), [ADR 0009](adr/0009-limites-por-ip-del-widget.md)): una sola IP no puede agotar el tope de un sitio, inventar visitantes ni mandar leads en masa. Se guarda solo una huella de la IP, por hasta 48 horas.
 - **Medir el detector de derivaciones y el caso del dato no cargado** ([spec 016](specs/016-medir-derivaciones-y-dato-no-cargado.md)): el eval mide si el panel cuenta bien las derivaciones; la portada muestra el número de "El dato no está cargado" (83 % hoy) junto al total, y el prompt corrige el patrón de sus fallas.
 
+## Línea WhatsApp (rama `whatsapp-os`)
+
+- **El canal del dueño** ([spec 100](specs/100-canal-del-dueno.md), borrador anticipado): el dueño del taller cuenta por WhatsApp lo que pasa, el sistema lo anota y confirma, y cada mañana le manda cómo está el taller y qué quedó pendiente. Se implementa si la [prueba a mano](whatsapp-os/prueba-a-mano-segunda-etapa.md) valida.
+
 ## Posicionamiento
 
 - **[Posicionamiento](posicionamiento.md):** para quién es, el problema en palabras del dueño, la promesa ("Ningún cliente sin respuesta. Y vos te enterás solo cuando hace falta.") y las tres pruebas que la sostienen. Cada spec y titular se contrasta contra esa página.
