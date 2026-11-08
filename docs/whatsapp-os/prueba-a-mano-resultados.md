@@ -188,7 +188,7 @@ Lo que dice esto:
 | Martes 3/11 | El resumen, a las 8:48, y tres confirmaciones. Una pide el contacto del cliente, "así te aviso cuando le toque el service" | Contesta el resumen en 5 minutos: un auto se había entregado y se olvidó de avisar. Avisa solo un auto nuevo, con foto y audio. Pasa el contacto en 17 minutos |
 | Miércoles 4/11 | El resumen, a las 9:55, pregunta si se entregó un auto que tenía que salir el día anterior. La confirmación sale casi 10 horas después de la respuesta y pregunta los kilómetros de un auto, "para el aviso del service" | Contesta el resumen al minuto, con un saludo y 4 textos cortos: dos entregas del día anterior, que queda un solo auto y que un cliente pasó a avisar que vuelve. A la noche contesta la confirmación en una hora: confirma que queda un solo auto y pasa los kilómetros |
 | Jueves 5/11 | Por error sale, a las 9:56, el resumen del miércoles, palabra por palabra: vuelve a preguntar por una entrega que el dueño ya había contestado. No lleva la confirmación de los kilómetros ni la regla de la foto. A la noche no va la pregunta | No contesta en todo el día |
-| Viernes 6/11 | Nada: ni la confirmación de sus audios, ni los números de la semana, ni la pregunta de cobertura, ni la oferta del mensaje para sus clientes | A las 12:57 contesta el resumen repetido con 3 audios cortos, uno por auto. De uno cuenta lo nuevo: un repuesto vino fallado, tuvo que desarmar otra vez y lo entrega al día siguiente. De los otros dos repite lo que ya había dicho, con detalles que no coinciden |
+| Viernes 6/11 | Nada: ni la confirmación de sus audios, ni los números de la semana, ni la pregunta de cobertura, ni la oferta del mensaje para sus clientes | A las 12:57 contesta el resumen repetido con 3 audios cortos, uno por auto. De uno cuenta lo nuevo: un repuesto vino fallado, tuvo que desarmar otra vez y lo entrega al día siguiente. De los otros dos cuenta una entrega que no coincide con lo del miércoles: puede ser el mismo trabajo contado otra vez o uno nuevo. Está sin confirmar |
 | Sábado 7 y domingo 8 | Nada | Nada |
 
 ### Los números, hasta ahora
@@ -231,13 +231,13 @@ Lo que dice esto:
    Para el producto, es el argumento más fuerte para automatizar: el resumen y la confirmación salen del registro, a hora fija, sin copiar y pegar. Para la prueba, ver [Cambios al plan](prueba-a-mano-segunda-etapa.md#cambios-al-plan).
 7. **Un resumen repetido sale caro.**
    - El jueves llegó el resumen del día anterior, con una pregunta que el dueño ya había contestado. Ese día no contestó: es el primer resumen sin respuesta en el día. No se puede separar si fue por el mensaje repetido o porque ese día tuvo un problema con un auto, que contó el viernes.
-   - El viernes contestó igual, auto por auto, sin marcar el error. Pero al contar de nuevo, los detalles cambiaron: otro día de entrega para un auto, y amortiguadores delanteros donde antes había dicho traseros.
-   - Usa "ayer" respecto del mensaje que contesta, no del día en que habla: al "tenía que salir ayer" del resumen viejo le contestó "salió ayer".
+   - El viernes contestó igual, auto por auto, sin marcar el error. Dos datos no coinciden con lo del miércoles: el día de entrega de un auto, y amortiguadores delanteros donde antes había dicho traseros.
+   - Hay dos lecturas, y el chat no alcanza para elegir: o contó de nuevo el mismo trabajo y se confundió, o son trabajos nuevos del jueves (otro auto del mismo modelo, o el tren delantero después del trasero). Si es lo primero, también usó "ayer" respecto del mensaje que contestaba ("tenía que salir ayer", "salió ayer"). Se confirma escuchando el audio, para descartar un error de la transcripción, y preguntándole.
    - Para el producto:
      - el resumen se arma siempre del registro, nunca se copia;
      - una pregunta contestada no se vuelve a hacer. El borrador de la spec 100 lo pide para dos días seguidos; tiene que valer para cualquier pregunta ya contestada;
      - cuando el dueño cuenta de nuevo un trabajo, el dominio no pisa lo anterior: lo reconoce como el mismo trabajo, y lo que no coincide lo pregunta o lo marca para revisar;
-     - una fecha relativa en una respuesta puede referirse al mensaje que contesta.
+     - una fecha relativa en una respuesta puede referirse al mensaje que contesta, y un dato que no coincide puede ser un trabajo nuevo: el sistema no elige solo, pregunta.
 8. **El auto en la lista trae lo nuevo, aunque no se pregunte por él.** El resumen viejo no preguntaba por el auto en reparación; solo lo listaba. Igual, el dueño contó lo que había pasado: el repuesto fallado, el desarme y la nueva fecha. Listar cada trabajo abierto funciona como pregunta.
 9. **Faltan los montos.** En la primera etapa, cuando contaba un trabajo de punta a punta, decía la mano de obra cobrada. En esta contesta lo que se le pregunta, y ninguna de las 4 entregas trajo el monto.
    - Sin montos no hay números de la semana (palanca 4).
