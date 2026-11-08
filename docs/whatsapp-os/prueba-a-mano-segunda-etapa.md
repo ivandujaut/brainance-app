@@ -143,7 +143,9 @@ Lo que se corrió de lo previsto, con fecha:
 - **El 8/11 el cierre pasó al lunes 23.** En la primera semana, las palancas 2, 3 y 5 no arrancaron (ver los puntos que siguen). Con el cierre el 16, la 5, la que toca el dolor principal del dueño, habría tenido cinco días hábiles. Los números del viernes son el 13 y el 20.
 - **El mensaje para retomar no se mandó el primer día.** El resumen ya sale desde el 2, así que el jueves 5 va solo la regla:
 
-  > [Nombre], una cosa más: cada auto que entra, aunque sea un cambio de aceite, mandame una foto. El resto te lo pregunto yo.
+  > Una cosa más: cada auto que entra, aunque sea un cambio de aceite, avisame. Con una foto alcanza; el resto te lo pregunto yo.
+
+  La regla es avisar cada auto; la foto es la forma más fácil, no un requisito. Un audio o un texto valen igual.
 
   El jueves 5 tampoco se mandó: ese día salió por error el resumen del día anterior. Va el lunes 9, y hasta ahí las palancas 2 y 3 no están en juego.
 - **El viernes 6 no salió nada:** ni los números, ni la pregunta de cobertura, ni la oferta del mensaje para sus clientes.
