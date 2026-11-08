@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al domingo 8 de noviembre,** con el chat hasta el viernes 6 y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 16 con la charla. Es un registro parcial: el veredicto va al cierre.
+**Actualizado al domingo 8 de noviembre,** con el chat hasta el viernes 6 y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -251,5 +251,5 @@ Lo que dice esto:
 
   Va fuera de la ventana de 24 horas, como el primero: el dueño no escribe desde el viernes al mediodía. En el producto, sería una plantilla paga.
 - **Martes 10/11:** la oferta del mensaje para sus clientes (palanca 5).
-- **Viernes 13/11:** los números de la semana y "¿Entró algún auto que no me contaste?".
-- **Lunes 16/11:** la charla de cierre, con la pregunta de precio. Las palancas 2, 3 y 5 llegan con una semana.
+- **Viernes 13/11 y 20/11:** los números de la semana y "¿Entró algún auto que no me contaste?".
+- **Lunes 23/11:** la charla de cierre, con la pregunta de precio. Se corrió del 16 para que las palancas 2, 3 y 5 tengan dos semanas.

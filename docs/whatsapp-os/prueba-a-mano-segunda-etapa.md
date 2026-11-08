@@ -1,6 +1,6 @@
 # Prueba a mano, segunda etapa: bajar la barrera
 
-Dos semanas más con el primer taller, del lunes 2 al lunes 16 de noviembre de 2026. Sale de los [resultados de la primera etapa](prueba-a-mano-resultados.md). Estaba prevista del 28 de octubre al 10 de noviembre (ver [Cambios al plan](#cambios-al-plan)).
+Tres semanas más con el primer taller, del lunes 2 al lunes 23 de noviembre de 2026. Sale de los [resultados de la primera etapa](prueba-a-mano-resultados.md). Estaba prevista en dos semanas, del 28 de octubre al 10 de noviembre (ver [Cambios al plan](#cambios-al-plan)).
 
 ## Qué cambia y por qué
 
@@ -37,7 +37,7 @@ Dos semanas más con el primer taller, del lunes 2 al lunes 16 de noviembre de 2
    - Una vez por semana, el sistema le arma un mensaje para sus clientes, **que manda él**.
    - Los días sin trabajo sirven para cargar a los clientes de antes, "así te aviso cuando les toca el service".
 
-**Las palancas 1 a 4 arrancan el primer día. La 5 arranca el viernes 6 de noviembre,** para no sumarle tarea al comienzo.
+**Las palancas 1 a 4 arrancan el primer día. La 5 arranca después,** para no sumarle tarea al comienzo: estaba prevista el viernes 6 y pasó al martes 10 (ver [Cambios al plan](#cambios-al-plan)).
 
 ## Lo que hace el sistema (el dueño del producto, a mano)
 
@@ -48,9 +48,9 @@ Siempre con la misma voz, mensajes cortos y sin opinar. Nunca se les escribe a s
 | Cada tanda | **Una confirmación,** con lo que se anotó. Si falta algo importante, **una sola pregunta** |
 | 8:00 | **El resumen:** los autos en curso, lo pendiente de cada uno y lo entregado el día anterior |
 | 20:00, solo los días sin mensajes | **Una pregunta,** sobre un trabajo abierto si lo hay. Si no, "¿Entró algún auto hoy? Con una foto alcanza" |
-| Viernes 6/11 y 13/11 | **Los números de la semana** (autos y mano de obra cobrada) y "¿Entró algún auto que no me contaste?" |
-| Viernes 6/11 | Además, **la oferta del mensaje para sus clientes** y la invitación a cargar clientes de antes en los días tranquilos |
-| Lunes 16/11 | **La charla de cierre,** en persona o por teléfono, con la pregunta de precio |
+| Martes 10/11 | **La oferta del mensaje para sus clientes** y la invitación a cargar clientes de antes en los días tranquilos |
+| Viernes 13/11 y 20/11 | **Los números de la semana** (autos y mano de obra cobrada) y "¿Entró algún auto que no me contaste?" |
+| Lunes 23/11 | **La charla de cierre,** en persona o por teléfono, con la pregunta de precio |
 
 **Fuera de eso no se le escribe ni se le recuerda nada.** Si hay una charla en persona sobre la prueba, se anota con fecha.
 
@@ -139,7 +139,8 @@ Y dos pestañas nuevas:
 
 Lo que se corrió de lo previsto, con fecha:
 
-- **Arrancó el lunes 2 de noviembre, no el 28 de octubre,** con el primer resumen. El cierre pasó del martes 10 al lunes 16, para que sigan siendo dos semanas. Los números del viernes son el 6 y el 13; el del 30 de octubre no se mandó, porque la etapa no había arrancado.
+- **Arrancó el lunes 2 de noviembre, no el 28 de octubre,** con el primer resumen. El cierre pasó del martes 10 al lunes 16, para que sigan siendo dos semanas. El número del 30 de octubre no se mandó, porque la etapa no había arrancado.
+- **El 8/11 el cierre pasó al lunes 23.** En la primera semana, las palancas 2, 3 y 5 no arrancaron (ver los puntos que siguen). Con el cierre el 16, la 5, la que toca el dolor principal del dueño, habría tenido cinco días hábiles. Los números del viernes son el 13 y el 20.
 - **El mensaje para retomar no se mandó el primer día.** El resumen ya sale desde el 2, así que el jueves 5 va solo la regla:
 
   > [Nombre], una cosa más: cada auto que entra, aunque sea un cambio de aceite, mandame una foto. El resto te lo pregunto yo.
