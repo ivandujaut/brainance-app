@@ -144,7 +144,11 @@ Lo que se corrió de lo previsto, con fecha:
 
   > [Nombre], una cosa más: cada auto que entra, aunque sea un cambio de aceite, mandame una foto. El resto te lo pregunto yo.
 
-  Hasta ahí, las palancas 2 y 3 no están en juego.
+  El jueves 5 tampoco se mandó: ese día salió por error el resumen del día anterior. Va el lunes 9, y hasta ahí las palancas 2 y 3 no están en juego.
+- **El viernes 6 no salió nada:** ni los números, ni la pregunta de cobertura, ni la oferta del mensaje para sus clientes.
+  - La oferta (palanca 5) pasa al martes 10.
+  - Los números y la pregunta de cobertura, al viernes 13.
+  - Desde el 9/11, cada confirmación de una entrega pregunta cuánto se cobró: sin montos no hay números.
 - **La planilla:** las columnas Origen y Auto y las pestañas Sistema y Cobertura se sumaron el 4/11, cargadas hacia atrás desde el chat.
 - **Los horarios del sistema:** dos de las tres primeras respuestas salieron horas tarde (ver [cómo va](prueba-a-mano-resultados.md#segunda-etapa-en-curso)). Desde el 5/11, quien hace de sistema tiene recordatorios en el calendario los días hábiles:
   - 7:55, el resumen;

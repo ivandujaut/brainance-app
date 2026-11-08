@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al miércoles 4 de noviembre,** con el chat de ese día completo, hasta la noche, y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 16 con la charla. Es un registro parcial: el veredicto va al cierre.
+**Actualizado al domingo 8 de noviembre,** con el chat hasta el viernes 6 y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 16 con la charla. Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -187,20 +187,24 @@ Lo que dice esto:
 | Lunes 2/11 | El resumen, a las 11:21, pregunta si se entregó un auto. La confirmación sale a las 18:25 y pregunta de quién es un auto nuevo | Contesta el resumen en 5 minutos, con 3 audios, una foto y un texto: la entrega, un auto que entró el viernes y un cliente que no volvió. La pregunta de la confirmación queda sin respuesta |
 | Martes 3/11 | El resumen, a las 8:48, y tres confirmaciones. Una pide el contacto del cliente, "así te aviso cuando le toque el service" | Contesta el resumen en 5 minutos: un auto se había entregado y se olvidó de avisar. Avisa solo un auto nuevo, con foto y audio. Pasa el contacto en 17 minutos |
 | Miércoles 4/11 | El resumen, a las 9:55, pregunta si se entregó un auto que tenía que salir el día anterior. La confirmación sale casi 10 horas después de la respuesta y pregunta los kilómetros de un auto, "para el aviso del service" | Contesta el resumen al minuto, con un saludo y 4 textos cortos: dos entregas del día anterior, que queda un solo auto y que un cliente pasó a avisar que vuelve. A la noche contesta la confirmación en una hora: confirma que queda un solo auto y pasa los kilómetros |
+| Jueves 5/11 | Por error sale, a las 9:56, el resumen del miércoles, palabra por palabra: vuelve a preguntar por una entrega que el dueño ya había contestado. No lleva la confirmación de los kilómetros ni la regla de la foto. A la noche no va la pregunta | No contesta en todo el día |
+| Viernes 6/11 | Nada: ni la confirmación de sus audios, ni los números de la semana, ni la pregunta de cobertura, ni la oferta del mensaje para sus clientes | A las 12:57 contesta el resumen repetido con 3 audios cortos, uno por auto. De uno cuenta lo nuevo: un repuesto vino fallado, tuvo que desarmar otra vez y lo entrega al día siguiente. De los otros dos repite lo que ya había dicho, con detalles que no coinciden |
+| Sábado 7 y domingo 8 | Nada | Nada |
 
 ### Los números, hasta ahora
 
 | Medida | Valor |
 |---|---|
-| Autos nuevos que llegaron al canal | 2, los dos solos. La pregunta del viernes dirá si entró alguno más |
+| Autos nuevos que llegaron al canal | 2, los dos solos. La pregunta de cobertura del viernes no se hizo: no se sabe si entró alguno más |
 | Llegaron el mismo día | 1 de 2. El otro entró un viernes y llegó el lunes, en la respuesta al resumen |
 | Entregas avisadas sin que se preguntara | 0 de 4 |
-| Resúmenes contestados | 3 de 3, en 5, 5 y 1 minuto |
-| Preguntas contestadas | 5 de 6 |
-| Días sin mensajes (los de la pregunta de la noche) | Ninguno |
+| Entregas con el monto cobrado | 0 de 4 |
+| Resúmenes contestados | 4 de 4: tres en 1 a 5 minutos; el repetido, al día siguiente |
+| Preguntas contestadas | 6 de 7 |
+| Días sin mensajes (los de la pregunta de la noche) | 1, el jueves. La pregunta no se mandó |
 | Consultas | Ninguna |
-| Minutos hasta que contesta al sistema | 18 en promedio, entre 1 y 71. El de 71 fue a la noche, después del trabajo |
-| Mensajes del sistema que habrían necesitado una plantilla paga | 1 de 8: el primer resumen, porque el dueño no escribía desde el 28/10 |
+| Minutos hasta que contesta al sistema | 11 de mediana, entre 1 minuto y 27 horas (el resumen repetido) |
+| Mensajes del sistema que habrían necesitado una plantilla paga | 1 de 9: el primer resumen, porque el dueño no escribía desde el 28/10 |
 
 ### Lo que muestra, por ahora
 
@@ -208,7 +212,7 @@ Lo que dice esto:
    - Los autos nuevos llegaron sin que nadie preguntara, con foto, cliente y trabajo.
    - Las 4 entregas se supieron porque el resumen las preguntó o las listó. En una, el dueño dijo que se había olvidado de avisar.
    - Para el producto: el resumen no es un extra, es lo que cierra los trabajos. Sin él, el registro tendría autos en el taller que ya se fueron. El borrador de la spec 100 ya lo pide: los pendientes vencidos van al resumen "sin confirmar".
-2. **El resumen es el mensaje que más se contesta,** y en minutos.
+2. **El resumen es el mensaje que más se contesta,** en minutos. La excepción fue el repetido (punto 7).
 3. **El seguimiento del resumen funcionó.** El resumen del lunes recordó al cliente que volvía a fin de mes. El dueño contestó que todavía no había vuelto, y el miércoles avisó que pasó y vuelve en unos días.
 4. **Un pedido con un para qué se contestó; uno sin para qué, no.**
    - "¿Me pasás el contacto? Así te aviso cuando le toque el service" se contestó en 17 minutos.
@@ -218,18 +222,34 @@ Lo que dice esto:
    Son dos casos contra uno: no alcanza para una regla, pero apunta a que el para qué ayuda, sobre todo si es el aviso a sus clientes.
 5. **Saluda antes de contestar y cierra con un "Ok".** No hace falta contestar ninguno de los dos.
 6. **El que falló fue el sistema, no el dueño.**
-   - El dueño contesta en minutos.
-   - Dos de los tres días, el sistema contestó horas tarde: 7 horas el lunes y casi 10 el miércoles, porque la respuesta no se leyó a tiempo.
-   - Los resúmenes salieron a las 11:21, a las 8:48 y a las 9:55: solo uno cerca de las 8.
+   - El dueño contesta en minutos, salvo el resumen repetido.
+   - Dos de los tres primeros días, el sistema contestó horas tarde: 7 horas el lunes y casi 10 el miércoles, porque la respuesta no se leyó a tiempo.
+   - Ningún resumen salió a las 8: salieron a las 11:21, 8:48, 9:55 y 9:56.
+   - El jueves salió un resumen viejo (punto 7). El viernes no salió nada, y desde el viernes al mediodía la respuesta del dueño no tiene acuse.
+   - Al cerrar la primera semana, las palancas 2, 3 y 5 no arrancaron, y la 4 va sin números. Lo que se midió es la palanca 1 (el sistema pregunta) y las confirmaciones.
 
-   Para el producto, es un argumento para que la confirmación sea automática. Para la prueba, desde el 5/11 hay recordatorios en el calendario (ver [Cambios al plan](prueba-a-mano-segunda-etapa.md#cambios-al-plan)).
+   Para el producto, es el argumento más fuerte para automatizar: el resumen y la confirmación salen del registro, a hora fija, sin copiar y pegar. Para la prueba, ver [Cambios al plan](prueba-a-mano-segunda-etapa.md#cambios-al-plan).
+7. **Un resumen repetido sale caro.**
+   - El jueves llegó el resumen del día anterior, con una pregunta que el dueño ya había contestado. Ese día no contestó: es el primer resumen sin respuesta en el día. No se puede separar si fue por el mensaje repetido o porque ese día tuvo un problema con un auto, que contó el viernes.
+   - El viernes contestó igual, auto por auto, sin marcar el error. Pero al contar de nuevo, los detalles cambiaron: otro día de entrega para un auto, y amortiguadores delanteros donde antes había dicho traseros.
+   - Usa "ayer" respecto del mensaje que contesta, no del día en que habla: al "tenía que salir ayer" del resumen viejo le contestó "salió ayer".
+   - Para el producto:
+     - el resumen se arma siempre del registro, nunca se copia;
+     - una pregunta contestada no se vuelve a hacer. El borrador de la spec 100 lo pide para dos días seguidos; tiene que valer para cualquier pregunta ya contestada;
+     - cuando el dueño cuenta de nuevo un trabajo, el dominio no pisa lo anterior: lo reconoce como el mismo trabajo, y lo que no coincide lo pregunta o lo marca para revisar;
+     - una fecha relativa en una respuesta puede referirse al mensaje que contesta.
+8. **El auto en la lista trae lo nuevo, aunque no se pregunte por él.** El resumen viejo no preguntaba por el auto en reparación; solo lo listaba. Igual, el dueño contó lo que había pasado: el repuesto fallado, el desarme y la nueva fecha. Listar cada trabajo abierto funciona como pregunta.
+9. **Faltan los montos.** En la primera etapa, cuando contaba un trabajo de punta a punta, decía la mano de obra cobrada. En esta contesta lo que se le pregunta, y ninguna de las 4 entregas trajo el monto.
+   - Sin montos no hay números de la semana (palanca 4).
+   - Para el producto: la confirmación de una entrega pregunta cuánto se cobró, que es lo que después arma los números.
 
 ### Qué falta
 
-- **Jueves 5/11:** la regla de la foto. Desde ahí se puede medir si llegan los autos chicos.
-- **Viernes 6/11:**
-  - los números de la semana;
-  - "¿Entró algún auto que no me contaste?";
-  - la oferta del mensaje para sus clientes.
-- **Viernes 13/11:** los números de la segunda semana.
-- **Lunes 16/11:** la charla de cierre, con la pregunta de precio.
+- **Lunes 9/11:**
+  - el resumen, con una disculpa por el repetido, lo nuevo del viernes y una sola pregunta;
+  - la regla de la foto.
+
+  Va fuera de la ventana de 24 horas, como el primero: el dueño no escribe desde el viernes al mediodía. En el producto, sería una plantilla paga.
+- **Martes 10/11:** la oferta del mensaje para sus clientes (palanca 5).
+- **Viernes 13/11:** los números de la semana y "¿Entró algún auto que no me contaste?".
+- **Lunes 16/11:** la charla de cierre, con la pregunta de precio. Las palancas 2, 3 y 5 llegan con una semana.
