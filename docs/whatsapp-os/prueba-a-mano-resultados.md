@@ -233,7 +233,7 @@ Lo que dice esto:
 7. **Un resumen repetido sale caro.**
    - El jueves llegó el resumen del día anterior, con una pregunta que el dueño ya había contestado. Ese día no contestó: es el primer resumen sin respuesta en el día. No se puede separar si fue por el mensaje repetido o porque ese día tuvo un problema con un auto, que contó el viernes.
    - El viernes contestó igual, auto por auto, sin marcar el error. Dos datos no coinciden con lo del miércoles: el día de entrega de un auto, y amortiguadores delanteros donde antes había dicho traseros.
-   - Hay dos lecturas, y el chat no alcanza para elegir: o contó de nuevo el mismo trabajo y se confundió, o son trabajos nuevos del jueves (otro auto del mismo modelo, o el tren delantero después del trasero). Si es lo primero, también usó "ayer" respecto del mensaje que contestaba ("tenía que salir ayer", "salió ayer"). Se confirma escuchando el audio, para descartar un error de la transcripción, y preguntándole.
+   - Hay dos lecturas, y el chat no alcanza para elegir: o contó de nuevo el mismo trabajo y se confundió, o son trabajos nuevos del jueves (otro auto del mismo modelo, o el tren delantero después del trasero). Si es lo primero, también usó "ayer" respecto del mensaje que contestaba ("tenía que salir ayer", "salió ayer"). Escuchado el audio, dice "delanteros": no es un error de la transcripción. Queda preguntarle.
    - Para el producto:
      - el resumen se arma siempre del registro, nunca se copia;
      - una pregunta contestada no se vuelve a hacer. El borrador de la spec 100 lo pide para dos días seguidos; tiene que valer para cualquier pregunta ya contestada;
