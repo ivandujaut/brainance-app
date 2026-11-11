@@ -225,7 +225,7 @@ Lo que dice esto:
    - "¿De quién es este auto?" quedó sin respuesta, pero además llegó 7 horas después de la tanda.
 
    Son dos casos contra uno: no alcanza para una regla, pero apunta a que el para qué ayuda, sobre todo si es el aviso a sus clientes.
-5. **Saluda antes de contestar y cierra con un "Ok".** No hace falta contestar ninguno de los dos.
+5. **Saluda antes de contestar y cierra con un "Ok", un "Si así es" o un "Muy bueno".** No hace falta contestarlos con texto. Una reacción de WhatsApp (👍) alcanza para que vea que se leyó, sin sumar un mensaje ni pedirle respuesta. Se usa desde el 11/11; la API de WhatsApp también permite mandar reacciones.
 6. **El que falló fue el sistema, no el dueño.**
    - El dueño contesta en minutos, salvo el resumen repetido.
    - Dos de los tres primeros días, el sistema contestó horas tarde: 7 horas el lunes y casi 10 el miércoles, porque la respuesta no se leyó a tiempo.
