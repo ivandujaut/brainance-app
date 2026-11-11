@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al martes 10 de noviembre,** con el chat hasta el martes 10 a la mañana y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
+**Actualizado al miércoles 11 de noviembre,** con el chat hasta el miércoles 11 al mediodía y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -192,6 +192,8 @@ Lo que dice esto:
 | Sábado 7 y domingo 8 | Nada | Nada |
 | Lunes 9/11 (feriado) | El resumen, a las 9:34, aclara el repetido del jueves, confirma lo del viernes y pregunta si se entregó un auto. Un minuto después, la regla: "cada auto que entra, aunque sea un cambio de aceite, avisame. Con una foto alcanza". La confirmación sale media hora después de la respuesta, sin pregunta | A los 2 minutos manda una foto del auto y a los 4 un audio: lo entregó el sábado, volvió el domingo por otra falla que no es su trabajo, y lo entrega de nuevo al día siguiente. A la confirmación contesta "Si así es" |
 | Martes 10/11 | El resumen, a las 9:01, lista el auto que sale ese día y pregunta si un dato del viernes que no coincidía era otro trabajo | Contesta en una hora y media con 4 audios, 2 fotos y un texto. Sí era otro trabajo: el auto había vuelto. Sin que se le pregunte, avisa otro auto que volvió el feriado y uno nuevo, con foto, trabajo, kilómetros y fecha de entrega |
+| Martes 10/11, mediodía | La confirmación, a las 12:25, anota todo y pregunta de quién es el auto nuevo, "así te aviso cuando le toque el service" | No contesta |
+| Miércoles 11/11 | El resumen, a las 10:13, pregunta si se entregó el auto que salía el día anterior. No repite la pregunta sin contestar | Contesta en casi 3 horas con 3 audios: el auto salió ese día, no el anterior; el auto nuevo tiene un problema más grave y está desarmando el motor; y va a ir a preguntarle a un cliente qué quiere hacer |
 
 ### Los números, hasta ahora
 
@@ -199,10 +201,10 @@ Lo que dice esto:
 |---|---|
 | Autos que entraron y llegaron al canal | 5: 3 nuevos y 2 que volvieron. 4 llegaron solos; uno, que había vuelto sin avisar, apareció en una respuesta |
 | Llegaron el mismo día | 2 de 4 con fecha de entrada. Uno, al lunes siguiente; otro, entró el feriado y llegó al día siguiente |
-| Entregas avisadas sin que se preguntara | 0 de 6 |
-| Entregas con el monto cobrado | 0 de 6 |
-| Resúmenes contestados | 6 de 6: cuatro en 1 a 5 minutos, uno en hora y media y el repetido, al día siguiente |
-| Preguntas contestadas | 8 de 9 |
+| Entregas avisadas sin que se preguntara | 0 de 7 |
+| Entregas con el monto cobrado | 0 de 7 |
+| Resúmenes contestados | 7 de 7: cuatro en 1 a 5 minutos, dos en 1,5 y 3 horas, y el repetido, al día siguiente |
+| Preguntas contestadas | 9 de 11 |
 | Días sin mensajes (los de la pregunta de la noche) | 1, el jueves. La pregunta no se mandó |
 | Consultas | Ninguna |
 | Minutos hasta que contesta al sistema | 11 de mediana, entre 1 minuto y 27 horas (el resumen repetido) |
@@ -254,9 +256,13 @@ Lo que dice esto:
 13. **El primer auto nuevo después de la regla llegó solo y completo:** foto con la patente, audio con el trabajo y la fecha de entrega, y un texto con los kilómetros. Es un solo caso, y no es un trabajo chico.
 14. **Los autos que vuelven son frecuentes:** dos en dos días, los dos por una falla después del trabajo. Uno lo avisó solo; el otro, solo cuando se le preguntó.
 
+15. **La pregunta por el dueño del auto quedó sin contestar, como la primera vez.** Las dos llegaron en una confirmación larga, después de que él ya había contado todo. La de los kilómetros, que se contestó, era corta y sola. Puede pesar más el formato que el para qué.
+16. **El cliente que no vuelve lo va a buscar él.** "Mañana iré a preguntar qué va a hacer con la pérdida de agua". Es el seguimiento que el sistema le recordó durante dos semanas. Para el producto, es justo el lugar del mensaje para sus clientes.
+17. **Las fechas previstas se corren y no lo avisa.** Un auto que salía el martes salió el miércoles, y otro que salía el miércoles se complicó. Lo cuenta cuando el resumen pregunta. El resumen tiene que listar lo que venció como "sin confirmar", no como hecho.
+
 ### Qué falta
 
-- **Martes 10/11:** la confirmación de lo de la mañana y la oferta del mensaje para sus clientes (palanca 5).
+- **La oferta del mensaje para sus clientes (palanca 5):** todavía no se mandó. Va después de la próxima respuesta.
 - **Jueves 12/11:** el monto de las entregas sin monto, en una sola pregunta y por el total.
 - **Sin confirmar:** si el otro dato del viernes (un auto que "entró el jueves") es la vuelta que avisó el martes o una visita más.
 - **Viernes 13/11 y 20/11:** los números de la semana y "¿Entró algún auto que no me contaste?".
