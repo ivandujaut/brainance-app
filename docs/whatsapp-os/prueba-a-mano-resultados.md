@@ -194,6 +194,7 @@ Lo que dice esto:
 | Martes 10/11 | El resumen, a las 9:01, lista el auto que sale ese día y pregunta si un dato del viernes que no coincidía era otro trabajo | Contesta en una hora y media con 4 audios, 2 fotos y un texto. Sí era otro trabajo: el auto había vuelto. Sin que se le pregunte, avisa otro auto que volvió el feriado y uno nuevo, con foto, trabajo, kilómetros y fecha de entrega |
 | Martes 10/11, mediodía | La confirmación, a las 12:25, anota todo y pregunta de quién es el auto nuevo, "así te aviso cuando le toque el service" | No contesta |
 | Miércoles 11/11 | El resumen, a las 10:13, pregunta si se entregó el auto que salía el día anterior. No repite la pregunta sin contestar | Contesta en casi 3 horas con 3 audios: el auto salió ese día, no el anterior; el auto nuevo tiene un problema más grave y está desarmando el motor; y va a ir a preguntarle a un cliente qué quiere hacer |
+| Miércoles 11/11, mediodía | La confirmación, sin pregunta, y la oferta del mensaje para sus clientes (palanca 5) | A la oferta contesta enseguida "mandame, sí", y cuenta que ya le escribió al cliente que no volvía |
 
 ### Los números, hasta ahora
 
@@ -260,9 +261,11 @@ Lo que dice esto:
 16. **El cliente que no vuelve lo va a buscar él.** "Mañana iré a preguntar qué va a hacer con la pérdida de agua". Es el seguimiento que el sistema le recordó durante dos semanas. Para el producto, es justo el lugar del mensaje para sus clientes.
 17. **Las fechas previstas se corren y no lo avisa.** Un auto que salía el martes salió el miércoles, y otro que salía el miércoles se complicó. Lo cuenta cuando el resumen pregunta. El resumen tiene que listar lo que venció como "sin confirmar", no como hecho.
 
+18. **La oferta del mensaje para sus clientes se aceptó a la primera,** en minutos y por audio. Es la palanca que toca su dolor principal. Falta ver si lo manda, a cuántos y si alguien contesta.
+
 ### Qué falta
 
-- **La oferta del mensaje para sus clientes (palanca 5):** todavía no se mandó. Va después de la próxima respuesta.
+- **El mensaje para sus clientes:** se le pasa el texto. Después, preguntarle si lo mandó y si alguien contestó.
 - **Jueves 12/11:** el monto de las entregas sin monto, en una sola pregunta y por el total.
 - **Sin confirmar:** si el otro dato del viernes (un auto que "entró el jueves") es la vuelta que avisó el martes o una visita más.
 - **Viernes 13/11 y 20/11:** los números de la semana y "¿Entró algún auto que no me contaste?".
