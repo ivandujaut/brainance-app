@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al miércoles 11 de noviembre,** con el chat hasta el miércoles 11 al mediodía y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
+**Actualizado al jueves 12 de noviembre,** con el chat hasta el jueves 12 al mediodía y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -194,7 +194,8 @@ Lo que dice esto:
 | Martes 10/11 | El resumen, a las 9:01, lista el auto que sale ese día y pregunta si un dato del viernes que no coincidía era otro trabajo | Contesta en una hora y media con 4 audios, 2 fotos y un texto. Sí era otro trabajo: el auto había vuelto. Sin que se le pregunte, avisa otro auto que volvió el feriado y uno nuevo, con foto, trabajo, kilómetros y fecha de entrega |
 | Martes 10/11, mediodía | La confirmación, a las 12:25, anota todo y pregunta de quién es el auto nuevo, "así te aviso cuando le toque el service" | No contesta |
 | Miércoles 11/11 | El resumen, a las 10:13, pregunta si se entregó el auto que salía el día anterior. No repite la pregunta sin contestar | Contesta en casi 3 horas con 3 audios: el auto salió ese día, no el anterior; el auto nuevo tiene un problema más grave y está desarmando el motor; y va a ir a preguntarle a un cliente qué quiere hacer |
-| Miércoles 11/11, mediodía | La confirmación, sin pregunta, y la oferta del mensaje para sus clientes (palanca 5) | A la oferta contesta enseguida "mandame, sí", y cuenta que ya le escribió al cliente que no volvía |
+| Miércoles 11/11, mediodía | La confirmación, sin pregunta, y la oferta del mensaje para sus clientes (palanca 5) | A la oferta contesta enseguida "mandame, sí", y cuenta que ya le escribió al cliente que no volvía. Al texto para sus clientes contesta "Muy bueno" |
+| Jueves 12/11 | El resumen, a las 12:03, pregunta cuánto cobró de mano de obra en total desde el 2/11, más o menos, por las 7 entregas sin monto | Contesta en una hora: un audio por cada auto abierto y el total en un texto, con cuál fue el que más cobró |
 
 ### Los números, hasta ahora
 
@@ -203,9 +204,9 @@ Lo que dice esto:
 | Autos que entraron y llegaron al canal | 5: 3 nuevos y 2 que volvieron. 4 llegaron solos; uno, que había vuelto sin avisar, apareció en una respuesta |
 | Llegaron el mismo día | 2 de 4 con fecha de entrada. Uno, al lunes siguiente; otro, entró el feriado y llegó al día siguiente |
 | Entregas avisadas sin que se preguntara | 0 de 7 |
-| Entregas con el monto cobrado | 0 de 7 |
-| Resúmenes contestados | 7 de 7: cuatro en 1 a 5 minutos, dos en 1,5 y 3 horas, y el repetido, al día siguiente |
-| Preguntas contestadas | 9 de 11 |
+| Entregas con el monto cobrado | Ninguna por auto. El total de las 7 sí: lo dio en una sola respuesta, cuando se le preguntó por el total |
+| Resúmenes contestados | 8 de 8: cuatro en 1 a 5 minutos, tres entre 1 y 3 horas, y el repetido, al día siguiente |
+| Preguntas contestadas | 11 de 13 |
 | Días sin mensajes (los de la pregunta de la noche) | 1, el jueves. La pregunta no se mandó |
 | Consultas | Ninguna |
 | Minutos hasta que contesta al sistema | 11 de mediana, entre 1 minuto y 27 horas (el resumen repetido) |
@@ -263,10 +264,11 @@ Lo que dice esto:
 
 18. **La oferta del mensaje para sus clientes se aceptó a la primera,** en minutos y por audio. Es la palanca que toca su dolor principal. Falta ver si lo manda, a cuántos y si alguien contesta.
 
+19. **La plata se contesta si se pregunta por el total.** Una pregunta por el total de dos semanas, "más o menos", se contestó en una hora y con el monto exacto. Para el producto: los números se pueden armar con una pregunta semanal por el total, sin preguntar auto por auto. La mano de obra de esas dos semanas es mucho más que lo que podría costar el producto.
+
 ### Qué falta
 
 - **El mensaje para sus clientes:** se le pasa el texto. Después, preguntarle si lo mandó y si alguien contestó.
-- **Jueves 12/11:** el monto de las entregas sin monto, en una sola pregunta y por el total.
 - **Sin confirmar:** si el otro dato del viernes (un auto que "entró el jueves") es la vuelta que avisó el martes o una visita más.
 - **Viernes 13/11 y 20/11:** los números de la semana y "¿Entró algún auto que no me contaste?".
 - **Lunes 23/11:** la charla de cierre, con la pregunta de precio. Se corrió del 16 para que las palancas 2, 3 y 5 tengan dos semanas.
