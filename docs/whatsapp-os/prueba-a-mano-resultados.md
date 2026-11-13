@@ -207,7 +207,7 @@ Lo que dice esto:
 | Entregas avisadas sin que se preguntara | 0 de 7 |
 | Entregas con el monto cobrado | Ninguna por auto. El total de las 7 sí: lo dio en una sola respuesta, cuando se le preguntó por el total |
 | Resúmenes contestados | 9 de 9: cinco en 1 a 5 minutos, tres entre 1 y 3 horas, y el repetido, al día siguiente |
-| Preguntas contestadas | 11 de 13 |
+| Preguntas contestadas | 12 de 14 |
 | Días sin mensajes (los de la pregunta de la noche) | 1, el jueves. La pregunta no se mandó |
 | Consultas | Ninguna |
 | Minutos hasta que contesta al sistema | 11 de mediana, entre 1 minuto y 27 horas (el resumen repetido) |
@@ -259,7 +259,7 @@ Lo que dice esto:
 13. **El primer auto nuevo después de la regla llegó solo y completo:** foto con la patente, audio con el trabajo y la fecha de entrega, y un texto con los kilómetros. Es un solo caso, y no es un trabajo chico.
 14. **Los autos que vuelven son frecuentes:** dos en dos días, los dos por una falla después del trabajo. Uno lo avisó solo; el otro, solo cuando se le preguntó.
 
-15. **La pregunta por el dueño del auto quedó sin contestar, como la primera vez.** Las dos llegaron en una confirmación larga, después de que él ya había contado todo. La de los kilómetros, que se contestó, era corta y sola. Puede pesar más el formato que el para qué.
+15. **La pregunta por el dueño del auto quedó sin contestar, como la primera vez.** Las dos llegaron en una confirmación larga, después de que él ya había contado todo. La de los kilómetros, que se contestó, era corta y sola. Puede pesar más el formato que el para qué. El viernes 13 se probó: la misma pregunta, con el mismo para qué, en una confirmación corta de dos líneas. Se contestó en menos de una hora, con la tarjeta de contacto del cliente. Apoya que pesa el formato: la pregunta tiene que ir en un mensaje corto, no al final de uno largo.
 16. **El cliente que no vuelve lo va a buscar él.** "Mañana iré a preguntar qué va a hacer con la pérdida de agua". Es el seguimiento que el sistema le recordó durante dos semanas. Para el producto, es justo el lugar del mensaje para sus clientes.
 17. **Las fechas previstas se corren y no lo avisa.** Un auto que salía el martes salió el miércoles, y otro que salía el miércoles se complicó. Lo cuenta cuando el resumen pregunta. El resumen tiene que listar lo que venció como "sin confirmar", no como hecho.
 
