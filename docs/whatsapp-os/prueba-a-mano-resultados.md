@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al viernes 13 de noviembre,** con el chat hasta el viernes 13 a la mañana y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
+**Actualizado al sábado 14 de noviembre,** con los mensajes hasta el sábado 14 a la tarde y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -196,18 +196,19 @@ Lo que dice esto:
 | Miércoles 11/11 | El resumen, a las 10:13, pregunta si se entregó el auto que salía el día anterior. No repite la pregunta sin contestar | Contesta en casi 3 horas con 3 audios: el auto salió ese día, no el anterior; el auto nuevo tiene un problema más grave y está desarmando el motor; y va a ir a preguntarle a un cliente qué quiere hacer |
 | Miércoles 11/11, mediodía | La confirmación, sin pregunta, y la oferta del mensaje para sus clientes (palanca 5) | A la oferta contesta enseguida "mandame, sí", y cuenta que ya le escribió al cliente que no volvía. Al texto para sus clientes contesta "Muy bueno" |
 | Jueves 12/11 | El resumen, a las 12:03, pregunta cuánto cobró de mano de obra en total desde el 2/11, más o menos, por las 7 entregas sin monto | Contesta en una hora: un audio por cada auto abierto y el total en un texto, con cuál fue el que más cobró |
-| Viernes 13/11 | El resumen, a las 8:17, sin pregunta: el auto en reparación y "a la tarde te paso los números" | Al minuto: "ok, ok", y avisa solo un auto que acaba de entrar, "ya te mando los datos". Foto y audio con el modelo, el trabajo y la entrega prevista |
+| Viernes 13/11 | El resumen, a las 8:17, sin pregunta: el auto en reparación y "a la tarde te paso los números" | Al minuto: "ok, ok", y avisa solo un auto que acaba de entrar, "ya te mando los datos". Foto y audio con el modelo, el trabajo y la entrega prevista. A una confirmación corta que pregunta de quién es, contesta en una hora con la tarjeta de contacto. Después no escribe más: no avisa otro auto que entró ese día ni si entregó el de la mañana |
+| Sábado 14/11 | Los números de la semana, a las 19, un día tarde: trabajos entregados, mano de obra y "¿Entró algún auto que no me contaste?" | A los 5 minutos: el viernes entró otro auto, con falla de motor |
 
 ### Los números, hasta ahora
 
 | Medida | Valor |
 |---|---|
-| Autos que entraron y llegaron al canal | 6: 4 nuevos y 2 que volvieron. 5 llegaron solos; uno, que había vuelto sin avisar, apareció en una respuesta |
-| Llegaron el mismo día | 3 de 5 con fecha de entrada. Uno, al lunes siguiente; otro, entró el feriado y llegó al día siguiente |
+| Autos que entraron y llegaron al canal | 7: 5 nuevos y 2 que volvieron. 5 llegaron sin que se preguntara por ellos; uno apareció en una respuesta y otro, con la pregunta de cobertura |
+| Llegaron el mismo día | 3 de 6 con fecha de entrada. Los otros tres, entre 1 y 3 días después |
 | Entregas avisadas sin que se preguntara | 0 de 7 |
 | Entregas con el monto cobrado | Ninguna por auto. El total de las 7 sí: lo dio en una sola respuesta, cuando se le preguntó por el total |
 | Resúmenes contestados | 9 de 9: cinco en 1 a 5 minutos, tres entre 1 y 3 horas, y el repetido, al día siguiente |
-| Preguntas contestadas | 12 de 14 |
+| Preguntas contestadas | 13 de 15 |
 | Días sin mensajes (los de la pregunta de la noche) | 1, el jueves. La pregunta no se mandó |
 | Consultas | Ninguna |
 | Minutos hasta que contesta al sistema | 11 de mediana, entre 1 minuto y 27 horas (el resumen repetido) |
@@ -269,9 +270,16 @@ Lo que dice esto:
 
 20. **El resumen temprano trae lo nuevo, aunque no pregunte nada.** El del viernes salió a las 8:17, sin pregunta, y al minuto el dueño avisó un auto que acababa de entrar, con foto. Es el segundo auto nuevo que llega solo y el mismo día desde la regla. "Ya te mando los datos": ya sabe qué hace falta.
 
+21. **La pregunta de cobertura encontró un auto.** "¿Entró algún auto que no me contaste?" trajo, en 5 minutos, uno que había entrado el día anterior. No era un trabajo chico: era una falla de motor. La regla de avisar cada auto no alcanza sola.
+22. **Avisa cuando el sistema le escribe, no cuando entra el auto.** En esta etapa, los 7 autos llegaron dentro de una conversación que abrió el sistema: en la respuesta al resumen, o minutos después de una confirmación. Ninguno llegó en frío. El que entró después del intercambio de la mañana quedó sin avisar hasta la pregunta siguiente.
+    - "Llegó solo" quiere decir que nadie preguntó por ese auto, no que el dueño abrió la conversación.
+    - En la primera etapa, sin mensajes del sistema, mandaba en tandas a la noche. Con el resumen, ese hábito se corrió a la mañana, y lo de la tarde queda afuera.
+    - Para el producto: el resumen de la mañana es el disparador de casi todo. Lo que entra después necesita otro toque, o que el resumen del día siguiente pregunte por el día anterior.
+
 ### Qué falta
 
 - **El mensaje para sus clientes:** se le pasa el texto. Después, preguntarle si lo mandó y si alguien contestó.
 - **Sin confirmar:** si el otro dato del viernes (un auto que "entró el jueves") es la vuelta que avisó el martes o una visita más.
-- **Viernes 13/11 y 20/11:** los números de la semana y "¿Entró algún auto que no me contaste?".
+- **Desde el lunes 16/11:** cuando no haya otra pregunta más urgente, el resumen pregunta por el día anterior ("¿Entró algún auto ayer a la tarde?"), para ver si cubre lo que entra después de la mañana.
+- **Viernes 20/11:** los números de la semana y "¿Entró algún auto que no me contaste?". Los del 13 salieron el sábado 14.
 - **Lunes 23/11:** la charla de cierre, con la pregunta de precio. Se corrió del 16 para que las palancas 2, 3 y 5 tengan dos semanas.
