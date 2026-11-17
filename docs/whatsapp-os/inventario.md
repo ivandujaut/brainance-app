@@ -40,5 +40,6 @@ Qué se reutiliza en la línea `whatsapp-os` y qué hay que construir. Es un map
 | Modelo del taller | Taller, cliente, vehículo (con patente), trabajo u orden, presupuesto, estado, cobro y próximo service. Cada registro guarda el mensaje del que salió |
 | Carga con confirmación | La IA propone el registro con herramientas acotadas, el sistema confirma ("Anotado: …") y el dueño corrige en una línea. Sin SQL libre |
 | Consultas | Herramientas de solo lectura ("autos para entregar hoy", "facturación del mes", "historial de una patente"). Lo que no está cargado se dice, no se inventa |
+| Perfil y marca del taller | Se carga por WhatsApp con **una foto de la tarjeta personal o del cartel**, no pidiendo "subí tu logo y elegí tus colores". De la foto salen el nombre, los colores, el teléfono, la dirección y la lista de servicios. El sistema muestra una tarjeta de ejemplo y el dueño dice "sí" o corrige. No hace falta que tenga logo: el nombre en su letra y sus colores ya es la marca. El panel queda para retocar. Lo usa la [tarjeta de service](prueba-tarjeta-de-service.md) |
 | Resumen diario | Tarea programada (Vercel Cron) que manda una plantilla de utilidad de WhatsApp |
 | Base de datos separada | Rama propia de Neon y variables propias en Vercel desde la primera migración ([ADR 0100](../adr/0100-linea-whatsapp-para-talleres.md)) |

@@ -40,7 +40,7 @@ La [plantilla](tarjeta-de-service/plantilla.html) es una imagen de 1080×1350 (4
 - **El intervalo lo pone el dueño, nunca el sistema.** La primera vez se le pregunta su regla ("¿cada cuántos km y meses hacés el próximo, con este aceite?") y después se usa la misma, mostrándola en el mensaje para que la corrija.
 - **Sin km, la tarjeta sale igual,** con el próximo service solo por fecha. Se anota que faltó.
 - **La tarjeta lleva la marca del taller,** no la nuestra: su logo, su color principal y uno de acento ([plantilla](tarjeta-de-service/plantilla.html), tres variables y una imagen). Es lo que hace la cartulina, donde la marca ocupa todo el frente.
-  - **En la prueba,** antes de la primera tarjeta se le pide por el grupo: "Mandame el logo del taller, o una foto del cartel o de la publicidad". Con eso se arman los colores a mano. Se le pregunta también cómo quiere que figure el nombre y qué número poner.
+  - **En la prueba,** antes de la primera tarjeta se le pide por el grupo: "Mandame una foto de tu tarjeta personal o del cartel del taller". De ahí salen el nombre, los colores y los datos, y se arma la tarjeta a mano. Se le pregunta también cómo quiere que figure el nombre y qué número poner.
   - **Sin logo,** la tarjeta sale con el nombre del taller y un color neutro. No se frena por eso.
 
 ## Cómo se hace
@@ -122,7 +122,9 @@ Si valida, la tarjeta pasa a la spec 100 como una salida del sistema, con tres v
 
 **La marca del taller en el producto.** El perfil del taller (logo y colores) se configura **primero por WhatsApp**, y además en el panel web:
 
-- **Por WhatsApp,** el dueño manda el logo o una foto del cartel. El sistema propone los colores sacados de la imagen y le muestra una tarjeta de ejemplo para que diga "sí" o pida otro color.
-- **El panel** sirve para retocarlo: subir otro logo o elegir los colores a mano.
+- **Por WhatsApp,** el sistema no pide "subí tu logo y elegí tus colores": pide **una foto de la tarjeta personal o del cartel**. De esa foto saca el nombre, los colores, el teléfono, la dirección y la lista de servicios. Después le muestra una tarjeta de ejemplo para que diga "sí" o corrija.
+- **No hace falta que tenga logo.** El primer taller no tiene: su tarjeta personal es el nombre en una letra gruesa, amarillo sobre negro, con una franja dorada. Eso ya es su marca.
+- **Los logos de las marcas de autos** que suelen aparecer en esas tarjetas no se usan: son marcas registradas y no son del taller.
+- **El panel** sirve para retocarlo: subir otra imagen o elegir los colores a mano.
 
 Va en ese orden porque el dueño casi no usa la web: si la marca dependiera del panel, la primera tarjeta saldría sin ella. El sistema también controla que el texto se lea sobre el color que elija.
