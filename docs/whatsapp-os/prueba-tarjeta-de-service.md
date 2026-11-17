@@ -39,7 +39,9 @@ La [plantilla](tarjeta-de-service/plantilla.html) es una imagen de 1080×1350 (4
 
 - **El intervalo lo pone el dueño, nunca el sistema.** La primera vez se le pregunta su regla ("¿cada cuántos km y meses hacés el próximo, con este aceite?") y después se usa la misma, mostrándola en el mensaje para que la corrija.
 - **Sin km, la tarjeta sale igual,** con el próximo service solo por fecha. Se anota que faltó.
-- **Los datos del taller** se arman con él antes de la primera: nombre, cómo lo quiere mostrar y qué número.
+- **La tarjeta lleva la marca del taller,** no la nuestra: su logo, su color principal y uno de acento ([plantilla](tarjeta-de-service/plantilla.html), tres variables y una imagen). Es lo que hace la cartulina, donde la marca ocupa todo el frente.
+  - **En la prueba,** antes de la primera tarjeta se le pide por el grupo: "Mandame el logo del taller, o una foto del cartel o de la publicidad". Con eso se arman los colores a mano. Se le pregunta también cómo quiere que figure el nombre y qué número poner.
+  - **Sin logo,** la tarjeta sale con el nombre del taller y un color neutro. No se frena por eso.
 
 ## Cómo se hace
 
@@ -117,3 +119,10 @@ Si valida, la tarjeta pasa a la spec 100 como una salida del sistema, con tres v
 - **la foto del auto** que el dueño ya manda;
 - **el recordatorio:** cuando le toca, el sistema le avisa al dueño y le arma el mensaje para el cliente;
 - **el historial,** una página por auto que junte las tarjetas: el "librito" digital, para el cliente.
+
+**La marca del taller en el producto.** El perfil del taller (logo y colores) se configura **primero por WhatsApp**, y además en el panel web:
+
+- **Por WhatsApp,** el dueño manda el logo o una foto del cartel. El sistema propone los colores sacados de la imagen y le muestra una tarjeta de ejemplo para que diga "sí" o pida otro color.
+- **El panel** sirve para retocarlo: subir otro logo o elegir los colores a mano.
+
+Va en ese orden porque el dueño casi no usa la web: si la marca dependiera del panel, la primera tarjeta saldría sin ella. El sistema también controla que el texto se lea sobre el color que elija.
