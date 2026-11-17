@@ -10,6 +10,24 @@ El taller argentino ya entrega una tarjeta después del cambio de aceite: una ca
 
 - **Es una tarjeta, no un sticker.** Se vende como "tarjeta de cambio de aceite" o "de control de lubricación": cartulina de 7×11 o 6×10 cm, con la marca del lubricentro al frente y el dorso para completar a mano. Se cuelga del espejo con un elástico o va en un estuche de PVC. También hay un "librito" para 12 visitas. Cuesta unos ARS 28.000 a 46.000 las 100.
 - **El sticker del parabrisas** se usa más en México y en EE.UU.
+
+### Cómo se ve la tarjeta de cartulina
+
+Esto sí se miró directo, en los ejemplos de una imprenta que les vende a lubricentros de Rosario, Jujuy y Misiones ([Re-ciclo](https://re-ciclo.com/automotor/tarjetas-para-cambio-de-aceite-colgante/)):
+
+- **El frente es del taller.** El logo y el nombre ocupan la mitad de la tarjeta, con la dirección y el "CEL/WSP". Abajo, casilleros para el **dominio** y una fila de casilleros para el km bajo la frase **"Lo esperamos para el próximo servicio en el km… o una vez por año"**.
+- **El dorso es un control** ("Control de lubricación"):
+  - fecha y "km actuales";
+  - aceites: motor, caja de cambios, caja de transferencia y diferencial;
+  - filtros: aceite, aire del motor, aire de cabina y combustible;
+  - casillas de engrase y refrigerante, aditivos y observaciones.
+- **Se completa a mano,** con birome, en el momento.
+
+Lo que se toma para la tarjeta digital:
+
+- la marca del taller bien grande;
+- el próximo service dicho como invitación;
+- la lista de lo que se reemplazó, como un control, en lugar de un texto libre.
 - **Los campos** que se repiten: fecha, km, aceite, filtros, trabajos hechos, próximo cambio y los datos del taller.
 - **El intervalo:** km y fecha, lo que llegue primero. Se ven 5.000 km fijos, 5.000 a 10.000 km según el aceite (mineral, semisintético o sintético) y 10.000 km o un año.
 - **Las petroleras no la digitalizaron.** En las apps de YPF, Copec e Ipiranga no apareció historial ni recordatorio por km. Sí lo tienen las terminales, como Toyota.

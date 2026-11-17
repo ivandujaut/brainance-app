@@ -24,15 +24,15 @@ Después de un service o un cambio de aceite que cuenta el dueño, el sistema le
 
 ## La tarjeta
 
-La [plantilla](tarjeta-de-service/plantilla.html) es una imagen de 1080×1350 (4:5), el formato que WhatsApp muestra sin recortar. Los campos son los que usa el rubro:
+La [plantilla](tarjeta-de-service/plantilla.html) es una imagen de 1080×1350 (4:5), el formato que WhatsApp muestra sin recortar. Los campos y las palabras son los de la cartulina que usa el rubro ([cómo se ve](../mercado/reports/Tarjeta%20de%20service%20para%20talleres.md#cómo-se-ve-la-tarjeta-de-cartulina)): la marca del taller arriba, "reemplazo de" en lugar de "qué se hizo" y el próximo service como invitación, "te esperamos".
 
 | Bloque | Qué lleva |
 |---|---|
 | El taller | Nombre, rubro y WhatsApp |
 | El auto | Modelo y patente |
 | El service | Fecha y "hecho a los … km" |
-| Qué se hizo | Aceite (tipo y litros), filtros y otros trabajos, uno por renglón |
-| Próximo service | "A los … km o en [mes y año], lo que llegue primero" |
+| Reemplazo de | Aceite (tipo y litros), filtros y otras piezas, una por renglón |
+| Próximo service | "Te esperamos para el próximo service a los … km o en [mes y año], lo que llegue primero" |
 | Pie | "Guardá esta tarjeta: es el historial de service de tu auto." |
 
 **Reglas:**
