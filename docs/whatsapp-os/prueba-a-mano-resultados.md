@@ -286,4 +286,4 @@ Lo que dice esto:
 - **Sin confirmar:** si el otro dato del viernes (un auto que "entró el jueves") es la vuelta que avisó el martes o una visita más.
 - **Hasta el cierre:** cuando no haya otra pregunta más urgente, el resumen pregunta por el día anterior ("¿Entró algún auto ayer?"). Se usó por primera vez el martes 17/11.
 - **Viernes 20/11:** los números de la semana y "¿Entró algún auto que no me contaste?". Los del 13 salieron el sábado 14.
-- **Lunes 23/11:** la charla de cierre, con la pregunta de precio. Se corrió del 16 para que las palancas 2, 3 y 5 tengan dos semanas.
+- **Lunes 23/11:** la charla de cierre, con la pregunta de precio ([guía](prueba-a-mano-charla-de-cierre.md)). Se corrió del 16 para que las palancas 2, 3 y 5 tengan dos semanas.
