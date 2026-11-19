@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al jueves 19 de noviembre,** con los mensajes hasta el jueves 19 a la mañana y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
+**Actualizado al jueves 19 de noviembre,** con los mensajes hasta el jueves 19 al mediodía y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -201,7 +201,7 @@ Lo que dice esto:
 | Lunes 16/11 | El resumen pregunta si se entregó el auto que salía el viernes | No contesta en todo el día |
 | Martes 17/11 | El resumen lista ese auto como "sin confirmar" y, en lugar de repetir la pregunta, pregunta por el día anterior: "¿Entró algún auto ayer?" | Contesta a media mañana con 4 textos: el auto se entregó el viernes, cómo va el que está en reparación y que ayer no entró ninguno |
 | Miércoles 18/11 | El resumen pregunta otra vez por el día anterior | "Por el momento no vino nadie" |
-| Jueves 19/11 | El resumen pregunta por el día anterior y, en la línea de un auto, recuerda la foto que había prometido | A media mañana avisa un auto que entró ese día, con foto. No contesta por el día anterior ni manda la foto prometida |
+| Jueves 19/11 | El resumen pregunta por el día anterior y, en la línea de un auto, recuerda la foto que había prometido | A media mañana avisa un auto que entró ese día, con foto. No contesta por el día anterior ni manda la foto prometida. Al mediodía, a una pregunta por la mano de obra de la semana, contesta con el monto y cuenta que ese día entregó un auto: el único cobro de la semana |
 
 ### Los números, hasta ahora
 
@@ -209,7 +209,7 @@ Lo que dice esto:
 |---|---|
 | Autos que entraron y llegaron al canal | 8: 6 nuevos y 2 que volvieron. 6 llegaron sin que se preguntara por ellos; uno apareció en una respuesta y otro, con la pregunta de cobertura |
 | Llegaron el mismo día | 4 de 7 con fecha de entrada. Los otros tres, entre 1 y 3 días después |
-| Entregas avisadas sin que se preguntara | 0 de 8 |
+| Entregas avisadas sin que se preguntara | 0 de 9. La última llegó el mismo día, al contestar cuánto cobró en la semana |
 | Entregas con el monto cobrado | Ninguna por auto. El total de las 7 sí: lo dio en una sola respuesta, cuando se le preguntó por el total |
 | Resúmenes contestados | 9 de 9: cinco en 1 a 5 minutos, tres entre 1 y 3 horas, y el repetido, al día siguiente |
 | Preguntas contestadas | 15 de 19 |
@@ -283,6 +283,8 @@ Lo que dice esto:
 23. **La pregunta por el día anterior se contestó directo:** "Ayer no entró ningún auto". Y la entrega que no contestó el lunes llegó el martes igual, porque el resumen la seguía listando "sin confirmar". La entrega se supo 4 días después: van 8 de 8 entregas que llegan por el resumen.
 
 24. **Los autos nuevos llegan con foto y el mismo día, cuando entran a la mañana.** Desde la regla, 3 de 3 autos que entraron antes de que él contestara el resumen llegaron así. El que entró después del intercambio de la mañana necesitó la pregunta de cobertura. Lo que no llega: las entregas, la foto que promete para después y la respuesta a una pregunta cuando ya tiene algo nuevo que contar.
+
+25. **La pregunta por la plata trae las entregas.** "¿Cuánto cobraste esta semana?" trajo el monto y, para explicarlo, la entrega de ese día: la primera que se supo el mismo día. El cobro y la entrega son el mismo momento para él. Para el producto, preguntar por lo cobrado puede ser la forma de cerrar los trabajos.
 
 ### Qué falta
 
