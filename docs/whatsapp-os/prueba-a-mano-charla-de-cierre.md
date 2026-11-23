@@ -31,7 +31,7 @@ Responder cuatro cosas, con hechos y no con opiniones:
 - **Las entregas:** casi todas me las contaste cuando te preguntaba en el resumen, no cuando salía el auto. ¿Por qué creés que pasa?
 - **Lo que entra a la tarde:** el C4 entró un viernes y me enteré el sábado, cuando te pregunté. ¿Qué pasó ese día?
 - **El aviso del jueves 19 a la noche:** me contaste la Fiorino sin que te pregunte nada. ¿Qué te hizo escribir esa vez? ¿Por qué otras veces no?
-- **Los días que no te escribí** (del viernes 20 al lunes 23): ¿lo notaste? ¿Te hizo falta algo?
+- **Los días que no te escribí** (del viernes 20 al domingo 22): ¿lo notaste? ¿Te hizo falta algo?
 - **La regla de la foto:** desde que te dije "avisame cada auto; con una foto alcanza", ¿hubo algún auto que no me contaste? ¿Un cambio de aceite, algo chico?
 
 ## 2. Qué le sirvió

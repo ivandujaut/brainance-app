@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al lunes 23 de noviembre,** con el chat completo: el último mensaje es del jueves 19 a la noche y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
+**Actualizado al lunes 23 de noviembre,** con el chat hasta el lunes 23 a la mañana y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -202,7 +202,8 @@ Lo que dice esto:
 | Martes 17/11 | El resumen lista ese auto como "sin confirmar" y, en lugar de repetir la pregunta, pregunta por el día anterior: "¿Entró algún auto ayer?" | Contesta a media mañana con 4 textos: el auto se entregó el viernes, cómo va el que está en reparación y que ayer no entró ninguno |
 | Miércoles 18/11 | El resumen pregunta otra vez por el día anterior | "Por el momento no vino nadie" |
 | Jueves 19/11 | El resumen pregunta por el día anterior y, en la línea de un auto, recuerda la foto que había prometido | A media mañana avisa un auto que entró ese día, con foto. No contesta por el día anterior ni manda la foto prometida. Al mediodía, a una pregunta por la mano de obra de la semana, contesta con el monto y cuenta que ese día entregó un auto: el único cobro de la semana. A las 19:21, sin ningún mensaje del sistema pendiente, avisa un auto que entró esa tarde |
-| Viernes 20 al lunes 23 | Nada: ni el resumen, ni la confirmación del aviso del jueves, ni la pregunta de cobertura | Nada |
+| Viernes 20 al domingo 22 | Nada: ni el resumen, ni la confirmación del aviso del jueves, ni la pregunta de cobertura | Nada |
+| Lunes 23/11 | El resumen, a las 10:54, confirma el aviso del jueves y pide una foto de ese auto, sin pregunta | Al minuto, 5 textos: confirma, cuenta cómo resolvió la falla de otro auto y cómo van los demás. La foto no llega |
 
 ### Los números, hasta ahora
 
@@ -212,7 +213,7 @@ Lo que dice esto:
 | Llegaron el mismo día | 5 de 8 con fecha de entrada. Los otros tres, entre 1 y 3 días después |
 | Entregas avisadas sin que se preguntara | 0 de 9. La última llegó el mismo día, al contestar cuánto cobró en la semana |
 | Entregas con el monto cobrado | Ninguna por auto. El total de las 7 sí: lo dio en una sola respuesta, cuando se le preguntó por el total |
-| Resúmenes contestados | 9 de 9: cinco en 1 a 5 minutos, tres entre 1 y 3 horas, y el repetido, al día siguiente |
+| Resúmenes contestados | 13 de 14: nueve en 1 a 5 minutos, tres entre 1 y 3 horas, y el repetido, al día siguiente. Uno, sin respuesta |
 | Preguntas contestadas | 16 de 21 |
 | Días sin mensajes (los de la pregunta de la noche) | 1, el jueves. La pregunta no se mandó |
 | Consultas | Ninguna |
@@ -289,7 +290,7 @@ Lo que dice esto:
 
 26. **El primer aviso en frío.** El jueves 19 a las 19:21, sin ninguna pregunta pendiente, avisó un auto que había entrado esa tarde, con el problema. Es la hora de las tandas de la primera etapa. Después de tres semanas de resúmenes, por primera vez contó lo de la tarde por su cuenta. Es un solo caso, y quedó sin respuesta hasta el lunes 23.
 27. **Dos preguntas en media hora: contestó la primera.** La pregunta por la plata y la de quién es un auto salieron con 28 minutos de diferencia. Contestó la de la plata y la otra quedó sin respuesta. Es la tercera pregunta por el dueño que no contesta; la única contestada iba sola, en un mensaje corto.
-28. **La última semana el sistema faltó otra vez.** Del viernes 20 al lunes 23 no salió nada: ni el resumen, ni el acuse del aviso del jueves, ni la pregunta de cobertura. El dueño tampoco escribió. Es la misma lección del punto 6: a mano, el sistema no se sostiene.
+28. **La última semana el sistema faltó otra vez.** Del viernes 20 al lunes 23 no salió nada: ni el resumen, ni el acuse del aviso del jueves, ni la pregunta de cobertura. El dueño tampoco escribió. Es la misma lección del punto 6: a mano, el sistema no se sostiene. Cuando el resumen volvió, el lunes, contestó al minuto como siempre: tres días sin mensajes no cortaron el hábito de contestar.
 
 ### Qué falta
 
