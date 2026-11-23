@@ -178,7 +178,7 @@ Lo que dice esto:
 
 ## Segunda etapa (en curso)
 
-**Actualizado al jueves 19 de noviembre,** con los mensajes hasta el jueves 19 al mediodía y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
+**Actualizado al lunes 23 de noviembre,** con el chat completo: el último mensaje es del jueves 19 a la noche y los audios, transcriptos en una máquina local con Whisper (medium). El [plan](prueba-a-mano-segunda-etapa.md) arrancó el lunes 2 y cierra el lunes 23 con la charla (se corrió del 16). Es un registro parcial: el veredicto va al cierre.
 
 ### Día por día
 
@@ -201,18 +201,19 @@ Lo que dice esto:
 | Lunes 16/11 | El resumen pregunta si se entregó el auto que salía el viernes | No contesta en todo el día |
 | Martes 17/11 | El resumen lista ese auto como "sin confirmar" y, en lugar de repetir la pregunta, pregunta por el día anterior: "¿Entró algún auto ayer?" | Contesta a media mañana con 4 textos: el auto se entregó el viernes, cómo va el que está en reparación y que ayer no entró ninguno |
 | Miércoles 18/11 | El resumen pregunta otra vez por el día anterior | "Por el momento no vino nadie" |
-| Jueves 19/11 | El resumen pregunta por el día anterior y, en la línea de un auto, recuerda la foto que había prometido | A media mañana avisa un auto que entró ese día, con foto. No contesta por el día anterior ni manda la foto prometida. Al mediodía, a una pregunta por la mano de obra de la semana, contesta con el monto y cuenta que ese día entregó un auto: el único cobro de la semana |
+| Jueves 19/11 | El resumen pregunta por el día anterior y, en la línea de un auto, recuerda la foto que había prometido | A media mañana avisa un auto que entró ese día, con foto. No contesta por el día anterior ni manda la foto prometida. Al mediodía, a una pregunta por la mano de obra de la semana, contesta con el monto y cuenta que ese día entregó un auto: el único cobro de la semana. A las 19:21, sin ningún mensaje del sistema pendiente, avisa un auto que entró esa tarde |
+| Viernes 20 al lunes 23 | Nada: ni el resumen, ni la confirmación del aviso del jueves, ni la pregunta de cobertura | Nada |
 
 ### Los números, hasta ahora
 
 | Medida | Valor |
 |---|---|
-| Autos que entraron y llegaron al canal | 8: 6 nuevos y 2 que volvieron. 6 llegaron sin que se preguntara por ellos; uno apareció en una respuesta y otro, con la pregunta de cobertura |
-| Llegaron el mismo día | 4 de 7 con fecha de entrada. Los otros tres, entre 1 y 3 días después |
+| Autos que entraron y llegaron al canal | 9: 7 nuevos y 2 que volvieron. 7 llegaron sin que se preguntara por ellos; uno apareció en una respuesta y otro, con la pregunta de cobertura |
+| Llegaron el mismo día | 5 de 8 con fecha de entrada. Los otros tres, entre 1 y 3 días después |
 | Entregas avisadas sin que se preguntara | 0 de 9. La última llegó el mismo día, al contestar cuánto cobró en la semana |
 | Entregas con el monto cobrado | Ninguna por auto. El total de las 7 sí: lo dio en una sola respuesta, cuando se le preguntó por el total |
 | Resúmenes contestados | 9 de 9: cinco en 1 a 5 minutos, tres entre 1 y 3 horas, y el repetido, al día siguiente |
-| Preguntas contestadas | 15 de 19 |
+| Preguntas contestadas | 16 de 21 |
 | Días sin mensajes (los de la pregunta de la noche) | 1, el jueves. La pregunta no se mandó |
 | Consultas | Ninguna |
 | Minutos hasta que contesta al sistema | 11 de mediana, entre 1 minuto y 27 horas (el resumen repetido) |
@@ -275,7 +276,7 @@ Lo que dice esto:
 20. **El resumen temprano trae lo nuevo, aunque no pregunte nada.** El del viernes salió a las 8:17, sin pregunta, y al minuto el dueño avisó un auto que acababa de entrar, con foto. Es el segundo auto nuevo que llega solo y el mismo día desde la regla. "Ya te mando los datos": ya sabe qué hace falta.
 
 21. **La pregunta de cobertura encontró un auto.** "¿Entró algún auto que no me contaste?" trajo, en 5 minutos, uno que había entrado el día anterior. No era un trabajo chico: era una falla de motor. La regla de avisar cada auto no alcanza sola.
-22. **Avisa cuando el sistema le escribe, no cuando entra el auto.** En esta etapa, los 7 autos llegaron dentro de una conversación que abrió el sistema: en la respuesta al resumen, o minutos después de una confirmación. Ninguno llegó en frío. El que entró después del intercambio de la mañana quedó sin avisar hasta la pregunta siguiente.
+22. **Avisa cuando el sistema le escribe, no cuando entra el auto.** Hasta el 14/11, los 7 autos llegaron dentro de una conversación que abrió el sistema: en la respuesta al resumen, o minutos después de una confirmación. Ninguno llegó en frío. El primero en frío llegó el jueves 19 a las 19:21 (punto 26). El que entró después del intercambio de la mañana quedó sin avisar hasta la pregunta siguiente.
     - "Llegó solo" quiere decir que nadie preguntó por ese auto, no que el dueño abrió la conversación.
     - En la primera etapa, sin mensajes del sistema, mandaba en tandas a la noche. Con el resumen, ese hábito se corrió a la mañana, y lo de la tarde queda afuera.
     - Para el producto: el resumen de la mañana es el disparador de casi todo. Lo que entra después necesita otro toque, o que el resumen del día siguiente pregunte por el día anterior.
@@ -285,6 +286,10 @@ Lo que dice esto:
 24. **Los autos nuevos llegan con foto y el mismo día, cuando entran a la mañana.** Desde la regla, 3 de 3 autos que entraron antes de que él contestara el resumen llegaron así. El que entró después del intercambio de la mañana necesitó la pregunta de cobertura. Lo que no llega: las entregas, la foto que promete para después y la respuesta a una pregunta cuando ya tiene algo nuevo que contar.
 
 25. **La pregunta por la plata trae las entregas.** "¿Cuánto cobraste esta semana?" trajo el monto y, para explicarlo, la entrega de ese día: la primera que se supo el mismo día. El cobro y la entrega son el mismo momento para él. Para el producto, preguntar por lo cobrado puede ser la forma de cerrar los trabajos.
+
+26. **El primer aviso en frío.** El jueves 19 a las 19:21, sin ninguna pregunta pendiente, avisó un auto que había entrado esa tarde, con el problema. Es la hora de las tandas de la primera etapa. Después de tres semanas de resúmenes, por primera vez contó lo de la tarde por su cuenta. Es un solo caso, y quedó sin respuesta hasta el lunes 23.
+27. **Dos preguntas en media hora: contestó la primera.** La pregunta por la plata y la de quién es un auto salieron con 28 minutos de diferencia. Contestó la de la plata y la otra quedó sin respuesta. Es la tercera pregunta por el dueño que no contesta; la única contestada iba sola, en un mensaje corto.
+28. **La última semana el sistema faltó otra vez.** Del viernes 20 al lunes 23 no salió nada: ni el resumen, ni el acuse del aviso del jueves, ni la pregunta de cobertura. El dueño tampoco escribió. Es la misma lección del punto 6: a mano, el sistema no se sostiene.
 
 ### Qué falta
 
