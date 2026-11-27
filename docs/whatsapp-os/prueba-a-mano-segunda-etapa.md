@@ -1,6 +1,6 @@
 # Prueba a mano, segunda etapa: bajar la barrera
 
-Dos semanas más con el primer taller, del miércoles 28 de octubre al martes 10 de noviembre de 2026. Sale de los [resultados de la primera etapa](prueba-a-mano-resultados.md).
+Tres semanas más con el primer taller, del lunes 2 al lunes 23 de noviembre de 2026. Sale de los [resultados de la primera etapa](prueba-a-mano-resultados.md). Estaba prevista en dos semanas, del 28 de octubre al 10 de noviembre (ver [Cambios al plan](#cambios-al-plan)).
 
 ## Qué cambia y por qué
 
@@ -37,7 +37,7 @@ Dos semanas más con el primer taller, del miércoles 28 de octubre al martes 10
    - Una vez por semana, el sistema le arma un mensaje para sus clientes, **que manda él**.
    - Los días sin trabajo sirven para cargar a los clientes de antes, "así te aviso cuando les toca el service".
 
-**Las palancas 1 a 4 arrancan el primer día. La 5 arranca el viernes 6 de noviembre,** para no sumarle tarea al comienzo.
+**Las palancas 1 a 4 arrancan el primer día. La 5 arranca después,** para no sumarle tarea al comienzo: estaba prevista el viernes 6 y pasó al martes 10 (ver [Cambios al plan](#cambios-al-plan)).
 
 ## Lo que hace el sistema (el dueño del producto, a mano)
 
@@ -48,15 +48,15 @@ Siempre con la misma voz, mensajes cortos y sin opinar. Nunca se les escribe a s
 | Cada tanda | **Una confirmación,** con lo que se anotó. Si falta algo importante, **una sola pregunta** |
 | 8:00 | **El resumen:** los autos en curso, lo pendiente de cada uno y lo entregado el día anterior |
 | 20:00, solo los días sin mensajes | **Una pregunta,** sobre un trabajo abierto si lo hay. Si no, "¿Entró algún auto hoy? Con una foto alcanza" |
-| Viernes 30/10 y 6/11 | **Los números de la semana** (autos y mano de obra cobrada) y "¿Entró algún auto que no me contaste?" |
-| Viernes 6/11 | Además, **la oferta del mensaje para sus clientes** y la invitación a cargar clientes de antes en los días tranquilos |
-| Martes 10/11 | **La charla de cierre,** en persona o por teléfono, con la pregunta de precio |
+| Martes 10/11 | **La oferta del mensaje para sus clientes** y la invitación a cargar clientes de antes en los días tranquilos |
+| Viernes 13/11 y 20/11 | **Los números de la semana** (autos y mano de obra cobrada) y "¿Entró algún auto que no me contaste?" |
+| Lunes 23/11 | **La charla de cierre,** en persona o por teléfono, con la pregunta de precio |
 
 **Fuera de eso no se le escribe ni se le recuerda nada.** Si hay una charla en persona sobre la prueba, se anota con fecha.
 
 ## Los mensajes
 
-**Para retomar, hoy:**
+**Para retomar** (el texto previsto para el primer día; lo que se manda el 5/11 está en [Cambios al plan](#cambios-al-plan)):
 
 > [Nombre], arrancamos la segunda parte. Desde ahora te contesto cada vez que mandás algo y todas las mañanas te mando cómo está el taller. Lo único que te pido: cada auto que entra, aunque sea un cambio de aceite, una foto. El resto te lo pregunto yo.
 
@@ -135,6 +135,29 @@ Y dos pestañas nuevas:
   - La planilla cuenta cuántas hicieron falta.
 - **Privacidad:** el consentimiento de la primera etapa sigue valiendo para esta. Los datos de sus clientes no salen del grupo y de la planilla.
 
+## Cambios al plan
+
+Lo que se corrió de lo previsto, con fecha:
+
+- **Arrancó el lunes 2 de noviembre, no el 28 de octubre,** con el primer resumen. El cierre pasó del martes 10 al lunes 16, para que sigan siendo dos semanas. El número del 30 de octubre no se mandó, porque la etapa no había arrancado.
+- **El 8/11 el cierre pasó al lunes 23.** En la primera semana, las palancas 2, 3 y 5 no arrancaron (ver los puntos que siguen). Con el cierre el 16, la 5, la que toca el dolor principal del dueño, habría tenido cinco días hábiles. Los números del viernes son el 13 y el 20.
+- **El mensaje para retomar no se mandó el primer día.** El resumen ya sale desde el 2, así que el jueves 5 va solo la regla:
+
+  > Una cosa más: cada auto que entra, aunque sea un cambio de aceite, avisame. Con una foto alcanza; el resto te lo pregunto yo.
+
+  La regla es avisar cada auto; la foto es la forma más fácil, no un requisito. Un audio o un texto valen igual.
+
+  El jueves 5 tampoco se mandó: ese día salió por error el resumen del día anterior. Va el lunes 9, y hasta ahí las palancas 2 y 3 no están en juego.
+- **El viernes 6 no salió nada:** ni los números, ni la pregunta de cobertura, ni la oferta del mensaje para sus clientes.
+  - La oferta (palanca 5) pasa al martes 10.
+  - Los números y la pregunta de cobertura, al viernes 13.
+  - Desde el 9/11, cada confirmación de una entrega pregunta cuánto se cobró: sin montos no hay números.
+- **La planilla:** las columnas Origen y Auto y las pestañas Sistema y Cobertura se sumaron el 4/11, cargadas hacia atrás desde el chat.
+- **Los horarios del sistema:** dos de las tres primeras respuestas salieron horas tarde (ver [cómo va](prueba-a-mano-resultados.md#segunda-etapa-en-curso)). Desde el 5/11, quien hace de sistema tiene recordatorios en el calendario los días hábiles:
+  - 7:55, el resumen;
+  - 10:30 y 14:30, revisar el grupo y contestar;
+  - 20:00, contestar lo pendiente o, si no mandó nada, la pregunta de la noche.
+
 ## Al terminar
 
-Los resultados se suman a [`prueba-a-mano-resultados.md`](prueba-a-mano-resultados.md), anonimizados, con la misma estructura. Con eso se decide si se escribe la spec 100 y qué palancas pasan a ser requisitos del producto.
+Los resultados se suman a [`prueba-a-mano-resultados.md`](prueba-a-mano-resultados.md), anonimizados, con la misma estructura. Con eso se decide qué palancas pasan a ser requisitos del producto en la spec 100, que ya tiene un borrador anticipado.
